@@ -1,0 +1,17 @@
+# Windows / macOS
+Thumbs.db
+.DS_Store
+
+# Local editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs and local archives
+*.log
+*.zip
+
+# Temporary files
+tmp/
+temp/

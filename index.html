@@ -1,0 +1,1237 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#176b87">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Klima Rechner">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="description" content="Kunden-Rechner fuer Klimaanlagen mit Richtpreis, Raumlast und Anfrage-Text.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <title>Klimaanlagen Rechner</title>
+  <style>
+:root {
+  color-scheme: light;
+  --background: #f6f7f9;
+  --foreground: #172027;
+  --card: #ffffff;
+  --card-foreground: #172027;
+  --primary: #176b87;
+  --primary-foreground: #ffffff;
+  --secondary: #e7eef2;
+  --secondary-foreground: #172027;
+  --muted: #e8edf0;
+  --muted-foreground: #5b6872;
+  --accent: #dceef4;
+  --accent-foreground: #172027;
+  --destructive: #b42318;
+  --border: #d6dde2;
+  --input: #cbd5dc;
+  --ring: #176b87;
+  --viz-series-1: #176b87;
+  --font-size-base: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --background: #11171b;
+    --foreground: #edf4f7;
+    --card: #192329;
+    --card-foreground: #edf4f7;
+    --primary: #7ac8df;
+    --primary-foreground: #102027;
+    --secondary: #243139;
+    --secondary-foreground: #edf4f7;
+    --muted: #263139;
+    --muted-foreground: #b5c2ca;
+    --accent: #1f3a44;
+    --accent-foreground: #edf4f7;
+    --destructive: #ff8a80;
+    --border: #32424b;
+    --input: #40515a;
+    --ring: #7ac8df;
+    --viz-series-1: #7ac8df;
+  }
+}
+
+html {
+  min-width: 320px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: hidden;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: var(--font-size-base);
+}
+
+.app-shell {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding: 18px;
+  padding-left: max(18px, env(safe-area-inset-left));
+  padding-right: max(18px, env(safe-area-inset-right));
+}
+
+.app-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 12px;
+}
+
+.app-logo {
+  width: 58px;
+  height: 52px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.app-title {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.app-title strong {
+  font-weight: 600;
+}
+
+.app-main {
+  min-width: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+.card {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--card-foreground);
+}
+
+.viz-stat-value {
+  font-size: 1.45rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.text-small {
+  font-size: .875rem;
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.form-label {
+  display: grid;
+  gap: 6px;
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.form-control,
+.form-select,
+textarea.form-control {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--input);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--foreground);
+  padding: 10px 11px;
+  font: inherit;
+  font-size: 16px;
+}
+
+.form-range {
+  width: 100%;
+  min-height: 36px;
+  accent-color: var(--primary);
+  touch-action: pan-x;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-weight: 400;
+}
+
+.form-check-input {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  margin: 0;
+  accent-color: var(--primary);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.btn-primary {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.btn[hidden] {
+  display: none;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    padding: 12px;
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+
+  .app-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .app-logo {
+    width: 50px;
+    height: 46px;
+  }
+
+  #app-install {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-shell {
+    padding: 10px;
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+
+  .app-brand {
+    gap: 10px;
+  }
+
+  .app-logo {
+    width: 46px;
+    height: 42px;
+  }
+
+  .card {
+    padding: 10px;
+  }
+}
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-bar">
+      <div class="app-brand">
+        <img class="app-logo" src="./assets/logo.png" alt="" width="58" height="52">
+        <div class="app-title">
+          <strong>Klimaanlagen Rechner</strong>
+          <span id="app-status" class="text-small text-muted">Bereit</span>
+        </div>
+      </div>
+      <button id="app-install" class="btn btn-primary" type="button" hidden>App installieren</button>
+    </header>
+    <main class="app-main">
+<div id="klima-kundenrechner" class="kunden-tool">
+  <style>
+    #klima-kundenrechner {
+      color: var(--foreground);
+      font-size: var(--font-size-base);
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+    #klima-kundenrechner * {
+      box-sizing: border-box;
+    }
+    #klima-kundenrechner .kr-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(280px, .96fr);
+      gap: 16px;
+      align-items: start;
+    }
+    #klima-kundenrechner .kr-form,
+    #klima-kundenrechner .kr-result {
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+      align-content: start;
+    }
+    #klima-kundenrechner .kr-section {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+    #klima-kundenrechner .kr-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    #klima-kundenrechner .kr-fields > *,
+    #klima-kundenrechner .kr-summary > * {
+      min-width: 0;
+    }
+    #klima-kundenrechner .kr-full {
+      grid-column: 1 / -1;
+    }
+    #klima-kundenrechner .kr-room-areas {
+      display: grid;
+      gap: 14px;
+    }
+    #klima-kundenrechner .kr-room {
+      display: grid;
+      gap: 10px;
+      padding-top: 2px;
+    }
+    #klima-kundenrechner .kr-room-title {
+      font-weight: 500;
+    }
+    #klima-kundenrechner .kr-hidden {
+      display: none !important;
+    }
+    #klima-kundenrechner .kr-inline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    #klima-kundenrechner output {
+      color: var(--foreground);
+      font-weight: 500;
+    }
+    #klima-kundenrechner .kr-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    #klima-kundenrechner .kr-list {
+      display: grid;
+      gap: 8px;
+    }
+    #klima-kundenrechner .kr-plan {
+      display: grid;
+      gap: 8px;
+    }
+    #klima-kundenrechner .kr-load-lines {
+      display: grid;
+      gap: 8px;
+    }
+    #klima-kundenrechner .kr-load-row {
+      display: grid;
+      grid-template-columns: minmax(80px, 116px) minmax(0, 1fr) 66px;
+      gap: 8px;
+      align-items: center;
+    }
+    #klima-kundenrechner .kr-load-row > span:last-child {
+      justify-self: end;
+      white-space: nowrap;
+    }
+    #klima-kundenrechner .kr-load-track {
+      min-height: 10px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--muted) 55%, transparent);
+      overflow: hidden;
+    }
+    #klima-kundenrechner .kr-load-fill {
+      display: block;
+      width: 0%;
+      min-height: 10px;
+      border-radius: inherit;
+      background: var(--viz-series-1);
+    }
+    #klima-kundenrechner .kr-line {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 96px;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: start;
+    }
+    #klima-kundenrechner .kr-line > span:first-child {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    #klima-kundenrechner .kr-line:last-child {
+      border-bottom: 0;
+    }
+    #klima-kundenrechner .kr-price {
+      text-align: right;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    #klima-kundenrechner .kr-total {
+      display: grid;
+      gap: 6px;
+    }
+    #klima-kundenrechner .kr-total-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      flex-wrap: wrap;
+    }
+    #klima-kundenrechner .kr-grand {
+      font-weight: 500;
+    }
+    #klima-kundenrechner .kr-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    #klima-kundenrechner .kr-actions .btn {
+      flex: 1 1 180px;
+    }
+    #klima-kundenrechner .kr-risk-list {
+      display: grid;
+      gap: 6px;
+    }
+    #klima-kundenrechner textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+    #klima-kundenrechner .kr-note {
+      color: var(--muted-foreground);
+    }
+    @media (min-width: 981px) {
+      #klima-kundenrechner .kr-result {
+        position: sticky;
+        top: 12px;
+      }
+    }
+    @media (max-width: 980px) {
+      #klima-kundenrechner .kr-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 680px) {
+      #klima-kundenrechner .kr-fields,
+      #klima-kundenrechner .kr-summary {
+        grid-template-columns: 1fr;
+      }
+      #klima-kundenrechner .kr-line {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+      #klima-kundenrechner .kr-load-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+      #klima-kundenrechner .kr-load-row > span:first-child {
+        grid-column: 1 / -1;
+      }
+      #klima-kundenrechner .kr-actions {
+        display: grid;
+      }
+      #klima-kundenrechner .kr-actions .btn {
+        width: 100%;
+      }
+    }
+    @media (max-width: 420px) {
+      #klima-kundenrechner .kr-line {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+      #klima-kundenrechner .kr-price {
+        text-align: left;
+        white-space: normal;
+      }
+      #klima-kundenrechner .kr-total-line {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 2px;
+      }
+      #klima-kundenrechner .kr-load-row {
+        grid-template-columns: 1fr;
+      }
+      #klima-kundenrechner .kr-load-row > span:last-child {
+        justify-self: start;
+      }
+    }
+  </style>
+
+  <div class="kr-layout">
+    <section class="kr-form" aria-label="Kundenangaben">
+      <div class="viz-controls kr-section" aria-label="Projekt">
+        <div class="kr-fields">
+          <label class="form-label">
+            Was soll gekuehlt werden?
+            <select id="kr-objekt" class="form-select">
+              <option value="wohnung">Wohnung</option>
+              <option value="haus">Haus</option>
+              <option value="buero">Buero / Praxis</option>
+              <option value="laden">Ladenflaeche</option>
+            </select>
+          </label>
+          <label class="form-label">
+            Wunschgeraet
+            <select id="kr-klasse" class="form-select">
+              <option value="basis">Preisbewusst</option>
+              <option value="standard" selected>Leise & effizient</option>
+              <option value="premium">Premium Design</option>
+            </select>
+          </label>
+          <label class="form-label">
+            Standort
+            <select id="kr-land" class="form-select">
+              <option value="at" selected>Oesterreich</option>
+              <option value="de">Deutschland</option>
+            </select>
+          </label>
+          <label class="form-label">
+            Berechnung
+            <select id="kr-modus" class="form-select">
+              <option value="basis" selected>Basis</option>
+              <option value="genau">Genauer</option>
+            </select>
+          </label>
+          <label class="form-label">
+            Gebaeudezustand
+            <select id="kr-gebaeude" class="form-select">
+              <option value="neubau">Neubau / sehr gut</option>
+              <option value="saniert" selected>Saniert / normal</option>
+              <option value="unsaniert">Altbau / unsaniert</option>
+            </select>
+          </label>
+        </div>
+        <div class="kr-fields">
+          <label class="form-label">
+            <span class="kr-inline">Raeume <output id="kr-raeume-out">1</output></span>
+            <input id="kr-raeume" class="form-range" type="range" min="1" max="6" step="1" value="1">
+          </label>
+          <div class="form-label">
+            <span class="kr-inline">Gesamtflaeche <output id="kr-flaeche-out">25 m2</output></span>
+            <span class="text-small kr-note">Jeder Raum wird einzeln abgefragt.</span>
+          </div>
+        </div>
+        <div id="kr-room-areas" class="kr-room-areas kr-full" aria-label="Raumdaten je Raum"></div>
+        <div id="kr-mode-note" class="text-small kr-note">Basis nutzt Richtwerte fuer U-Wert, Raumhoehe und Daemmung.</div>
+      </div>
+
+      <div class="viz-controls kr-section" aria-label="Montage">
+        <div class="kr-fields">
+          <label class="form-label">
+            Wo steht das Aussengeraet?
+            <select id="kr-aussen" class="form-select">
+              <option value="balkon">Balkon / Terrasse</option>
+              <option value="wand">Hauswand</option>
+              <option value="boden">Garten / Boden</option>
+              <option value="dach">Dach / schwer erreichbar</option>
+            </select>
+          </label>
+          <label class="form-label">
+            Wanddurchbruch
+            <select id="kr-bohrung" class="form-select">
+              <option value="1" selected>Ja, 1 Durchbruch</option>
+              <option value="0">Nicht noetig</option>
+              <option value="2">Mehrere Durchbrueche</option>
+            </select>
+          </label>
+        </div>
+        <div class="kr-fields">
+          <label class="form-label">
+            <span class="kr-inline">Entfernung innen/aussen <output id="kr-leitung-out">5 m</output></span>
+            <input id="kr-leitung" class="form-range" type="range" min="1" max="35" step="1" value="5">
+          </label>
+          <label class="form-label">
+            <span class="kr-inline">Sichtbarer Kabelkanal <output id="kr-kanal-out">4 m</output></span>
+            <input id="kr-kanal" class="form-range" type="range" min="0" max="35" step="1" value="4">
+          </label>
+        </div>
+      </div>
+
+      <div class="viz-controls kr-section" aria-label="Montagerisiken">
+        <div class="kr-risk-list">
+          <label class="form-check" for="kr-risk-ladder">
+            <input id="kr-risk-ladder" class="form-check-input" type="checkbox" data-risk="ladder">
+            <span class="form-check-label">Leiter, Geruest oder Arbeit in Hoehe noetig</span>
+          </label>
+          <label class="form-check" for="kr-risk-concrete">
+            <input id="kr-risk-concrete" class="form-check-input" type="checkbox" data-risk="concrete">
+            <span class="form-check-label">Stahlbeton / schwierige Kernbohrung</span>
+          </label>
+          <label class="form-check" for="kr-risk-permit">
+            <input id="kr-risk-permit" class="form-check-input" type="checkbox" data-risk="permit">
+            <span class="form-check-label">Eigentuemergemeinschaft, Denkmalschutz oder Genehmigung offen</span>
+          </label>
+          <label class="form-check" for="kr-risk-oldunit">
+            <input id="kr-risk-oldunit" class="form-check-input" type="checkbox" data-risk="oldunit">
+            <span class="form-check-label">Altgeraet demontieren und entsorgen</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="viz-controls kr-section" aria-label="Extras">
+        <div class="kr-fields">
+          <label class="form-label">
+            Stromanschluss
+            <select id="kr-strom" class="form-select">
+              <option value="nah" selected>Steckdose / Anschluss in der Naehe</option>
+              <option value="mittel">Zuleitung bis 10 m</option>
+              <option value="weit">Zuleitung ueber 10 m</option>
+            </select>
+          </label>
+          <label class="form-label">
+            Kondensat
+            <select id="kr-kondensat" class="form-select">
+              <option value="frei" selected>Freier Ablauf moeglich</option>
+              <option value="pumpe">Pumpe vermutlich noetig</option>
+            </select>
+          </label>
+        </div>
+        <label class="form-label kr-full">
+          Was ist noch wichtig?
+          <textarea id="kr-notiz" class="form-control" placeholder="z. B. Altgeraet abbauen, Denkmalschutz, sehr leise Anlage, schnelle Montage"></textarea>
+        </label>
+      </div>
+    </section>
+
+    <section class="kr-result" aria-label="Richtpreis und Anfrage">
+      <div class="kr-summary">
+        <div class="card viz-stat">
+          <span class="text-muted">Geschaetzter Richtpreis</span>
+          <span id="kr-brutto" class="viz-stat-value">0 EUR</span>
+          <span id="kr-spanne" class="text-small kr-note">inkl. Montage und USt.</span>
+        </div>
+        <div class="card viz-stat">
+          <span class="text-muted">Empfehlung</span>
+          <span id="kr-empfehlung" class="viz-stat-value">3,5 kW</span>
+          <span id="kr-system" class="text-small kr-note">Single-Split Anlage</span>
+        </div>
+        <div class="card viz-stat">
+          <span class="text-muted">Raumlast</span>
+          <span id="kr-last" class="viz-stat-value">0 kW</span>
+          <span id="kr-treiber" class="text-small kr-note">groesster Raum</span>
+        </div>
+      </div>
+
+      <div class="kr-load-lines" aria-label="Kuehllast je Raum">
+        <div class="text-small kr-note">Kuehllast je Raum</div>
+        <div id="kr-load-lines"></div>
+      </div>
+
+      <div class="kr-plan" aria-label="Kuehllast-Aufbau">
+        <div class="text-small kr-note">Kuehllast-Aufbau</div>
+        <div id="kr-load-breakdown"></div>
+      </div>
+
+      <div class="kr-plan" aria-label="Geraetevorschlag">
+        <div class="text-small kr-note">Geraetevorschlag je Raum</div>
+        <div id="kr-device-plan"></div>
+      </div>
+
+      <div class="kr-list" aria-label="Kostenuebersicht">
+        <div id="kr-lines"></div>
+      </div>
+
+      <div class="kr-total">
+        <div class="kr-total-line text-small"><span>Richtpreis netto</span><span id="kr-netto">0 EUR</span></div>
+        <div class="kr-total-line text-small"><span id="kr-ust-label">USt. 20 Prozent</span><span id="kr-ust">0 EUR</span></div>
+        <div class="kr-total-line kr-grand"><span>Unverbindlicher Richtpreis</span><span id="kr-final">0 EUR</span></div>
+      </div>
+
+      <div class="kr-actions">
+        <button id="kr-copy" type="button" class="btn btn-primary">Anfrage kopieren</button>
+        <button id="kr-reset" type="button" class="btn">Neu starten</button>
+      </div>
+      <div id="kr-status" class="text-small kr-note" aria-live="polite">Der finale Preis wird nach Besichtigung bestaetigt.</div>
+    </section>
+  </div>
+
+  <script>
+window.initKlimaCalculator = () => {
+
+    (() => {
+      const root = document.getElementById('klima-kundenrechner');
+      const $ = (selector) => root.querySelector(selector);
+      const euro = (value) => `${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(value)} EUR`;
+      const fields = {
+        objekt: $('#kr-objekt'),
+        klasse: $('#kr-klasse'),
+        land: $('#kr-land'),
+        modus: $('#kr-modus'),
+        gebaeude: $('#kr-gebaeude'),
+        raeume: $('#kr-raeume'),
+        aussen: $('#kr-aussen'),
+        bohrung: $('#kr-bohrung'),
+        leitung: $('#kr-leitung'),
+        kanal: $('#kr-kanal'),
+        strom: $('#kr-strom'),
+        kondensat: $('#kr-kondensat'),
+        notiz: $('#kr-notiz')
+      };
+      const out = {
+        flaeche: $('#kr-flaeche-out'),
+        raeume: $('#kr-raeume-out'),
+        leitung: $('#kr-leitung-out'),
+        kanal: $('#kr-kanal-out'),
+        brutto: $('#kr-brutto'),
+        spanne: $('#kr-spanne'),
+        empfehlung: $('#kr-empfehlung'),
+        system: $('#kr-system'),
+        last: $('#kr-last'),
+        treiber: $('#kr-treiber'),
+        loadLines: $('#kr-load-lines'),
+        loadBreakdown: $('#kr-load-breakdown'),
+        devicePlan: $('#kr-device-plan'),
+        lines: $('#kr-lines'),
+        netto: $('#kr-netto'),
+        ustLabel: $('#kr-ust-label'),
+        ust: $('#kr-ust'),
+        final: $('#kr-final'),
+        status: $('#kr-status'),
+        modeNote: $('#kr-mode-note')
+      };
+      const roomData = [
+        { area: 25, height: 2.6, window: 5, u: 1.3, sun: 'sued', shade: 'none', insulation: 'normal', persons: 2, attic: 'no' },
+        { area: 18, height: 2.6, window: 3, u: 1.3, sun: 'west', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
+        { area: 16, height: 2.6, window: 3, u: 1.3, sun: 'ost', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
+        { area: 14, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
+        { area: 12, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
+        { area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' }
+      ];
+      const defaultPriceConfig = {
+        devicePackages: {
+          basis: { label: 'Basis-Paket Wandgeraet', base: 980, room: 740, capacityStep: 210 },
+          standard: { label: 'Komfort-Paket leise/effizient', base: 1280, room: 890, capacityStep: 230 },
+          premium: { label: 'Premium-Paket Design/leise', base: 1780, room: 1120, capacityStep: 260 }
+        },
+        mounting: {
+          baseInstall: 760,
+          additionalIndoor: 340,
+          drilling: 125,
+          lineMeter: 44,
+          channelMeter: 26,
+          outdoor: { balkon: 170, wand: 230, boden: 260, dach: 620 },
+          power: { nah: 0, mittel: 330, weit: 620 },
+          condensatePump: 280
+        },
+        objectFactor: { wohnung: 1, haus: 1.04, buero: 1.08, laden: 1.12 },
+        risks: {
+          ladder: { label: 'Leiter/Geruest/Hoehe', cost: 380, complexity: 0.035 },
+          concrete: { label: 'Stahlbeton/Kernbohrung schwer', cost: 260, complexity: 0.025 },
+          permit: { label: 'Genehmigung/WEG/Denkmalschutz offen', cost: 180, complexity: 0.04 },
+          oldunit: { label: 'Altgeraet demontieren/entsorgen', cost: 220, complexity: 0.015 }
+        },
+        taxRates: { at: 0.20, de: 0.19 },
+        markupFactor: 1.22
+      };
+      const priceConfig = window.KLIMA_PRICE_CONFIG || defaultPriceConfig;
+      const devicePrices = priceConfig.devicePackages;
+      const mountingPrices = priceConfig.mounting;
+      const objectFactor = priceConfig.objectFactor;
+      const baseWattsPerM2 = { gut: 45, normal: 60, altbau: 80 };
+      const buildingDefaults = {
+        neubau: { insulation: 'gut', u: 0.9, height: 2.5 },
+        saniert: { insulation: 'normal', u: 1.3, height: 2.6 },
+        unsaniert: { insulation: 'altbau', u: 2.4, height: 2.8 }
+      };
+      const sunWatts = { nord: 20, ost: 65, sued: 85, west: 100, suedwest: 120, stark: 150 };
+      const shadeFactors = { none: 1, inside: 0.85, outside: 0.55, shutter: 0.4 };
+      const indoorSizes = [2.0, 2.5, 3.5, 4.2, 5.0, 6.0, 7.1, 10.0];
+      const riskDefinitions = priceConfig.risks;
+      const taxRates = priceConfig.taxRates;
+      const serviceFactor = priceConfig.markupFactor;
+
+      function number(field) {
+        return Math.max(0, Number(field.value) || 0);
+      }
+
+      function roomCount() {
+        return Math.max(1, number(fields.raeume));
+      }
+
+      function applyMode() {
+        const exact = fields.modus.value === 'genau';
+        root.querySelectorAll('[data-advanced-room]').forEach((node) => {
+          node.classList.toggle('kr-hidden', !exact);
+        });
+        out.modeNote.textContent = exact
+          ? 'Genauer Modus nutzt die Werte je Raum.'
+          : 'Basis nutzt Richtwerte fuer U-Wert, Raumhoehe und Daemmung.';
+      }
+
+      function renderRoomAreas() {
+        const rooms = roomCount();
+        Array.from(root.querySelectorAll('[data-room-field]')).forEach((input) => {
+          const index = Number(input.dataset.roomIndex);
+          const field = input.dataset.roomField;
+          if (!roomData[index]) return;
+          roomData[index][field] = input.type === 'range' || input.type === 'number' ? number(input) : input.value;
+        });
+        out.roomAreas.innerHTML = Array.from({ length: rooms }, (_, index) => {
+          const data = roomData[index] || { area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' };
+          roomData[index] = data;
+          return `
+            <div class="kr-room">
+              <div class="kr-room-title">Raum ${index + 1}</div>
+              <div class="kr-fields">
+                <label class="form-label">
+                  <span class="kr-inline">Flaeche <output id="kr-room-${index}-area-out">${data.area} m2</output></span>
+                  <input class="form-range" data-room-field="area" data-room-index="${index}" type="range" min="8" max="80" step="1" value="${data.area}">
+                </label>
+                <label class="form-label" data-advanced-room>
+                  <span class="kr-inline">Raumhoehe <output id="kr-room-${index}-height-out">${data.height.toLocaleString('de-DE')} m</output></span>
+                  <input class="form-range" data-room-field="height" data-room-index="${index}" type="range" min="2.1" max="4.2" step="0.1" value="${data.height}">
+                </label>
+                <label class="form-label">
+                  <span class="kr-inline">Fensterflaeche <output id="kr-room-${index}-window-out">${data.window} m2</output></span>
+                  <input class="form-range" data-room-field="window" data-room-index="${index}" type="range" min="0" max="30" step="0.5" value="${data.window}">
+                </label>
+                <label class="form-label" data-advanced-room>
+                  <span class="kr-inline">Fenster U-Wert <output id="kr-room-${index}-u-out">${data.u.toLocaleString('de-DE')} W/m2K</output></span>
+                  <input class="form-range" data-room-field="u" data-room-index="${index}" type="range" min="0.7" max="3.0" step="0.1" value="${data.u}">
+                </label>
+                <label class="form-label">
+                  Fensterrichtung
+                  <select class="form-select" data-room-field="sun" data-room-index="${index}">
+                    <option value="nord"${data.sun === 'nord' ? ' selected' : ''}>Nord / wenig Sonne</option>
+                    <option value="ost"${data.sun === 'ost' ? ' selected' : ''}>Ost</option>
+                    <option value="sued"${data.sun === 'sued' ? ' selected' : ''}>Sued</option>
+                    <option value="west"${data.sun === 'west' ? ' selected' : ''}>West</option>
+                    <option value="suedwest"${data.sun === 'suedwest' ? ' selected' : ''}>Sued-West</option>
+                    <option value="stark"${data.sun === 'stark' ? ' selected' : ''}>Sehr sonnig / grosse Glasflaeche</option>
+                  </select>
+                </label>
+                <label class="form-label">
+                  Verschattung
+                  <select class="form-select" data-room-field="shade" data-room-index="${index}">
+                    <option value="none"${data.shade === 'none' ? ' selected' : ''}>Keine</option>
+                    <option value="inside"${data.shade === 'inside' ? ' selected' : ''}>Innenliegend / Vorhang</option>
+                    <option value="outside"${data.shade === 'outside' ? ' selected' : ''}>Aussenjalousie / Markise</option>
+                    <option value="shutter"${data.shade === 'shutter' ? ' selected' : ''}>Rollladen / starke Verschattung</option>
+                  </select>
+                </label>
+                <label class="form-label" data-advanced-room>
+                  Daemmung
+                  <select class="form-select" data-room-field="insulation" data-room-index="${index}">
+                    <option value="gut"${data.insulation === 'gut' ? ' selected' : ''}>Gut gedaemmt</option>
+                    <option value="normal"${data.insulation === 'normal' ? ' selected' : ''}>Normal</option>
+                    <option value="altbau"${data.insulation === 'altbau' ? ' selected' : ''}>Altbau / schwach gedaemmt</option>
+                  </select>
+                </label>
+                <label class="form-label">
+                  <span class="kr-inline">Personen <output id="kr-room-${index}-persons-out">${data.persons}</output></span>
+                  <input class="form-range" data-room-field="persons" data-room-index="${index}" type="range" min="0" max="8" step="1" value="${data.persons}">
+                </label>
+                <label class="form-label">
+                  Dachgeschoss
+                  <select class="form-select" data-room-field="attic" data-room-index="${index}">
+                    <option value="no"${data.attic === 'no' ? ' selected' : ''}>Nein</option>
+                    <option value="yes"${data.attic === 'yes' ? ' selected' : ''}>Ja</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+          `;
+        }).join('');
+        root.querySelectorAll('[data-room-field]').forEach((input) => input.addEventListener('input', calculate));
+        applyMode();
+      }
+
+      function getRooms() {
+        return Array.from(root.querySelectorAll('[data-room-field="area"]')).map((input) => {
+          const index = Number(input.dataset.roomIndex);
+          return {
+            area: number(root.querySelector(`[data-room-index="${index}"][data-room-field="area"]`)),
+            height: number(root.querySelector(`[data-room-index="${index}"][data-room-field="height"]`)),
+            window: number(root.querySelector(`[data-room-index="${index}"][data-room-field="window"]`)),
+            u: number(root.querySelector(`[data-room-index="${index}"][data-room-field="u"]`)),
+            sun: root.querySelector(`[data-room-index="${index}"][data-room-field="sun"]`).value,
+            shade: root.querySelector(`[data-room-index="${index}"][data-room-field="shade"]`).value,
+            insulation: root.querySelector(`[data-room-index="${index}"][data-room-field="insulation"]`).value,
+            persons: number(root.querySelector(`[data-room-index="${index}"][data-room-field="persons"]`)),
+            attic: root.querySelector(`[data-room-index="${index}"][data-room-field="attic"]`).value
+          };
+        });
+      }
+
+      function systemFor(roomCount) {
+        return roomCount > 1 ? 'Multi-Split Anlage' : 'Single-Split Anlage';
+      }
+
+      function roomLoad(room) {
+        const defaults = buildingDefaults[fields.gebaeude.value];
+        const exact = fields.modus.value === 'genau';
+        const height = exact ? room.height : defaults.height;
+        const uValue = exact ? room.u : defaults.u;
+        const insulation = exact ? room.insulation : defaults.insulation;
+        const heightFactor = height / 2.6;
+        const volumeLoad = room.area * baseWattsPerM2[insulation] * heightFactor;
+        const solarLoad = room.window * sunWatts[room.sun] * shadeFactors[room.shade];
+        const windowTransmission = room.window * uValue * 10;
+        const peopleLoad = room.persons * 90;
+        const subtotal = volumeLoad + solarLoad + windowTransmission + peopleLoad;
+        const atticLoad = room.attic === 'yes' ? subtotal * 0.12 : 0;
+        const reserveLoad = (subtotal + atticLoad) * 0.05;
+        const watts = subtotal + atticLoad + reserveLoad;
+        return { watts, volumeLoad, solarLoad, windowTransmission, peopleLoad, atticLoad, reserveLoad };
+      }
+
+      function roundIndoorSize(kw) {
+        return indoorSizes.find((size) => size >= kw) || Math.ceil(kw);
+      }
+
+      function loadPlan(rooms) {
+        const perRoom = rooms.map((room, index) => {
+          const load = roomLoad(room);
+          const rawKw = load.watts / 1000;
+          const indoorKw = roundIndoorSize(Math.max(2.0, rawKw));
+          return { index, room, load, rawKw, indoorKw };
+        });
+        const rawKw = perRoom.reduce((sum, item) => sum + item.rawKw, 0);
+        const indoorSumKw = perRoom.reduce((sum, item) => sum + item.indoorKw, 0);
+        const diversity = perRoom.length > 1 ? Math.max(0.78, 0.92 - (perRoom.length - 2) * 0.03) : 1;
+        const outdoorKw = roundIndoorSize(Math.max(2.5, rawKw * diversity));
+        const largest = perRoom.reduce((best, item) => item.rawKw > best.rawKw ? item : best, perRoom[0]);
+        return { perRoom, rawKw, indoorSumKw, diversity, outdoorKw, largest };
+      }
+
+      function selectedRisks() {
+        return Array.from(root.querySelectorAll('[data-risk]:checked')).map((input) => riskDefinitions[input.dataset.risk]);
+      }
+
+      function calculate() {
+        const roomDetails = getRooms();
+        const area = roomDetails.reduce((sum, room) => sum + room.area, 0);
+        const rooms = roomCount();
+        const device = devicePrices[fields.klasse.value];
+        const plan = loadPlan(roomDetails);
+        const kw = plan.outdoorKw;
+        const capacitySurcharge = Math.max(0, plan.indoorSumKw - 3.5) * (device.capacityStep || 210);
+        const baseDevice = device.base + Math.max(0, rooms - 1) * device.room;
+        const baseInstall = mountingPrices.baseInstall + Math.max(0, rooms - 1) * mountingPrices.additionalIndoor;
+        const drilling = Number(fields.bohrung.value) * mountingPrices.drilling;
+        const line = number(fields.leitung) * mountingPrices.lineMeter;
+        const channel = number(fields.kanal) * mountingPrices.channelMeter;
+        const outside = mountingPrices.outdoor[fields.aussen.value];
+        const electric = mountingPrices.power[fields.strom.value];
+        const pump = fields.kondensat.value === 'pumpe' ? mountingPrices.condensatePump : 0;
+        const risks = selectedRisks();
+        const riskCost = risks.reduce((sum, risk) => sum + risk.cost, 0);
+        const baseLines = [
+          [device.label, baseDevice + capacitySurcharge],
+          ['Montage und Inbetriebnahme', baseInstall],
+          ['Leitungen und Kabelkanal', line + channel],
+          ['Wanddurchbruch und Aussengeraet', drilling + outside]
+        ];
+        if (electric > 0) baseLines.push(['Stromzuleitung', electric]);
+        if (pump > 0) baseLines.push(['Kondensatpumpe', pump]);
+        risks.forEach((risk) => baseLines.push([`Montage-Zuschlag: ${risk.label}`, risk.cost]));
+        const beforeObjectFactor = baseLines.reduce((sum, lineItem) => sum + lineItem[1], 0);
+        const objectSurcharge = beforeObjectFactor * (objectFactor[fields.objekt.value] - 1);
+        if (objectSurcharge > 0) baseLines.push(['Objekt-/Gewerbeaufschlag', objectSurcharge]);
+        const subtotal = baseLines.reduce((sum, lineItem) => sum + lineItem[1], 0);
+        const net = subtotal * serviceFactor;
+        const taxRate = taxRates[fields.land.value];
+        const tax = net * taxRate;
+        const gross = net + tax;
+        const hasAttic = roomDetails.some((room) => room.attic === 'yes');
+        const riskComplexity = risks.reduce((sum, risk) => sum + risk.complexity, 0);
+        const complexity = Math.min(0.24, 0.08 + Math.max(0, rooms - 1) * 0.015 + (fields.aussen.value === 'dach' ? 0.06 : 0) + (number(fields.leitung) > 15 ? 0.035 : 0) + (hasAttic ? 0.02 : 0) + riskComplexity);
+        const low = gross * (1 - complexity);
+        const high = gross * (1 + complexity + 0.04);
+        const lines = baseLines;
+
+        out.flaeche.value = `${area} m2`;
+        out.raeume.value = rooms;
+        roomDetails.forEach((room, index) => {
+          const areaOut = root.querySelector(`#kr-room-${index}-area-out`);
+          const heightOut = root.querySelector(`#kr-room-${index}-height-out`);
+          const windowOut = root.querySelector(`#kr-room-${index}-window-out`);
+          const uOut = root.querySelector(`#kr-room-${index}-u-out`);
+          const personsOut = root.querySelector(`#kr-room-${index}-persons-out`);
+          if (areaOut) areaOut.value = `${room.area} m2`;
+          if (heightOut) heightOut.value = `${room.height.toLocaleString('de-DE')} m`;
+          if (windowOut) windowOut.value = `${room.window.toLocaleString('de-DE')} m2`;
+          if (uOut) uOut.value = `${room.u.toLocaleString('de-DE')} W/m2K`;
+          if (personsOut) personsOut.value = room.persons;
+        });
+        out.leitung.value = `${number(fields.leitung)} m`;
+        out.kanal.value = `${number(fields.kanal)} m`;
+        out.brutto.textContent = euro(gross);
+        out.spanne.textContent = `ca. ${euro(low)} bis ${euro(high)}`;
+        out.empfehlung.textContent = `${kw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
+        out.system.textContent = rooms > 1
+          ? `${systemFor(rooms)}, innen ${plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`
+          : systemFor(rooms);
+        out.last.textContent = `${plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
+        out.treiber.textContent = `Raum ${plan.largest.index + 1}: ${plan.largest.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
+        out.netto.textContent = euro(net);
+        out.ustLabel.textContent = `USt. ${Math.round(taxRate * 100)} Prozent`;
+        out.ust.textContent = euro(tax);
+        out.final.textContent = euro(gross);
+        out.lines.innerHTML = lines.map((lineItem) => `
+          <div class="kr-line">
+            <span>${lineItem[0]}</span>
+            <span class="kr-price">${euro(lineItem[1] * serviceFactor)}</span>
+          </div>
+        `).join('');
+        const maxRoomLoad = Math.max(...plan.perRoom.map((item) => item.rawKw), 1);
+        out.loadLines.innerHTML = plan.perRoom.map((item) => {
+          const width = Math.max(4, item.rawKw / maxRoomLoad * 100);
+          return `
+            <div class="kr-load-row">
+              <span class="text-small">Raum ${item.index + 1}</span>
+              <span class="kr-load-track" aria-hidden="true"><span class="kr-load-fill" style="width:${width.toFixed(1)}%"></span></span>
+              <span class="text-small">${item.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</span>
+            </div>
+          `;
+        }).join('');
+        const loadTotals = plan.perRoom.reduce((totals, item) => {
+          totals.volume += item.load.volumeLoad;
+          totals.solar += item.load.solarLoad;
+          totals.window += item.load.windowTransmission;
+          totals.people += item.load.peopleLoad;
+          totals.attic += item.load.atticLoad;
+          totals.reserve += item.load.reserveLoad;
+          return totals;
+        }, { volume: 0, solar: 0, window: 0, people: 0, attic: 0, reserve: 0 });
+        const loadLines = [
+          ['Grundlast Gebaeude', loadTotals.volume],
+          ['Sonne / Glasflaechen', loadTotals.solar],
+          ['Fenster U-Wert', loadTotals.window],
+          ['Personen', loadTotals.people],
+          ['Dachgeschoss', loadTotals.attic],
+          ['Reserve', loadTotals.reserve]
+        ].filter((lineItem) => lineItem[1] > 0.5);
+        out.loadBreakdown.innerHTML = loadLines.map((lineItem) => `
+          <div class="kr-line">
+            <span>${lineItem[0]}</span>
+            <span class="kr-price">${(lineItem[1] / 1000).toLocaleString('de-DE', { maximumFractionDigits: 2 })} kW</span>
+          </div>
+        `).join('');
+        out.devicePlan.innerHTML = plan.perRoom.map((item) => `
+          <div class="kr-line">
+            <span>Raum ${item.index + 1}: Innengeraet ${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</span>
+            <span class="kr-price">${item.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW Last</span>
+          </div>
+        `).join('');
+        return { area, roomDetails, rooms, kw, plan, risks, lines, net, tax, gross, low, high, device };
+      }
+
+      function requestText() {
+        const result = calculate();
+        const objectLabel = fields.objekt.options[fields.objekt.selectedIndex].text;
+        const countryLabel = fields.land.options[fields.land.selectedIndex].text;
+        const modeLabel = fields.modus.options[fields.modus.selectedIndex].text;
+        const buildingLabel = fields.gebaeude.options[fields.gebaeude.selectedIndex].text;
+        const outsideLabel = fields.aussen.options[fields.aussen.selectedIndex].text;
+        const note = fields.notiz.value.trim();
+        const sunLabels = { nord: 'Nord/wenig Sonne', ost: 'Ost', sued: 'Sued', west: 'West', suedwest: 'Sued-West', stark: 'sehr sonnig' };
+        const shadeLabels = { none: 'keine Verschattung', inside: 'innen verschattet', outside: 'aussen verschattet', shutter: 'stark verschattet' };
+        const insulationLabels = { gut: 'gut gedaemmt', normal: 'normal gedaemmt', altbau: 'Altbau/schwach gedaemmt' };
+        const exact = fields.modus.value === 'genau';
+        const defaults = buildingDefaults[fields.gebaeude.value];
+        return [
+          'Anfrage Klimaanlage',
+          '',
+          `Objekt: ${objectLabel}`,
+          `Standort: ${countryLabel}`,
+          `Berechnung: ${modeLabel}`,
+          `Gebaeudezustand: ${buildingLabel}`,
+          `Raeume: ${result.rooms}`,
+          `Raumdaten: ${result.roomDetails.map((room, index) => {
+            const height = exact ? room.height : defaults.height;
+            const uValue = exact ? room.u : defaults.u;
+            const insulation = exact ? room.insulation : defaults.insulation;
+            return `Raum ${index + 1}: ${room.area} m2, ${height.toLocaleString('de-DE')} m hoch, Fenster ${room.window.toLocaleString('de-DE')} m2, U-Wert ${uValue.toLocaleString('de-DE')}, ${sunLabels[room.sun]}, ${shadeLabels[room.shade]}, ${insulationLabels[insulation]}, ${room.persons} Personen, Dachgeschoss ${room.attic === 'yes' ? 'ja' : 'nein'}`;
+          }).join(' | ')}`,
+          `Gesamtflaeche: ${result.area} m2`,
+          `Wunsch: ${result.device.label}`,
+          `Berechnete Raumlast: ${result.plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
+          `Innengeraete gesamt: ${result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
+          `Empfohlenes Aussengeraet: ${result.kw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
+          `Innengeraete je Raum: ${result.plan.perRoom.map((item) => `Raum ${item.index + 1}: ${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`).join(', ')}`,
+          `Aussengeraet: ${outsideLabel}`,
+          `Entfernung innen/aussen: ${number(fields.leitung)} m`,
+          `Kabelkanal sichtbar: ${number(fields.kanal)} m`,
+          result.risks.length ? `Montagehinweise: ${result.risks.map((risk) => risk.label).join(', ')}` : '',
+          `Richtpreis brutto: ${euro(result.gross)}`,
+          `Preisspanne: ${euro(result.low)} bis ${euro(result.high)}`,
+          note ? `Hinweis: ${note}` : ''
+        ].filter(Boolean).join('\n');
+      }
+
+      Object.values(fields).forEach((field) => field.addEventListener('input', calculate));
+      fields.modus.addEventListener('input', () => {
+        applyMode();
+        calculate();
+      });
+      fields.raeume.addEventListener('input', () => {
+        renderRoomAreas();
+        calculate();
+      });
+      root.querySelectorAll('[data-risk]').forEach((input) => input.addEventListener('input', calculate));
+      $('#kr-reset').addEventListener('click', () => {
+        fields.objekt.value = 'wohnung';
+        fields.klasse.value = 'standard';
+        fields.land.value = 'at';
+        fields.modus.value = 'basis';
+        fields.gebaeude.value = 'saniert';
+        fields.raeume.value = '1';
+        roomData.splice(
+          0,
+          roomData.length,
+          { area: 25, height: 2.6, window: 5, u: 1.3, sun: 'sued', shade: 'none', insulation: 'normal', persons: 2, attic: 'no' },
+          { area: 18, height: 2.6, window: 3, u: 1.3, sun: 'west', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
+          { area: 16, height: 2.6, window: 3, u: 1.3, sun: 'ost', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
+          { area: 14, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
+          { area: 12, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
+          { area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' }
+        );
+        fields.aussen.value = 'balkon';
+        fields.bohrung.value = '1';
+        fields.leitung.value = '5';
+        fields.kanal.value = '4';
+        fields.strom.value = 'nah';
+        fields.kondensat.value = 'frei';
+        fields.notiz.value = '';
+        root.querySelectorAll('[data-risk]').forEach((input) => { input.checked = false; });
+        out.status.textContent = 'Der finale Preis wird nach Besichtigung bestaetigt.';
+        renderRoomAreas();
+        calculate();
+      });
+      $('#kr-copy').addEventListener('click', async () => {
+        const text = requestText();
+        try {
+          await navigator.clipboard.writeText(text);
+          out.status.textContent = 'Anfrage wurde kopiert.';
+        } catch (error) {
+          out.status.textContent = text;
+        }
+      });
+      out.roomAreas = $('#kr-room-areas');
+      renderRoomAreas();
+      calculate();
+      if (window.lucide) {
+        window.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+      }
+    })();
+  
+};
+</script>
+</div>
+
+    </main>
+  </div>
+  
+<script>
+  (() => {
+    const installButton = document.getElementById('app-install');
+    const status = document.getElementById('app-status');
+    let deferredPrompt = null;
+    let calculatorStarted = false;
+
+    async function loadPrices() {
+      try {
+        const response = await fetch('./prices.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error('prices.json not available');
+        window.KLIMA_PRICE_CONFIG = await response.json();
+        status.textContent = 'Preisliste geladen';
+      } catch (error) {
+        status.textContent = 'Standardpreise aktiv';
+      }
+    }
+
+    async function startCalculator() {
+      if (calculatorStarted) return;
+      calculatorStarted = true;
+      await loadPrices();
+      if (typeof window.initKlimaCalculator === 'function') {
+        window.initKlimaCalculator();
+      }
+    }
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      installButton.hidden = false;
+    });
+
+    installButton.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installButton.hidden = true;
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', async () => {
+        try {
+          await navigator.serviceWorker.register('./service-worker.js');
+          if (status.textContent === 'Bereit') status.textContent = navigator.onLine ? 'Offline bereit' : 'Offline-Modus';
+        } catch (error) {
+          if (status.textContent === 'Bereit') status.textContent = 'Offline-Speicher nicht aktiv';
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', startCalculator);
+    window.addEventListener('online', () => { if (status.textContent === 'Offline-Modus') status.textContent = 'Offline bereit'; });
+    window.addEventListener('offline', () => { status.textContent = 'Offline-Modus'; });
+  })();
+</script>
+
+</body>
+</html>
