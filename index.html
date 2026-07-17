@@ -11,8 +11,8 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="description" content="Kunden-Rechner fuer Klimaanlagen mit Richtpreis, Raumlast und Anfrage-Text.">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./icons/icon-192.png">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="icon" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
   <title>Klimaanlagen Rechner</title>
   <style>
 :root {
@@ -285,7 +285,7 @@ textarea:focus-visible {
   <div class="app-shell">
     <header class="app-bar">
       <div class="app-brand">
-        <img class="app-logo" src="./assets/logo.png" alt="" width="58" height="52">
+        <img class="app-logo" src="./logo.png" alt="" width="58" height="52">
         <div class="app-title">
           <strong>Klimaanlagen Rechner</strong>
           <span id="app-status" class="text-small text-muted">Bereit</span>
@@ -447,6 +447,63 @@ textarea:focus-visible {
       display: grid;
       gap: 6px;
     }
+    #klima-kundenrechner .kr-db-panel {
+      display: grid;
+      gap: 12px;
+    }
+    #klima-kundenrechner .kr-db-editor {
+      display: grid;
+      gap: 12px;
+    }
+    #klima-kundenrechner .kr-db-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    #klima-kundenrechner .kr-editor-section {
+      display: grid;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    #klima-kundenrechner .kr-section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    #klima-kundenrechner .kr-editor-list {
+      display: grid;
+      gap: 10px;
+    }
+    #klima-kundenrechner .kr-editor-row {
+      display: grid;
+      gap: 10px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    #klima-kundenrechner .kr-editor-row-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    #klima-kundenrechner .kr-db-panel details {
+      display: grid;
+      gap: 10px;
+    }
+    #klima-kundenrechner .kr-db-panel summary {
+      cursor: pointer;
+      font-weight: 500;
+    }
+    #klima-kundenrechner .kr-db-panel textarea {
+      min-height: 220px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: .875rem;
+    }
     #klima-kundenrechner textarea {
       min-height: 96px;
       resize: vertical;
@@ -467,7 +524,8 @@ textarea:focus-visible {
     }
     @media (max-width: 680px) {
       #klima-kundenrechner .kr-fields,
-      #klima-kundenrechner .kr-summary {
+      #klima-kundenrechner .kr-summary,
+      #klima-kundenrechner .kr-db-grid {
         grid-template-columns: 1fr;
       }
       #klima-kundenrechner .kr-line {
@@ -523,18 +581,11 @@ textarea:focus-visible {
             </select>
           </label>
           <label class="form-label">
-            Wunschgeraet
+            Standardgeraet
             <select id="kr-klasse" class="form-select">
               <option value="basis">Preisbewusst</option>
               <option value="standard" selected>Leise & effizient</option>
               <option value="premium">Premium Design</option>
-            </select>
-          </label>
-          <label class="form-label">
-            Standort
-            <select id="kr-land" class="form-select">
-              <option value="at" selected>Oesterreich</option>
-              <option value="de">Deutschland</option>
             </select>
           </label>
           <label class="form-label">
@@ -562,6 +613,13 @@ textarea:focus-visible {
             <span class="kr-inline">Gesamtflaeche <output id="kr-flaeche-out">25 m2</output></span>
             <span class="text-small kr-note">Jeder Raum wird einzeln abgefragt.</span>
           </div>
+          <label id="kr-systemtyp-wrap" class="form-label kr-hidden">
+            Anlagentyp
+            <select id="kr-systemtyp" class="form-select">
+              <option value="multi" selected>Multi-Split mit einem Aussengeraet</option>
+              <option value="single">Single-Split je Raum</option>
+            </select>
+          </label>
         </div>
         <div id="kr-room-areas" class="kr-room-areas kr-full" aria-label="Raumdaten je Raum"></div>
         <div id="kr-mode-note" class="text-small kr-note">Basis nutzt Richtwerte fuer U-Wert, Raumhoehe und Daemmung.</div>
@@ -589,8 +647,8 @@ textarea:focus-visible {
         </div>
         <div class="kr-fields">
           <label class="form-label">
-            <span class="kr-inline">Entfernung innen/aussen <output id="kr-leitung-out">5 m</output></span>
-            <input id="kr-leitung" class="form-range" type="range" min="1" max="35" step="1" value="5">
+            <span class="kr-inline">Rohrlaenge gesamt <output id="kr-leitung-out">5 m</output></span>
+            <input id="kr-leitung" class="form-range" type="range" min="1" max="60" step="1" value="5">
           </label>
           <label class="form-label">
             <span class="kr-inline">Sichtbarer Kabelkanal <output id="kr-kanal-out">4 m</output></span>
@@ -600,24 +658,7 @@ textarea:focus-visible {
       </div>
 
       <div class="viz-controls kr-section" aria-label="Montagerisiken">
-        <div class="kr-risk-list">
-          <label class="form-check" for="kr-risk-ladder">
-            <input id="kr-risk-ladder" class="form-check-input" type="checkbox" data-risk="ladder">
-            <span class="form-check-label">Leiter, Geruest oder Arbeit in Hoehe noetig</span>
-          </label>
-          <label class="form-check" for="kr-risk-concrete">
-            <input id="kr-risk-concrete" class="form-check-input" type="checkbox" data-risk="concrete">
-            <span class="form-check-label">Stahlbeton / schwierige Kernbohrung</span>
-          </label>
-          <label class="form-check" for="kr-risk-permit">
-            <input id="kr-risk-permit" class="form-check-input" type="checkbox" data-risk="permit">
-            <span class="form-check-label">Eigentuemergemeinschaft, Denkmalschutz oder Genehmigung offen</span>
-          </label>
-          <label class="form-check" for="kr-risk-oldunit">
-            <input id="kr-risk-oldunit" class="form-check-input" type="checkbox" data-risk="oldunit">
-            <span class="form-check-label">Altgeraet demontieren und entsorgen</span>
-          </label>
-        </div>
+        <div id="kr-risk-list" class="kr-risk-list"></div>
       </div>
 
       <div class="viz-controls kr-section" aria-label="Extras">
@@ -692,8 +733,69 @@ textarea:focus-visible {
       <div class="kr-actions">
         <button id="kr-copy" type="button" class="btn btn-primary">Anfrage kopieren</button>
         <button id="kr-reset" type="button" class="btn">Neu starten</button>
+        <button id="kr-db-toggle" type="button" class="btn">Datenbank aktualisieren</button>
       </div>
       <div id="kr-status" class="text-small kr-note" aria-live="polite">Der finale Preis wird nach Besichtigung bestaetigt.</div>
+      <div id="kr-db-panel" class="card kr-db-panel kr-hidden" aria-label="Datenbank aktualisieren">
+        <div id="kr-db-login">
+          <label class="form-label">
+            Passwort fuer Preisliste
+            <input id="kr-db-code" class="form-control" type="password" autocomplete="off" placeholder="Passwort eingeben">
+          </label>
+          <div class="kr-actions">
+            <button id="kr-db-unlock" type="button" class="btn btn-primary">Preisliste freischalten</button>
+          </div>
+        </div>
+        <div id="kr-db-editor" class="kr-db-editor kr-hidden">
+          <div class="kr-editor-section">
+            <div class="kr-section-head">
+              <strong>Geraetepakete</strong>
+              <button id="kr-db-add-device" type="button" class="btn">Geraet hinzufuegen</button>
+            </div>
+            <div id="kr-db-devices" class="kr-editor-list"></div>
+          </div>
+
+          <div class="kr-editor-section">
+            <div class="kr-section-head">
+              <strong>Montagepreise</strong>
+            </div>
+            <div id="kr-db-mounting" class="kr-db-grid"></div>
+          </div>
+
+          <div class="kr-editor-section">
+            <div class="kr-section-head">
+              <strong>Zusatzarbeiten</strong>
+              <button id="kr-db-add-risk" type="button" class="btn">Zusatzarbeit hinzufuegen</button>
+            </div>
+            <div id="kr-db-risks" class="kr-editor-list"></div>
+          </div>
+
+          <div class="kr-editor-section">
+            <div class="kr-section-head">
+              <strong>Einstellwerte Kuehllast</strong>
+            </div>
+            <div id="kr-db-settings" class="kr-db-grid"></div>
+          </div>
+
+          <details>
+            <summary>Expertenansicht JSON</summary>
+            <label class="form-label">
+              Komplette Datenbank
+              <textarea id="kr-db-json" class="form-control" spellcheck="false"></textarea>
+            </label>
+            <div class="kr-actions">
+              <button id="kr-db-template" type="button" class="btn">Aktuelle Daten laden</button>
+              <button id="kr-db-import-json" type="button" class="btn">JSON in Formular uebernehmen</button>
+            </div>
+          </details>
+
+          <div class="kr-actions">
+            <button id="kr-db-save" type="button" class="btn btn-primary">Aenderungen speichern</button>
+            <button id="kr-db-reset" type="button" class="btn">Lokale Daten loeschen</button>
+          </div>
+        </div>
+        <div id="kr-db-status" class="text-small kr-note" aria-live="polite">Freigabecode erforderlich.</div>
+      </div>
     </section>
   </div>
 
@@ -707,10 +809,10 @@ window.initKlimaCalculator = () => {
       const fields = {
         objekt: $('#kr-objekt'),
         klasse: $('#kr-klasse'),
-        land: $('#kr-land'),
         modus: $('#kr-modus'),
         gebaeude: $('#kr-gebaeude'),
         raeume: $('#kr-raeume'),
+        systemtyp: $('#kr-systemtyp'),
         aussen: $('#kr-aussen'),
         bohrung: $('#kr-bohrung'),
         leitung: $('#kr-leitung'),
@@ -739,17 +841,30 @@ window.initKlimaCalculator = () => {
         ust: $('#kr-ust'),
         final: $('#kr-final'),
         status: $('#kr-status'),
-        modeNote: $('#kr-mode-note')
+        modeNote: $('#kr-mode-note'),
+        systemWrap: $('#kr-systemtyp-wrap'),
+        dbPanel: $('#kr-db-panel'),
+        dbCode: $('#kr-db-code'),
+        dbLogin: $('#kr-db-login'),
+        dbEditor: $('#kr-db-editor'),
+        dbDevices: $('#kr-db-devices'),
+        dbMounting: $('#kr-db-mounting'),
+        dbRisks: $('#kr-db-risks'),
+        dbSettings: $('#kr-db-settings'),
+        dbJson: $('#kr-db-json'),
+        dbStatus: $('#kr-db-status')
       };
       const roomData = [
-        { area: 25, height: 2.6, window: 5, u: 1.3, sun: 'sued', shade: 'none', insulation: 'normal', persons: 2, attic: 'no' },
-        { area: 18, height: 2.6, window: 3, u: 1.3, sun: 'west', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
-        { area: 16, height: 2.6, window: 3, u: 1.3, sun: 'ost', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
-        { area: 14, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
-        { area: 12, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
-        { area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' }
+        { area: 25, height: 2.6, window: 5, u: 1.3, sun: 'sued', shade: 'none', insulation: 'normal', persons: 2, attic: 'no', device: 'standard' },
+        { area: 18, height: 2.6, window: 3, u: 1.3, sun: 'west', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+        { area: 16, height: 2.6, window: 3, u: 1.3, sun: 'ost', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+        { area: 14, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+        { area: 12, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+        { area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' }
       ];
       const defaultPriceConfig = {
+        version: 3,
+        admin: { updateCode: 'KLIMA2026' },
         devicePackages: {
           basis: { label: 'Basis-Paket Wandgeraet', base: 980, room: 740, capacityStep: 210 },
           standard: { label: 'Komfort-Paket leise/effizient', base: 1280, room: 890, capacityStep: 230 },
@@ -772,25 +887,198 @@ window.initKlimaCalculator = () => {
           permit: { label: 'Genehmigung/WEG/Denkmalschutz offen', cost: 180, complexity: 0.04 },
           oldunit: { label: 'Altgeraet demontieren/entsorgen', cost: 220, complexity: 0.015 }
         },
-        taxRates: { at: 0.20, de: 0.19 },
-        markupFactor: 1.22
+        taxRates: { at: 0.20 },
+        markupFactor: 1.22,
+        settings: {
+          baseWattsPerM2: { gut: 45, normal: 60, altbau: 80 },
+          buildingDefaults: {
+            neubau: { insulation: 'gut', u: 0.9, height: 2.5 },
+            saniert: { insulation: 'normal', u: 1.3, height: 2.6 },
+            unsaniert: { insulation: 'altbau', u: 2.4, height: 2.8 }
+          },
+          sunWatts: { nord: 20, ost: 65, sued: 85, west: 100, suedwest: 120, stark: 150 },
+          shadeFactors: { none: 1, inside: 0.85, outside: 0.55, shutter: 0.4 },
+          indoorSizes: [2.0, 2.5, 3.5, 4.2, 5.0, 6.0, 7.1, 10.0]
+        }
       };
-      const priceConfig = window.KLIMA_PRICE_CONFIG || defaultPriceConfig;
-      const devicePrices = priceConfig.devicePackages;
-      const mountingPrices = priceConfig.mounting;
-      const objectFactor = priceConfig.objectFactor;
-      const baseWattsPerM2 = { gut: 45, normal: 60, altbau: 80 };
-      const buildingDefaults = {
-        neubau: { insulation: 'gut', u: 0.9, height: 2.5 },
-        saniert: { insulation: 'normal', u: 1.3, height: 2.6 },
-        unsaniert: { insulation: 'altbau', u: 2.4, height: 2.8 }
-      };
-      const sunWatts = { nord: 20, ost: 65, sued: 85, west: 100, suedwest: 120, stark: 150 };
-      const shadeFactors = { none: 1, inside: 0.85, outside: 0.55, shutter: 0.4 };
-      const indoorSizes = [2.0, 2.5, 3.5, 4.2, 5.0, 6.0, 7.1, 10.0];
-      const riskDefinitions = priceConfig.risks;
-      const taxRates = priceConfig.taxRates;
-      const serviceFactor = priceConfig.markupFactor;
+      const DATABASE_STORAGE_KEY = 'klimaRechnerDatenbankV2';
+      let priceConfig;
+      let devicePrices;
+      let mountingPrices;
+      let objectFactor;
+      let baseWattsPerM2;
+      let buildingDefaults;
+      let sunWatts;
+      let shadeFactors;
+      let indoorSizes;
+      let riskDefinitions;
+      let taxRates;
+      let serviceFactor;
+      let editorConfig = null;
+      let databaseUnlocked = false;
+
+      function isPlainObject(value) {
+        return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+      }
+
+      function mergeConfig(base, override) {
+        const result = Array.isArray(base) ? [...base] : { ...base };
+        Object.entries(override || {}).forEach(([key, value]) => {
+          if (isPlainObject(value) && isPlainObject(result[key])) {
+            result[key] = mergeConfig(result[key], value);
+          } else {
+            result[key] = value;
+          }
+        });
+        return result;
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (char) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[char]));
+      }
+
+      function cloneConfig(config) {
+        return JSON.parse(JSON.stringify(config));
+      }
+
+      function normalizeNumber(value, fallback = 0) {
+        const parsed = Number(String(value).replace(',', '.'));
+        return Number.isFinite(parsed) ? parsed : fallback;
+      }
+
+      function normalizeKey(value, fallback) {
+        const key = String(value || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '');
+        return key || fallback;
+      }
+
+      function uniqueKey(collection, prefix) {
+        let index = Object.keys(collection || {}).length + 1;
+        let key = `${prefix}${index}`;
+        while (collection && collection[key]) {
+          index += 1;
+          key = `${prefix}${index}`;
+        }
+        return key;
+      }
+
+      function getPath(target, path) {
+        return path.split('.').reduce((current, part) => current?.[part], target);
+      }
+
+      function setPath(target, path, value) {
+        const parts = path.split('.');
+        const last = parts.pop();
+        const parent = parts.reduce((current, part) => {
+          if (!isPlainObject(current[part])) current[part] = {};
+          return current[part];
+        }, target);
+        parent[last] = value;
+      }
+
+      function storedDatabase() {
+        try {
+          const stored = localStorage.getItem(DATABASE_STORAGE_KEY);
+          return stored ? JSON.parse(stored) : null;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function validateConfig(config) {
+        if (!config || !config.devicePackages || !config.mounting || !config.settings) {
+          throw new Error('devicePackages, mounting und settings muessen vorhanden sein.');
+        }
+        if (!Object.keys(config.devicePackages).length) {
+          throw new Error('Mindestens ein Geraetepaket ist erforderlich.');
+        }
+        if (!config.settings.baseWattsPerM2 || !config.settings.buildingDefaults || !config.settings.indoorSizes) {
+          throw new Error('settings.baseWattsPerM2, settings.buildingDefaults und settings.indoorSizes sind erforderlich.');
+        }
+        if (!Array.isArray(config.settings.indoorSizes) || !config.settings.indoorSizes.length) {
+          throw new Error('settings.indoorSizes muss mindestens eine Leistung enthalten.');
+        }
+      }
+
+      function setRuntimeConfig(config) {
+        priceConfig = mergeConfig(defaultPriceConfig, config || {});
+        validateConfig(priceConfig);
+        devicePrices = priceConfig.devicePackages;
+        mountingPrices = priceConfig.mounting;
+        objectFactor = priceConfig.objectFactor;
+        baseWattsPerM2 = priceConfig.settings.baseWattsPerM2;
+        buildingDefaults = priceConfig.settings.buildingDefaults;
+        sunWatts = priceConfig.settings.sunWatts;
+        shadeFactors = priceConfig.settings.shadeFactors;
+        indoorSizes = [...priceConfig.settings.indoorSizes].sort((a, b) => a - b);
+        riskDefinitions = priceConfig.risks;
+        taxRates = priceConfig.taxRates;
+        serviceFactor = priceConfig.markupFactor;
+        syncDeviceChoices();
+        syncRiskOptions();
+      }
+
+      function deviceOptions(selected) {
+        return Object.entries(devicePrices).map(([value, config]) => (
+          `<option value="${escapeHtml(value)}"${value === selected ? ' selected' : ''}>${escapeHtml(config.label)}</option>`
+        )).join('');
+      }
+
+      function fallbackDeviceKey() {
+        return Object.keys(devicePrices)[0];
+      }
+
+      function syncDeviceChoices() {
+        if (!fields.klasse || !devicePrices) return;
+        const fallback = fallbackDeviceKey();
+        const selected = devicePrices[fields.klasse.value] ? fields.klasse.value : fallback;
+        fields.klasse.innerHTML = deviceOptions(selected);
+        fields.klasse.value = selected;
+        roomData.forEach((room) => {
+          if (!devicePrices[room.device]) room.device = selected;
+        });
+      }
+
+      function syncRiskOptions() {
+        const riskList = $('#kr-risk-list');
+        if (!riskList || !riskDefinitions) return;
+        const checked = new Set(Array.from(root.querySelectorAll('[data-risk]:checked')).map((input) => input.dataset.risk));
+        riskList.innerHTML = Object.entries(riskDefinitions).map(([key, risk]) => {
+          const id = `kr-risk-${normalizeKey(key, 'risk')}`;
+          return `
+            <label class="form-check" for="${escapeHtml(id)}">
+              <input id="${escapeHtml(id)}" class="form-check-input" type="checkbox" data-risk="${escapeHtml(key)}"${checked.has(key) ? ' checked' : ''}>
+              <span class="form-check-label">${escapeHtml(risk.label)}</span>
+            </label>
+          `;
+        }).join('');
+        riskList.querySelectorAll('[data-risk]').forEach((input) => input.addEventListener('input', calculate));
+      }
+
+      function currentSystemType() {
+        return roomCount() > 1 ? fields.systemtyp.value : 'single';
+      }
+
+      function syncSystemChoice() {
+        const multiRoom = roomCount() > 1;
+        out.systemWrap.classList.toggle('kr-hidden', !multiRoom);
+        if (!multiRoom) fields.systemtyp.value = 'single';
+        if (multiRoom && fields.systemtyp.value === 'single' && !fields.systemtyp.dataset.userSelected) {
+          fields.systemtyp.value = 'multi';
+        }
+      }
+
+      setRuntimeConfig(storedDatabase() || window.KLIMA_PRICE_CONFIG || defaultPriceConfig);
 
       function number(field) {
         return Math.max(0, Number(field.value) || 0);
@@ -812,6 +1100,7 @@ window.initKlimaCalculator = () => {
 
       function renderRoomAreas() {
         const rooms = roomCount();
+        syncSystemChoice();
         Array.from(root.querySelectorAll('[data-room-field]')).forEach((input) => {
           const index = Number(input.dataset.roomIndex);
           const field = input.dataset.roomField;
@@ -819,12 +1108,19 @@ window.initKlimaCalculator = () => {
           roomData[index][field] = input.type === 'range' || input.type === 'number' ? number(input) : input.value;
         });
         out.roomAreas.innerHTML = Array.from({ length: rooms }, (_, index) => {
-          const data = roomData[index] || { area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' };
+          const data = roomData[index] || { area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: fields.klasse.value };
+          if (!devicePrices[data.device]) data.device = fields.klasse.value;
           roomData[index] = data;
           return `
             <div class="kr-room">
               <div class="kr-room-title">Raum ${index + 1}</div>
               <div class="kr-fields">
+                <label class="form-label">
+                  Geraet fuer Raum ${index + 1}
+                  <select class="form-select" data-room-field="device" data-room-index="${index}">
+                    ${deviceOptions(data.device)}
+                  </select>
+                </label>
                 <label class="form-label">
                   <span class="kr-inline">Flaeche <output id="kr-room-${index}-area-out">${data.area} m2</output></span>
                   <input class="form-range" data-room-field="area" data-room-index="${index}" type="range" min="8" max="80" step="1" value="${data.area}">
@@ -896,6 +1192,7 @@ window.initKlimaCalculator = () => {
             height: number(root.querySelector(`[data-room-index="${index}"][data-room-field="height"]`)),
             window: number(root.querySelector(`[data-room-index="${index}"][data-room-field="window"]`)),
             u: number(root.querySelector(`[data-room-index="${index}"][data-room-field="u"]`)),
+            device: root.querySelector(`[data-room-index="${index}"][data-room-field="device"]`).value,
             sun: root.querySelector(`[data-room-index="${index}"][data-room-field="sun"]`).value,
             shade: root.querySelector(`[data-room-index="${index}"][data-room-field="shade"]`).value,
             insulation: root.querySelector(`[data-room-index="${index}"][data-room-field="insulation"]`).value,
@@ -905,8 +1202,9 @@ window.initKlimaCalculator = () => {
         });
       }
 
-      function systemFor(roomCount) {
-        return roomCount > 1 ? 'Multi-Split Anlage' : 'Single-Split Anlage';
+      function systemFor(systemType, roomCount) {
+        if (roomCount <= 1) return 'Single-Split Anlage';
+        return systemType === 'single' ? 'Single-Split je Raum' : 'Multi-Split Anlage';
       }
 
       function roomLoad(room) {
@@ -931,7 +1229,7 @@ window.initKlimaCalculator = () => {
         return indoorSizes.find((size) => size >= kw) || Math.ceil(kw);
       }
 
-      function loadPlan(rooms) {
+      function loadPlan(rooms, systemType) {
         const perRoom = rooms.map((room, index) => {
           const load = roomLoad(room);
           const rawKw = load.watts / 1000;
@@ -940,36 +1238,57 @@ window.initKlimaCalculator = () => {
         });
         const rawKw = perRoom.reduce((sum, item) => sum + item.rawKw, 0);
         const indoorSumKw = perRoom.reduce((sum, item) => sum + item.indoorKw, 0);
-        const diversity = perRoom.length > 1 ? Math.max(0.78, 0.92 - (perRoom.length - 2) * 0.03) : 1;
-        const outdoorKw = roundIndoorSize(Math.max(2.5, rawKw * diversity));
+        const diversity = systemType === 'multi' && perRoom.length > 1 ? Math.max(0.78, 0.92 - (perRoom.length - 2) * 0.03) : 1;
+        const outdoorKw = systemType === 'multi'
+          ? roundIndoorSize(Math.max(2.5, rawKw * diversity))
+          : indoorSumKw;
         const largest = perRoom.reduce((best, item) => item.rawKw > best.rawKw ? item : best, perRoom[0]);
         return { perRoom, rawKw, indoorSumKw, diversity, outdoorKw, largest };
       }
 
+      function deviceCostForRoom(item, systemType) {
+        const config = devicePrices[item.room.device] || devicePrices[fields.klasse.value];
+        const capacityBase = systemType === 'single' ? 3.5 : 2.5;
+        const capacitySurcharge = Math.max(0, item.indoorKw - capacityBase) * (config.capacityStep || 210);
+        const base = systemType === 'single' ? config.base : config.room;
+        return { label: config.label, cost: base + capacitySurcharge };
+      }
+
       function selectedRisks() {
-        return Array.from(root.querySelectorAll('[data-risk]:checked')).map((input) => riskDefinitions[input.dataset.risk]);
+        return Array.from(root.querySelectorAll('[data-risk]:checked'))
+          .map((input) => riskDefinitions[input.dataset.risk])
+          .filter(Boolean);
       }
 
       function calculate() {
         const roomDetails = getRooms();
         const area = roomDetails.reduce((sum, room) => sum + room.area, 0);
         const rooms = roomCount();
+        syncSystemChoice();
+        const systemType = currentSystemType();
+        const systemLabel = systemFor(systemType, rooms);
         const device = devicePrices[fields.klasse.value];
-        const plan = loadPlan(roomDetails);
+        const plan = loadPlan(roomDetails, systemType);
         const kw = plan.outdoorKw;
-        const capacitySurcharge = Math.max(0, plan.indoorSumKw - 3.5) * (device.capacityStep || 210);
-        const baseDevice = device.base + Math.max(0, rooms - 1) * device.room;
-        const baseInstall = mountingPrices.baseInstall + Math.max(0, rooms - 1) * mountingPrices.additionalIndoor;
-        const drilling = Number(fields.bohrung.value) * mountingPrices.drilling;
+        const roomDeviceCosts = plan.perRoom.map((item) => deviceCostForRoom(item, systemType));
+        const deviceCost = systemType === 'multi'
+          ? device.base + roomDeviceCosts.reduce((sum, item) => sum + item.cost, 0)
+          : roomDeviceCosts.reduce((sum, item) => sum + item.cost, 0);
+        const baseInstall = systemType === 'multi'
+          ? mountingPrices.baseInstall + Math.max(0, rooms - 1) * mountingPrices.additionalIndoor
+          : mountingPrices.baseInstall * rooms;
+        const drillingUnits = systemType === 'multi'
+          ? Number(fields.bohrung.value)
+          : Math.max(Number(fields.bohrung.value), rooms);
+        const drilling = drillingUnits * mountingPrices.drilling;
         const line = number(fields.leitung) * mountingPrices.lineMeter;
         const channel = number(fields.kanal) * mountingPrices.channelMeter;
-        const outside = mountingPrices.outdoor[fields.aussen.value];
+        const outside = mountingPrices.outdoor[fields.aussen.value] * (systemType === 'single' ? rooms : 1);
         const electric = mountingPrices.power[fields.strom.value];
         const pump = fields.kondensat.value === 'pumpe' ? mountingPrices.condensatePump : 0;
         const risks = selectedRisks();
-        const riskCost = risks.reduce((sum, risk) => sum + risk.cost, 0);
         const baseLines = [
-          [device.label, baseDevice + capacitySurcharge],
+          [systemType === 'multi' ? `${device.label} Multi-Split` : 'Single-Split Anlagen je Raum', deviceCost],
           ['Montage und Inbetriebnahme', baseInstall],
           ['Leitungen und Kabelkanal', line + channel],
           ['Wanddurchbruch und Aussengeraet', drilling + outside]
@@ -982,7 +1301,7 @@ window.initKlimaCalculator = () => {
         if (objectSurcharge > 0) baseLines.push(['Objekt-/Gewerbeaufschlag', objectSurcharge]);
         const subtotal = baseLines.reduce((sum, lineItem) => sum + lineItem[1], 0);
         const net = subtotal * serviceFactor;
-        const taxRate = taxRates[fields.land.value];
+        const taxRate = taxRates.at;
         const tax = net * taxRate;
         const gross = net + tax;
         const hasAttic = roomDetails.some((room) => room.attic === 'yes');
@@ -1010,10 +1329,12 @@ window.initKlimaCalculator = () => {
         out.kanal.value = `${number(fields.kanal)} m`;
         out.brutto.textContent = euro(gross);
         out.spanne.textContent = `ca. ${euro(low)} bis ${euro(high)}`;
-        out.empfehlung.textContent = `${kw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
+        out.empfehlung.textContent = systemType === 'single' && rooms > 1
+          ? `${rooms} Single-Split`
+          : `${kw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
         out.system.textContent = rooms > 1
-          ? `${systemFor(rooms)}, innen ${plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`
-          : systemFor(rooms);
+          ? `${systemLabel}, innen ${plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`
+          : systemLabel;
         out.last.textContent = `${plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
         out.treiber.textContent = `Raum ${plan.largest.index + 1}: ${plan.largest.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
         out.netto.textContent = euro(net);
@@ -1062,17 +1383,16 @@ window.initKlimaCalculator = () => {
         `).join('');
         out.devicePlan.innerHTML = plan.perRoom.map((item) => `
           <div class="kr-line">
-            <span>Raum ${item.index + 1}: Innengeraet ${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</span>
+            <span>Raum ${item.index + 1}: ${escapeHtml((devicePrices[item.room.device] || device).label)}, Innengeraet ${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</span>
             <span class="kr-price">${item.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW Last</span>
           </div>
         `).join('');
-        return { area, roomDetails, rooms, kw, plan, risks, lines, net, tax, gross, low, high, device };
+        return { area, roomDetails, rooms, kw, plan, risks, lines, net, tax, gross, low, high, device, systemType, systemLabel };
       }
 
       function requestText() {
         const result = calculate();
         const objectLabel = fields.objekt.options[fields.objekt.selectedIndex].text;
-        const countryLabel = fields.land.options[fields.land.selectedIndex].text;
         const modeLabel = fields.modus.options[fields.modus.selectedIndex].text;
         const buildingLabel = fields.gebaeude.options[fields.gebaeude.selectedIndex].text;
         const outsideLabel = fields.aussen.options[fields.aussen.selectedIndex].text;
@@ -1086,24 +1406,26 @@ window.initKlimaCalculator = () => {
           'Anfrage Klimaanlage',
           '',
           `Objekt: ${objectLabel}`,
-          `Standort: ${countryLabel}`,
+          'Standort: Oesterreich',
           `Berechnung: ${modeLabel}`,
           `Gebaeudezustand: ${buildingLabel}`,
           `Raeume: ${result.rooms}`,
+          `Anlagentyp: ${result.systemLabel}`,
           `Raumdaten: ${result.roomDetails.map((room, index) => {
             const height = exact ? room.height : defaults.height;
             const uValue = exact ? room.u : defaults.u;
             const insulation = exact ? room.insulation : defaults.insulation;
-            return `Raum ${index + 1}: ${room.area} m2, ${height.toLocaleString('de-DE')} m hoch, Fenster ${room.window.toLocaleString('de-DE')} m2, U-Wert ${uValue.toLocaleString('de-DE')}, ${sunLabels[room.sun]}, ${shadeLabels[room.shade]}, ${insulationLabels[insulation]}, ${room.persons} Personen, Dachgeschoss ${room.attic === 'yes' ? 'ja' : 'nein'}`;
+            const deviceLabel = (devicePrices[room.device] || result.device).label;
+            return `Raum ${index + 1}: ${room.area} m2, ${deviceLabel}, ${height.toLocaleString('de-DE')} m hoch, Fenster ${room.window.toLocaleString('de-DE')} m2, U-Wert ${uValue.toLocaleString('de-DE')}, ${sunLabels[room.sun]}, ${shadeLabels[room.shade]}, ${insulationLabels[insulation]}, ${room.persons} Personen, Dachgeschoss ${room.attic === 'yes' ? 'ja' : 'nein'}`;
           }).join(' | ')}`,
           `Gesamtflaeche: ${result.area} m2`,
           `Wunsch: ${result.device.label}`,
           `Berechnete Raumlast: ${result.plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
           `Innengeraete gesamt: ${result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
           `Empfohlenes Aussengeraet: ${result.kw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
-          `Innengeraete je Raum: ${result.plan.perRoom.map((item) => `Raum ${item.index + 1}: ${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`).join(', ')}`,
+          `Innengeraete je Raum: ${result.plan.perRoom.map((item) => `Raum ${item.index + 1}: ${(devicePrices[item.room.device] || result.device).label}, ${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`).join(', ')}`,
           `Aussengeraet: ${outsideLabel}`,
-          `Entfernung innen/aussen: ${number(fields.leitung)} m`,
+          `Rohrlaenge gesamt: ${number(fields.leitung)} m`,
           `Kabelkanal sichtbar: ${number(fields.kanal)} m`,
           result.risks.length ? `Montagehinweise: ${result.risks.map((risk) => risk.label).join(', ')}` : '',
           `Richtpreis brutto: ${euro(result.gross)}`,
@@ -1112,7 +1434,283 @@ window.initKlimaCalculator = () => {
         ].filter(Boolean).join('\n');
       }
 
-      Object.values(fields).forEach((field) => field.addEventListener('input', calculate));
+      function databaseText(config = priceConfig) {
+        return JSON.stringify(config, null, 2);
+      }
+
+      function codeIsValid() {
+        const requiredCode = String(priceConfig.admin?.updateCode || defaultPriceConfig.admin.updateCode);
+        return out.dbCode.value.trim() === requiredCode;
+      }
+
+      function showDatabaseStatus(message) {
+        out.dbStatus.textContent = message;
+      }
+
+      function editorNumberField(label, path, step = '1', min = '0') {
+        const value = getPath(editorConfig, path);
+        return `
+          <label class="form-label">
+            ${escapeHtml(label)}
+            <input class="form-control" type="number" min="${escapeHtml(min)}" step="${escapeHtml(step)}" value="${escapeHtml(value ?? 0)}" data-db-type="number" data-db-path="${escapeHtml(path)}">
+          </label>
+        `;
+      }
+
+      function editorTextField(label, path) {
+        const value = getPath(editorConfig, path);
+        return `
+          <label class="form-label">
+            ${escapeHtml(label)}
+            <input class="form-control" type="text" value="${escapeHtml(value ?? '')}" data-db-type="text" data-db-path="${escapeHtml(path)}">
+          </label>
+        `;
+      }
+
+      function editorListField(label, path) {
+        const value = getPath(editorConfig, path);
+        return `
+          <label class="form-label">
+            ${escapeHtml(label)}
+            <input class="form-control" type="text" value="${escapeHtml((value || []).join(', '))}" data-db-type="list" data-db-path="${escapeHtml(path)}">
+          </label>
+        `;
+      }
+
+      function editorValue(input) {
+        if (input.dataset.dbType === 'number') return normalizeNumber(input.value);
+        if (input.dataset.dbType === 'list') {
+          return input.value
+            .split(/[,\s;]+/)
+            .map((item) => normalizeNumber(item, NaN))
+            .filter((item) => Number.isFinite(item) && item > 0)
+            .sort((a, b) => a - b);
+        }
+        return input.value.trim();
+      }
+
+      function updateEditorConfigFromInputs() {
+        if (!editorConfig) return;
+        root.querySelectorAll('[data-db-path]').forEach((input) => {
+          setPath(editorConfig, input.dataset.dbPath, editorValue(input));
+        });
+        editorConfig.version = 3;
+      }
+
+      function syncEditorJson() {
+        if (!editorConfig) return;
+        out.dbJson.value = databaseText(editorConfig);
+      }
+
+      function attachEditorInputListeners() {
+        root.querySelectorAll('[data-db-path]').forEach((input) => {
+          input.addEventListener('input', () => {
+            updateEditorConfigFromInputs();
+            syncEditorJson();
+          });
+        });
+      }
+
+      function renderDeviceEditor() {
+        const entries = Object.entries(editorConfig.devicePackages || {});
+        out.dbDevices.innerHTML = entries.map(([key, item]) => `
+          <div class="kr-editor-row">
+            <div class="kr-editor-row-head">
+              <strong>${escapeHtml(item.label || key)}</strong>
+              <button type="button" class="btn" data-db-delete-device="${escapeHtml(key)}"${entries.length <= 1 ? ' disabled' : ''}>Loeschen</button>
+            </div>
+            <div class="kr-db-grid">
+              ${editorTextField('Bezeichnung', `devicePackages.${key}.label`)}
+              ${editorNumberField('Basispreis Single/Multi-Aussenteil', `devicePackages.${key}.base`, '1')}
+              ${editorNumberField('Preis je Innengeraet', `devicePackages.${key}.room`, '1')}
+              ${editorNumberField('Zuschlag je kW Mehrleistung', `devicePackages.${key}.capacityStep`, '1')}
+            </div>
+            <div class="text-small kr-note">Interner Code: ${escapeHtml(key)}</div>
+          </div>
+        `).join('');
+        out.dbDevices.querySelectorAll('[data-db-delete-device]').forEach((button) => {
+          button.addEventListener('click', () => {
+            updateEditorConfigFromInputs();
+            if (Object.keys(editorConfig.devicePackages).length <= 1) {
+              showDatabaseStatus('Mindestens ein Geraetepaket muss bleiben.');
+              return;
+            }
+            delete editorConfig.devicePackages[button.dataset.dbDeleteDevice];
+            renderDatabaseEditor();
+          });
+        });
+      }
+
+      function renderMountingEditor() {
+        out.dbMounting.innerHTML = [
+          editorNumberField('Montage Grundpreis', 'mounting.baseInstall', '1'),
+          editorNumberField('Weiteres Innengeraet', 'mounting.additionalIndoor', '1'),
+          editorNumberField('Kernbohrung je Stueck', 'mounting.drilling', '1'),
+          editorNumberField('Rohrleitung je Meter', 'mounting.lineMeter', '1'),
+          editorNumberField('Kabelkanal je Meter', 'mounting.channelMeter', '1'),
+          editorNumberField('Aussengeraet Balkon', 'mounting.outdoor.balkon', '1'),
+          editorNumberField('Aussengeraet Wand', 'mounting.outdoor.wand', '1'),
+          editorNumberField('Aussengeraet Boden', 'mounting.outdoor.boden', '1'),
+          editorNumberField('Aussengeraet Dach', 'mounting.outdoor.dach', '1'),
+          editorNumberField('Strom nah', 'mounting.power.nah', '1'),
+          editorNumberField('Strom bis 10 m', 'mounting.power.mittel', '1'),
+          editorNumberField('Strom ueber 10 m', 'mounting.power.weit', '1'),
+          editorNumberField('Kondensatpumpe', 'mounting.condensatePump', '1'),
+          editorNumberField('Kalkulationsaufschlag Faktor', 'markupFactor', '0.01', '1')
+        ].join('');
+      }
+
+      function renderRiskEditor() {
+        const entries = Object.entries(editorConfig.risks || {});
+        out.dbRisks.innerHTML = entries.map(([key, risk]) => `
+          <div class="kr-editor-row">
+            <div class="kr-editor-row-head">
+              <strong>${escapeHtml(risk.label || key)}</strong>
+              <button type="button" class="btn" data-db-delete-risk="${escapeHtml(key)}">Loeschen</button>
+            </div>
+            <div class="kr-db-grid">
+              ${editorTextField('Bezeichnung', `risks.${key}.label`)}
+              ${editorNumberField('Preis', `risks.${key}.cost`, '1')}
+              ${editorNumberField('Unsicherheit Faktor', `risks.${key}.complexity`, '0.005', '0')}
+            </div>
+            <div class="text-small kr-note">Interner Code: ${escapeHtml(key)}</div>
+          </div>
+        `).join('');
+        out.dbRisks.querySelectorAll('[data-db-delete-risk]').forEach((button) => {
+          button.addEventListener('click', () => {
+            updateEditorConfigFromInputs();
+            delete editorConfig.risks[button.dataset.dbDeleteRisk];
+            renderDatabaseEditor();
+          });
+        });
+      }
+
+      function renderSettingsEditor() {
+        out.dbSettings.innerHTML = [
+          editorNumberField('W/m2 gut gedaemmt', 'settings.baseWattsPerM2.gut', '1'),
+          editorNumberField('W/m2 normal', 'settings.baseWattsPerM2.normal', '1'),
+          editorNumberField('W/m2 Altbau', 'settings.baseWattsPerM2.altbau', '1'),
+          editorNumberField('U-Wert Neubau', 'settings.buildingDefaults.neubau.u', '0.1'),
+          editorNumberField('Raumhoehe Neubau', 'settings.buildingDefaults.neubau.height', '0.1'),
+          editorNumberField('U-Wert saniert', 'settings.buildingDefaults.saniert.u', '0.1'),
+          editorNumberField('Raumhoehe saniert', 'settings.buildingDefaults.saniert.height', '0.1'),
+          editorNumberField('U-Wert unsaniert', 'settings.buildingDefaults.unsaniert.u', '0.1'),
+          editorNumberField('Raumhoehe unsaniert', 'settings.buildingDefaults.unsaniert.height', '0.1'),
+          editorNumberField('Sonne Nord W/m2 Glas', 'settings.sunWatts.nord', '1'),
+          editorNumberField('Sonne Ost W/m2 Glas', 'settings.sunWatts.ost', '1'),
+          editorNumberField('Sonne Sued W/m2 Glas', 'settings.sunWatts.sued', '1'),
+          editorNumberField('Sonne West W/m2 Glas', 'settings.sunWatts.west', '1'),
+          editorNumberField('Sonne Sued-West W/m2 Glas', 'settings.sunWatts.suedwest', '1'),
+          editorNumberField('Sonne stark W/m2 Glas', 'settings.sunWatts.stark', '1'),
+          editorNumberField('Verschattung keine', 'settings.shadeFactors.none', '0.05'),
+          editorNumberField('Verschattung innen', 'settings.shadeFactors.inside', '0.05'),
+          editorNumberField('Verschattung aussen', 'settings.shadeFactors.outside', '0.05'),
+          editorNumberField('Verschattung Rollladen', 'settings.shadeFactors.shutter', '0.05'),
+          editorListField('Innengeraete-Groessen kW', 'settings.indoorSizes')
+        ].join('');
+      }
+
+      function renderDatabaseEditor() {
+        if (!editorConfig) return;
+        renderDeviceEditor();
+        renderMountingEditor();
+        renderRiskEditor();
+        renderSettingsEditor();
+        attachEditorInputListeners();
+        syncEditorJson();
+      }
+
+      function unlockDatabaseEditor() {
+        if (!codeIsValid()) {
+          showDatabaseStatus('Passwort stimmt nicht.');
+          return;
+        }
+        databaseUnlocked = true;
+        editorConfig = cloneConfig(priceConfig);
+        out.dbLogin.classList.add('kr-hidden');
+        out.dbEditor.classList.remove('kr-hidden');
+        renderDatabaseEditor();
+        showDatabaseStatus('Preisliste ist freigeschaltet.');
+      }
+
+      function addDevicePackage() {
+        updateEditorConfigFromInputs();
+        const key = uniqueKey(editorConfig.devicePackages, 'paket');
+        editorConfig.devicePackages[key] = {
+          label: `Neues Geraetepaket ${Object.keys(editorConfig.devicePackages).length + 1}`,
+          base: 1200,
+          room: 850,
+          capacityStep: 230
+        };
+        renderDatabaseEditor();
+        showDatabaseStatus('Geraetepaket hinzugefuegt. Speichern nicht vergessen.');
+      }
+
+      function addRisk() {
+        updateEditorConfigFromInputs();
+        const key = uniqueKey(editorConfig.risks, 'zusatz');
+        editorConfig.risks[key] = {
+          label: `Neue Zusatzarbeit ${Object.keys(editorConfig.risks).length + 1}`,
+          cost: 150,
+          complexity: 0.015
+        };
+        renderDatabaseEditor();
+        showDatabaseStatus('Zusatzarbeit hinzugefuegt. Speichern nicht vergessen.');
+      }
+
+      function applyDatabaseFromEditor() {
+        if (!databaseUnlocked || !codeIsValid()) {
+          showDatabaseStatus('Passwort stimmt nicht.');
+          return;
+        }
+        try {
+          updateEditorConfigFromInputs();
+          const merged = mergeConfig(defaultPriceConfig, editorConfig);
+          validateConfig(merged);
+          localStorage.setItem(DATABASE_STORAGE_KEY, JSON.stringify(merged));
+          setRuntimeConfig(merged);
+          editorConfig = cloneConfig(priceConfig);
+          renderRoomAreas();
+          renderDatabaseEditor();
+          calculate();
+          showDatabaseStatus('Preisliste wurde gespeichert.');
+        } catch (error) {
+          showDatabaseStatus(`Speichern nicht moeglich: ${error.message}`);
+        }
+      }
+
+      function importDatabaseFromJson() {
+        if (!databaseUnlocked || !codeIsValid()) {
+          showDatabaseStatus('Passwort stimmt nicht.');
+          return;
+        }
+        try {
+          const parsed = JSON.parse(out.dbJson.value);
+          const merged = mergeConfig(defaultPriceConfig, parsed);
+          validateConfig(merged);
+          editorConfig = cloneConfig(merged);
+          renderDatabaseEditor();
+          showDatabaseStatus('JSON wurde ins Formular uebernommen. Danach speichern.');
+        } catch (error) {
+          showDatabaseStatus(`Fehler in JSON: ${error.message}`);
+        }
+      }
+
+      Object.entries(fields).forEach(([key, field]) => {
+        if (key === 'klasse' || key === 'systemtyp') return;
+        field.addEventListener('input', calculate);
+        field.addEventListener('change', calculate);
+      });
+      fields.klasse.addEventListener('input', () => {
+        roomData.forEach((room) => { room.device = fields.klasse.value; });
+        renderRoomAreas();
+        calculate();
+      });
+      fields.klasse.addEventListener('change', () => {
+        roomData.forEach((room) => { room.device = fields.klasse.value; });
+        renderRoomAreas();
+        calculate();
+      });
       fields.modus.addEventListener('input', () => {
         applyMode();
         calculate();
@@ -1121,23 +1719,69 @@ window.initKlimaCalculator = () => {
         renderRoomAreas();
         calculate();
       });
+      fields.systemtyp.addEventListener('input', () => {
+        fields.systemtyp.dataset.userSelected = 'true';
+        calculate();
+      });
+      fields.systemtyp.addEventListener('change', () => {
+        fields.systemtyp.dataset.userSelected = 'true';
+        calculate();
+      });
       root.querySelectorAll('[data-risk]').forEach((input) => input.addEventListener('input', calculate));
+      $('#kr-db-toggle').addEventListener('click', () => {
+        out.dbPanel.classList.toggle('kr-hidden');
+        if (!out.dbPanel.classList.contains('kr-hidden')) {
+          showDatabaseStatus(databaseUnlocked ? 'Preisliste ist freigeschaltet.' : 'Passwort erforderlich.');
+        }
+      });
+      $('#kr-db-unlock').addEventListener('click', unlockDatabaseEditor);
+      $('#kr-db-template').addEventListener('click', () => {
+        if (databaseUnlocked) {
+          updateEditorConfigFromInputs();
+          syncEditorJson();
+        } else {
+          out.dbJson.value = databaseText();
+        }
+        showDatabaseStatus('Aktuelle Daten geladen.');
+      });
+      $('#kr-db-import-json').addEventListener('click', importDatabaseFromJson);
+      $('#kr-db-add-device').addEventListener('click', addDevicePackage);
+      $('#kr-db-add-risk').addEventListener('click', addRisk);
+      $('#kr-db-save').addEventListener('click', applyDatabaseFromEditor);
+      $('#kr-db-reset').addEventListener('click', () => {
+        if (!databaseUnlocked || !codeIsValid()) {
+          showDatabaseStatus('Passwort stimmt nicht.');
+          return;
+        }
+        try {
+          localStorage.removeItem(DATABASE_STORAGE_KEY);
+          setRuntimeConfig(window.KLIMA_PRICE_CONFIG || defaultPriceConfig);
+          editorConfig = cloneConfig(priceConfig);
+          renderRoomAreas();
+          renderDatabaseEditor();
+          calculate();
+          showDatabaseStatus('Lokale Datenbank wurde geloescht. Datei prices.json ist wieder aktiv.');
+        } catch (error) {
+          showDatabaseStatus(`Reset nicht moeglich: ${error.message}`);
+        }
+      });
       $('#kr-reset').addEventListener('click', () => {
         fields.objekt.value = 'wohnung';
         fields.klasse.value = 'standard';
-        fields.land.value = 'at';
         fields.modus.value = 'basis';
         fields.gebaeude.value = 'saniert';
         fields.raeume.value = '1';
+        fields.systemtyp.value = 'single';
+        delete fields.systemtyp.dataset.userSelected;
         roomData.splice(
           0,
           roomData.length,
-          { area: 25, height: 2.6, window: 5, u: 1.3, sun: 'sued', shade: 'none', insulation: 'normal', persons: 2, attic: 'no' },
-          { area: 18, height: 2.6, window: 3, u: 1.3, sun: 'west', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
-          { area: 16, height: 2.6, window: 3, u: 1.3, sun: 'ost', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
-          { area: 14, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
-          { area: 12, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' },
-          { area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no' }
+          { area: 25, height: 2.6, window: 5, u: 1.3, sun: 'sued', shade: 'none', insulation: 'normal', persons: 2, attic: 'no', device: 'standard' },
+          { area: 18, height: 2.6, window: 3, u: 1.3, sun: 'west', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+          { area: 16, height: 2.6, window: 3, u: 1.3, sun: 'ost', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+          { area: 14, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+          { area: 12, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+          { area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' }
         );
         fields.aussen.value = 'balkon';
         fields.bohrung.value = '1';

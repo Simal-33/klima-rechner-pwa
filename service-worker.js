@@ -1,12 +1,12 @@
-const CACHE_NAME = 'klima-rechner-v7';
+const CACHE_NAME = 'klima-rechner-v10-flat';
 const APP_SHELL = [
   './',
   './index.html',
   './prices.json',
   './manifest.webmanifest',
-  './assets/logo.png',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  './logo.png',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {

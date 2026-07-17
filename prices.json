@@ -1,6 +1,9 @@
 {
-  "version": 1,
+  "version": 3,
   "currency": "EUR",
+  "admin": {
+    "updateCode": "KLIMA2026"
+  },
   "devicePackages": {
     "basis": {
       "label": "Basis-Paket Wandgeraet",
@@ -69,8 +72,55 @@
     }
   },
   "taxRates": {
-    "at": 0.2,
-    "de": 0.19
+    "at": 0.2
   },
-  "markupFactor": 1.22
+  "markupFactor": 1.22,
+  "settings": {
+    "baseWattsPerM2": {
+      "gut": 45,
+      "normal": 60,
+      "altbau": 80
+    },
+    "buildingDefaults": {
+      "neubau": {
+        "insulation": "gut",
+        "u": 0.9,
+        "height": 2.5
+      },
+      "saniert": {
+        "insulation": "normal",
+        "u": 1.3,
+        "height": 2.6
+      },
+      "unsaniert": {
+        "insulation": "altbau",
+        "u": 2.4,
+        "height": 2.8
+      }
+    },
+    "sunWatts": {
+      "nord": 20,
+      "ost": 65,
+      "sued": 85,
+      "west": 100,
+      "suedwest": 120,
+      "stark": 150
+    },
+    "shadeFactors": {
+      "none": 1,
+      "inside": 0.85,
+      "outside": 0.55,
+      "shutter": 0.4
+    },
+    "indoorSizes": [
+      2.0,
+      2.5,
+      3.5,
+      4.2,
+      5.0,
+      6.0,
+      7.1,
+      10.0
+    ]
+  }
 }
