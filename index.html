@@ -511,6 +511,87 @@ textarea:focus-visible {
     #klima-kundenrechner .kr-note {
       color: var(--muted-foreground);
     }
+    #klima-kundenrechner .kr-print-offer {
+      display: none;
+    }
+    #klima-kundenrechner .kr-print-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      border-bottom: 2px solid #172027;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+    #klima-kundenrechner .kr-print-title {
+      font-size: 24pt;
+      line-height: 1.12;
+      font-weight: 700;
+      margin: 0;
+    }
+    #klima-kundenrechner .kr-print-meta {
+      text-align: right;
+      font-size: 10pt;
+      line-height: 1.45;
+    }
+    #klima-kundenrechner .kr-print-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin: 14px 0;
+    }
+    #klima-kundenrechner .kr-print-box {
+      border: 1px solid #c8d2d8;
+      padding: 8px;
+      min-height: 52px;
+    }
+    #klima-kundenrechner .kr-print-label {
+      display: block;
+      color: #53616b;
+      font-size: 8.5pt;
+      margin-bottom: 3px;
+    }
+    #klima-kundenrechner .kr-print-value {
+      font-size: 13pt;
+      font-weight: 700;
+    }
+    #klima-kundenrechner .kr-print-section {
+      margin-top: 14px;
+      break-inside: avoid;
+    }
+    #klima-kundenrechner .kr-print-section h3 {
+      font-size: 12pt;
+      margin: 0 0 6px;
+    }
+    #klima-kundenrechner .kr-print-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9.5pt;
+    }
+    #klima-kundenrechner .kr-print-table th,
+    #klima-kundenrechner .kr-print-table td {
+      border-bottom: 1px solid #d8e0e4;
+      padding: 5px 4px;
+      text-align: left;
+      vertical-align: top;
+    }
+    #klima-kundenrechner .kr-print-table th {
+      color: #53616b;
+      font-weight: 700;
+    }
+    #klima-kundenrechner .kr-print-money {
+      text-align: right !important;
+      white-space: nowrap;
+    }
+    #klima-kundenrechner .kr-print-total {
+      font-size: 12pt;
+      font-weight: 700;
+    }
+    #klima-kundenrechner .kr-print-note {
+      margin-top: 12px;
+      font-size: 9pt;
+      color: #53616b;
+    }
     @media (min-width: 981px) {
       #klima-kundenrechner .kr-result {
         position: sticky;
@@ -563,6 +644,47 @@ textarea:focus-visible {
       }
       #klima-kundenrechner .kr-load-row > span:last-child {
         justify-self: start;
+      }
+    }
+    @media print {
+      @page {
+        margin: 14mm;
+      }
+      html,
+      body {
+        background: #ffffff !important;
+        color: #111820 !important;
+      }
+      body {
+        margin: 0 !important;
+      }
+      .app-bar,
+      #app-install,
+      #klima-kundenrechner .kr-layout {
+        display: none !important;
+      }
+      .app-shell,
+      .app-main {
+        width: auto !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      #klima-kundenrechner {
+        color: #111820 !important;
+        font-size: 11pt;
+      }
+      #klima-kundenrechner .kr-print-offer {
+        display: block !important;
+        background: #ffffff !important;
+        color: #111820 !important;
+      }
+      #klima-kundenrechner .kr-print-summary {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      #klima-kundenrechner .kr-print-table th,
+      #klima-kundenrechner .kr-print-table td {
+        color: #111820 !important;
       }
     }
   </style>
@@ -731,7 +853,8 @@ textarea:focus-visible {
       </div>
 
       <div class="kr-actions">
-        <button id="kr-copy" type="button" class="btn btn-primary">Anfrage kopieren</button>
+        <button id="kr-print" type="button" class="btn btn-primary">PDF drucken</button>
+        <button id="kr-download-pdf" type="button" class="btn kr-hidden">PDF herunterladen</button>
         <button id="kr-reset" type="button" class="btn">Neu starten</button>
         <button id="kr-db-toggle" type="button" class="btn">Datenbank aktualisieren</button>
       </div>
@@ -798,6 +921,7 @@ textarea:focus-visible {
       </div>
     </section>
   </div>
+  <section id="kr-print-offer" class="kr-print-offer" aria-label="Druckansicht Angebot"></section>
 
   <script>
 window.initKlimaCalculator = () => {
@@ -852,7 +976,9 @@ window.initKlimaCalculator = () => {
         dbRisks: $('#kr-db-risks'),
         dbSettings: $('#kr-db-settings'),
         dbJson: $('#kr-db-json'),
-        dbStatus: $('#kr-db-status')
+        dbStatus: $('#kr-db-status'),
+        printOffer: $('#kr-print-offer'),
+        downloadPdf: $('#kr-download-pdf')
       };
       const roomData = [
         { area: 25, height: 2.6, window: 5, u: 1.3, sun: 'sued', shade: 'none', insulation: 'normal', persons: 2, attic: 'no', device: 'standard' },
@@ -1434,6 +1560,297 @@ window.initKlimaCalculator = () => {
         ].filter(Boolean).join('\n');
       }
 
+      function printableOfferHtml() {
+        const result = calculate();
+        const objectLabel = fields.objekt.options[fields.objekt.selectedIndex].text;
+        const modeLabel = fields.modus.options[fields.modus.selectedIndex].text;
+        const buildingLabel = fields.gebaeude.options[fields.gebaeude.selectedIndex].text;
+        const outsideLabel = fields.aussen.options[fields.aussen.selectedIndex].text;
+        const note = fields.notiz.value.trim();
+        const exact = fields.modus.value === 'genau';
+        const defaults = buildingDefaults[fields.gebaeude.value];
+        const sunLabels = { nord: 'Nord/wenig Sonne', ost: 'Ost', sued: 'Sued', west: 'West', suedwest: 'Sued-West', stark: 'sehr sonnig' };
+        const shadeLabels = { none: 'keine Verschattung', inside: 'innen verschattet', outside: 'aussen verschattet', shutter: 'stark verschattet' };
+        const insulationLabels = { gut: 'gut gedaemmt', normal: 'normal gedaemmt', altbau: 'Altbau/schwach gedaemmt' };
+        const today = new Date().toLocaleDateString('de-DE');
+        const roomRows = result.plan.perRoom.map((item) => {
+          const room = item.room;
+          const height = exact ? room.height : defaults.height;
+          const uValue = exact ? room.u : defaults.u;
+          const insulation = exact ? room.insulation : defaults.insulation;
+          const deviceLabel = (devicePrices[room.device] || result.device).label;
+          return `
+            <tr>
+              <td>Raum ${item.index + 1}</td>
+              <td>${room.area.toLocaleString('de-DE')} m2</td>
+              <td>${escapeHtml(deviceLabel)}</td>
+              <td>${height.toLocaleString('de-DE')} m</td>
+              <td>${room.window.toLocaleString('de-DE')} m2 / U ${uValue.toLocaleString('de-DE')}</td>
+              <td>${escapeHtml(sunLabels[room.sun])}, ${escapeHtml(shadeLabels[room.shade])}</td>
+              <td>${escapeHtml(insulationLabels[insulation])}</td>
+              <td>${room.persons}</td>
+              <td>${item.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td>
+              <td>${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td>
+            </tr>
+          `;
+        }).join('');
+        const costRows = result.lines.map((lineItem) => `
+          <tr>
+            <td>${escapeHtml(lineItem[0])}</td>
+            <td class="kr-print-money">${euro(lineItem[1] * serviceFactor)}</td>
+          </tr>
+        `).join('');
+        const riskText = result.risks.length
+          ? result.risks.map((risk) => risk.label).join(', ')
+          : 'keine Zusatzarbeiten ausgewaehlt';
+        return `
+          <div class="kr-print-head">
+            <div>
+              <h1 class="kr-print-title">Richtangebot Klimaanlage</h1>
+              <div class="kr-print-note">Unverbindliche Vorkalkulation fuer Split-Klimaanlagen</div>
+            </div>
+            <div class="kr-print-meta">
+              <strong>Datum:</strong> ${today}<br>
+              <strong>Standort:</strong> Oesterreich<br>
+              <strong>Berechnung:</strong> ${escapeHtml(modeLabel)}
+            </div>
+          </div>
+          <div class="kr-print-summary">
+            <div class="kr-print-box"><span class="kr-print-label">Richtpreis brutto</span><span class="kr-print-value">${euro(result.gross)}</span></div>
+            <div class="kr-print-box"><span class="kr-print-label">Preisspanne</span><span class="kr-print-value">${euro(result.low)} bis ${euro(result.high)}</span></div>
+            <div class="kr-print-box"><span class="kr-print-label">Empfehlung</span><span class="kr-print-value">${result.systemType === 'single' && result.rooms > 1 ? `${result.rooms} Single-Split` : `${result.kw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`}</span></div>
+            <div class="kr-print-box"><span class="kr-print-label">Objekt</span><span class="kr-print-value">${escapeHtml(objectLabel)}</span></div>
+            <div class="kr-print-box"><span class="kr-print-label">Raeume / Flaeche</span><span class="kr-print-value">${result.rooms} / ${result.area} m2</span></div>
+            <div class="kr-print-box"><span class="kr-print-label">Anlagentyp</span><span class="kr-print-value">${escapeHtml(result.systemLabel)}</span></div>
+          </div>
+          <div class="kr-print-section">
+            <h3>Projekt</h3>
+            <table class="kr-print-table">
+              <tbody>
+                <tr><th>Gebaeudezustand</th><td>${escapeHtml(buildingLabel)}</td><th>Aussengeraet</th><td>${escapeHtml(outsideLabel)}</td></tr>
+                <tr><th>Rohrlaenge gesamt</th><td>${number(fields.leitung).toLocaleString('de-DE')} m</td><th>Kabelkanal sichtbar</th><td>${number(fields.kanal).toLocaleString('de-DE')} m</td></tr>
+                <tr><th>Berechnete Raumlast</th><td>${result.plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td><th>Innengeraete gesamt</th><td>${result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td></tr>
+                <tr><th>Montagehinweise</th><td colspan="3">${escapeHtml(riskText)}</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="kr-print-section">
+            <h3>Raeume und Geraete</h3>
+            <table class="kr-print-table">
+              <thead>
+                <tr><th>Raum</th><th>Flaeche</th><th>Geraet</th><th>Hoehe</th><th>Fenster</th><th>Sonne</th><th>Daemmung</th><th>Pers.</th><th>Last</th><th>Innen</th></tr>
+              </thead>
+              <tbody>${roomRows}</tbody>
+            </table>
+          </div>
+          <div class="kr-print-section">
+            <h3>Kostenuebersicht</h3>
+            <table class="kr-print-table">
+              <tbody>
+                ${costRows}
+                <tr><th>Richtpreis netto</th><td class="kr-print-money">${euro(result.net)}</td></tr>
+                <tr><th>USt. ${Math.round(taxRates.at * 100)} Prozent</th><td class="kr-print-money">${euro(result.tax)}</td></tr>
+                <tr class="kr-print-total"><th>Unverbindlicher Richtpreis</th><td class="kr-print-money">${euro(result.gross)}</td></tr>
+              </tbody>
+            </table>
+          </div>
+          ${note ? `<div class="kr-print-section"><h3>Hinweis</h3><p>${escapeHtml(note)}</p></div>` : ''}
+          <p class="kr-print-note">Dieses Dokument ist ein Richtangebot auf Basis der eingegebenen Kundendaten. Der finale Preis wird nach Besichtigung, Herstellerdatenblatt, Montageort und Elektroanschluss bestaetigt.</p>
+        `;
+      }
+
+      function offerPdfLines() {
+        const result = calculate();
+        const objectLabel = fields.objekt.options[fields.objekt.selectedIndex].text;
+        const modeLabel = fields.modus.options[fields.modus.selectedIndex].text;
+        const buildingLabel = fields.gebaeude.options[fields.gebaeude.selectedIndex].text;
+        const outsideLabel = fields.aussen.options[fields.aussen.selectedIndex].text;
+        const note = fields.notiz.value.trim();
+        const today = new Date().toLocaleDateString('de-DE');
+        const riskText = result.risks.length
+          ? result.risks.map((risk) => risk.label).join(', ')
+          : 'keine Zusatzarbeiten ausgewaehlt';
+        const lines = [
+          'Richtangebot Klimaanlage',
+          `Datum: ${today}`,
+          `Standort: Oesterreich`,
+          `Berechnung: ${modeLabel}`,
+          '',
+          `Objekt: ${objectLabel}`,
+          `Gebaeudezustand: ${buildingLabel}`,
+          `Raeume / Flaeche: ${result.rooms} / ${result.area} m2`,
+          `Anlagentyp: ${result.systemLabel}`,
+          `Aussengeraet: ${outsideLabel}`,
+          `Rohrlaenge gesamt: ${number(fields.leitung)} m`,
+          `Kabelkanal sichtbar: ${number(fields.kanal)} m`,
+          `Montagehinweise: ${riskText}`,
+          '',
+          'Kuehllast und Geraete:',
+          `Berechnete Raumlast: ${result.plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
+          `Innengeraete gesamt: ${result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
+          `Empfohlenes Aussengeraet: ${result.systemType === 'single' && result.rooms > 1 ? `${result.rooms} Single-Split` : `${result.kw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`}`,
+          ...result.plan.perRoom.map((item) => {
+            const deviceLabel = (devicePrices[item.room.device] || result.device).label;
+            return `Raum ${item.index + 1}: ${item.room.area} m2, ${deviceLabel}, Last ${item.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW, Innengeraet ${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
+          }),
+          '',
+          'Kostenuebersicht:',
+          ...result.lines.map((lineItem) => `${lineItem[0]}: ${euro(lineItem[1] * serviceFactor)}`),
+          `Richtpreis netto: ${euro(result.net)}`,
+          `USt. ${Math.round(taxRates.at * 100)} Prozent: ${euro(result.tax)}`,
+          `Unverbindlicher Richtpreis: ${euro(result.gross)}`,
+          `Preisspanne: ${euro(result.low)} bis ${euro(result.high)}`,
+          note ? '' : null,
+          note ? `Hinweis: ${note}` : null,
+          '',
+          'Dieses Dokument ist ein Richtangebot auf Basis der eingegebenen Kundendaten.',
+          'Der finale Preis wird nach Besichtigung, Herstellerdatenblatt, Montageort und Elektroanschluss bestaetigt.'
+        ];
+        return lines.filter((line) => line !== null);
+      }
+
+      function pdfSafeText(value) {
+        return String(value)
+          .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+          .replace(/Ä/g, 'Ae').replace(/Ö/g, 'Oe').replace(/Ü/g, 'Ue')
+          .replace(/€/g, 'EUR')
+          .normalize('NFKD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^\x20-\x7E]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      function pdfEscape(value) {
+        return pdfSafeText(value).replace(/[\\()]/g, '\\$&');
+      }
+
+      function wrapPdfLines(lines, maxChars = 92) {
+        const wrapped = [];
+        lines.forEach((line) => {
+          let text = pdfSafeText(line);
+          if (!text) {
+            wrapped.push('');
+            return;
+          }
+          while (text.length > maxChars) {
+            let cut = text.lastIndexOf(' ', maxChars);
+            if (cut < 28) cut = maxChars;
+            wrapped.push(text.slice(0, cut));
+            text = text.slice(cut).trim();
+          }
+          wrapped.push(text);
+        });
+        return wrapped;
+      }
+
+      function createPdfBlob(lines) {
+        const pageWidth = 595;
+        const pageHeight = 842;
+        const margin = 42;
+        const lineHeight = 14;
+        const maxLines = Math.floor((pageHeight - margin * 2) / lineHeight);
+        const wrapped = wrapPdfLines(lines);
+        const pages = [];
+        for (let index = 0; index < wrapped.length; index += maxLines) {
+          pages.push(wrapped.slice(index, index + maxLines));
+        }
+        if (!pages.length) pages.push(['Richtangebot Klimaanlage']);
+
+        const objects = [
+          '<< /Type /Catalog /Pages 2 0 R >>',
+          '',
+          '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'
+        ];
+        const kids = [];
+        pages.forEach((pageLines, pageIndex) => {
+          const pageObjectNumber = 4 + pageIndex * 2;
+          const contentObjectNumber = pageObjectNumber + 1;
+          kids.push(`${pageObjectNumber} 0 R`);
+          const commands = [
+            'BT',
+            '/F1 10 Tf',
+            `${lineHeight} TL`,
+            `1 0 0 1 ${margin} ${pageHeight - margin} Tm`
+          ];
+          pageLines.forEach((line, lineIndex) => {
+            if (pageIndex === 0 && lineIndex === 0) {
+              commands.push('/F1 16 Tf');
+              commands.push(`(${pdfEscape(line)}) Tj`);
+              commands.push('/F1 10 Tf');
+            } else if (line) {
+              commands.push(`(${pdfEscape(line)}) Tj`);
+            }
+            commands.push('T*');
+          });
+          commands.push('ET');
+          const content = commands.join('\n');
+          objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /Font << /F1 3 0 R >> >> /Contents ${contentObjectNumber} 0 R >>`);
+          objects.push(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
+        });
+        objects[1] = `<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${pages.length} >>`;
+
+        let pdf = '%PDF-1.4\n';
+        const offsets = [0];
+        objects.forEach((object, index) => {
+          offsets.push(pdf.length);
+          pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+        });
+        const xrefOffset = pdf.length;
+        pdf += `xref\n0 ${objects.length + 1}\n`;
+        pdf += '0000000000 65535 f \n';
+        offsets.slice(1).forEach((offset) => {
+          pdf += `${String(offset).padStart(10, '0')} 00000 n \n`;
+        });
+        pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+        return new Blob([pdf], { type: 'application/pdf' });
+      }
+
+      function downloadPdfOffer() {
+        const blob = createPdfBlob(offerPdfLines());
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const date = new Date().toISOString().slice(0, 10);
+        link.href = url;
+        link.download = `klima-richtangebot-${date}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 30000);
+      }
+
+      function printOffer() {
+        out.printOffer.innerHTML = printableOfferHtml();
+        out.downloadPdf.classList.add('kr-hidden');
+        out.printOffer.offsetHeight;
+        out.status.textContent = 'Druckfenster wird geoeffnet. Fuer PDF bitte "Als PDF speichern" waehlen.';
+        let printStarted = false;
+        const markPrintStarted = () => {
+          printStarted = true;
+        };
+        const showPdfFallback = () => {
+          out.downloadPdf.classList.remove('kr-hidden');
+          try {
+            downloadPdfOffer();
+            out.status.textContent = 'Das Druckfenster wurde vermutlich vom Browser blockiert. Die PDF-Datei wurde stattdessen erstellt.';
+          } catch (error) {
+            out.status.textContent = 'Druckfenster wurde blockiert. Bitte PDF herunterladen klicken oder Strg+P in Chrome/Edge verwenden.';
+          }
+        };
+        window.addEventListener('beforeprint', markPrintStarted, { once: true });
+        try {
+          window.print();
+        } catch (error) {
+          window.removeEventListener('beforeprint', markPrintStarted);
+          showPdfFallback();
+          return;
+        }
+        window.setTimeout(() => {
+          window.removeEventListener('beforeprint', markPrintStarted);
+          if (!printStarted) showPdfFallback();
+        }, 1200);
+      }
+
       function databaseText(config = priceConfig) {
         return JSON.stringify(config, null, 2);
       }
@@ -1765,6 +2182,11 @@ window.initKlimaCalculator = () => {
           showDatabaseStatus(`Reset nicht moeglich: ${error.message}`);
         }
       });
+      $('#kr-download-pdf').addEventListener('click', () => {
+        out.printOffer.innerHTML = printableOfferHtml();
+        downloadPdfOffer();
+        out.status.textContent = 'PDF-Datei wurde erstellt.';
+      });
       $('#kr-reset').addEventListener('click', () => {
         fields.objekt.value = 'wohnung';
         fields.klasse.value = 'standard';
@@ -1795,15 +2217,7 @@ window.initKlimaCalculator = () => {
         renderRoomAreas();
         calculate();
       });
-      $('#kr-copy').addEventListener('click', async () => {
-        const text = requestText();
-        try {
-          await navigator.clipboard.writeText(text);
-          out.status.textContent = 'Anfrage wurde kopiert.';
-        } catch (error) {
-          out.status.textContent = text;
-        }
-      });
+      $('#kr-print').addEventListener('click', printOffer);
       out.roomAreas = $('#kr-room-areas');
       renderRoomAreas();
       calculate();

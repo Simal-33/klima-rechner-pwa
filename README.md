@@ -26,6 +26,7 @@ Alle wichtigen Dateien liegen direkt im Hauptordner. Es muessen keine Unterordne
 - Auswahl Single-Split je Raum oder Multi-Split bei mehreren Raeumen
 - Geraeteauswahl pro Raum
 - Rohrlaenge bis maximal 60 m
+- PDF-Druckansicht fuer das Richtangebot
 - Datenbank-Button fuer Preise und Einstellwerte
 - Passwortgeschuetzte Preisliste: Geraetepakete und Zusatzarbeiten hinzufuegen oder loeschen
 - Standard-Passwort: `KLIMA2026`
