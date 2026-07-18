@@ -606,7 +606,32 @@
       "capacityStep": 230
     }
   },
-     "aussen_lg_multi_aussengeraet_mu2r15": {
+  "outdoorUnits": {
+    "multi42": {
+      "label": "Multi-Split Au\u00dfenger\u00e4t bis 4,2 kW",
+      "base": 1450,
+      "capacityStep": 230,
+      "ratedKw": 4.2
+    },
+    "multi60": {
+      "label": "Multi-Split Au\u00dfenger\u00e4t bis 6,0 kW",
+      "base": 1850,
+      "capacityStep": 250,
+      "ratedKw": 6.0
+    },
+    "multi80": {
+      "label": "Multi-Split Au\u00dfenger\u00e4t bis 8,0 kW",
+      "base": 2450,
+      "capacityStep": 280,
+      "ratedKw": 8.0
+    },
+    "aussen_multisplit_aussengeraet_fuer_2_innengeraete": {
+      "label": "Multisplit-Au\u00dfenger\u00e4t f\u00fcr 2 Innenger\u00e4te",
+      "ratedKw": 5.0,
+      "base": 1850.0,
+      "capacityStep": 250
+    },
+    "aussen_lg_multi_aussengeraet_mu2r15": {
       "label": "LG Multi Au\u00dfenger\u00e4t MU2R15",
       "ratedKw": 4.4,
       "base": 1827.0,
@@ -713,8 +738,8 @@
   "objectFactor": {
     "wohnung": 1,
     "haus": 1,
-    "buero": 1.20,
-    "laden": 1.20
+    "buero": 1.10,
+    "laden": 1.10
   },
   "risks": {
     "ladder": {
@@ -741,7 +766,7 @@
   "taxRates": {
     "at": 0.2
   },
-  "markupFactor": 1.10,
+  "markupFactor": 1,
   "settings": {
     "baseWattsPerM2": {
       "gut": 45,

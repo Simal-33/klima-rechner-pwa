@@ -444,6 +444,22 @@ textarea:focus-visible {
     #klima-kundenrechner .kr-result .kr-note {
       color: var(--kr-deep-muted);
     }
+    #klima-kundenrechner .kr-outdoor-check {
+      margin-top: 8px;
+      padding: 9px 10px;
+      border: 1px solid rgba(216, 236, 232, .22);
+      background: rgba(255, 255, 255, .06);
+    }
+    #klima-kundenrechner .kr-outdoor-check.kr-check-warning {
+      border-color: rgba(245, 158, 11, .7);
+      background: rgba(245, 158, 11, .14);
+      color: #ffe8b5;
+    }
+    #klima-kundenrechner .kr-outdoor-check.kr-check-ok {
+      border-color: rgba(125, 211, 172, .55);
+      background: rgba(125, 211, 172, .12);
+      color: #dff7ea;
+    }
     #klima-kundenrechner .kr-main-stat {
       padding: 18px;
     }
@@ -1027,6 +1043,7 @@ textarea:focus-visible {
       <div class="kr-plan" aria-label="Gerätevorschlag">
         <div class="text-small kr-note">Gerätevorschlag je Raum</div>
         <div id="kr-device-plan"></div>
+        <div id="kr-outdoor-check" class="kr-outdoor-check text-small kr-note kr-hidden"></div>
       </div>
 
       <div class="kr-list" aria-label="Kostenübersicht">
@@ -1155,6 +1172,7 @@ window.initKlimaCalculator = () => {
         loadLines: $('#kr-load-lines'),
         loadBreakdown: $('#kr-load-breakdown'),
         devicePlan: $('#kr-device-plan'),
+        outdoorCheck: $('#kr-outdoor-check'),
         lines: $('#kr-lines'),
         netto: $('#kr-netto'),
         ustLabel: $('#kr-ust-label'),
@@ -2436,12 +2454,71 @@ window.initKlimaCalculator = () => {
         return { perRoom, rawKw, indoorSumKw, diversity, outdoorKw, largest };
       }
 
+      function outdoorMaxIndoorUnits(unit, key = '') {
+        const explicit = Number(unit.maxIndoorUnits || unit.maxRooms || unit.indoorUnits || 0);
+        if (explicit > 0) return explicit;
+        const source = `${key} ${unit.label || ''}`.toLowerCase();
+        const patterns = [
+          /(\d+)\s*(?:innengeräte|innengeraete|ig)/,
+          /mu(\d+)r/,
+          /aj\d+[_\s-]*(\d+)ig/
+        ];
+        for (const pattern of patterns) {
+          const match = source.match(pattern);
+          if (match) return Number(match[1]);
+        }
+        return 0;
+      }
+
+      function outdoorUnitCheck(plan, outdoorUnit, systemType, outdoorKey = '') {
+        if (systemType !== 'multi') {
+          return { ok: true, message: 'Single-Split: jedes Set bringt ein eigenes Außengerät mit.', requiredKw: plan.outdoorKw, selectedKw: 0, maxIndoorUnits: 0 };
+        }
+        const selectedKw = Number(outdoorUnit.ratedKw || 0);
+        const requiredKw = plan.outdoorKw;
+        const maxIndoorUnits = outdoorMaxIndoorUnits(outdoorUnit, outdoorKey);
+        const capacityOk = selectedKw <= 0 || selectedKw + 0.05 >= requiredKw;
+        const roomCountOk = maxIndoorUnits <= 0 || maxIndoorUnits >= plan.perRoom.length;
+        const messages = [];
+        if (!capacityOk) {
+          messages.push(`gewählt ${selectedKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW, benötigt ca. ${requiredKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`);
+        }
+        if (!roomCountOk) {
+          messages.push(`gewählt für ${maxIndoorUnits} Innengeräte, benötigt ${plan.perRoom.length}`);
+        }
+        const ok = capacityOk && roomCountOk;
+        return {
+          ok,
+          message: ok
+            ? `Außengerät passt: ${selectedKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW für ca. ${requiredKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW Bedarf.`
+            : `Außengerät prüfen: ${messages.join('; ')}.`,
+          requiredKw,
+          selectedKw,
+          maxIndoorUnits
+        };
+      }
+
       function deviceCostForRoom(item, systemType) {
         const config = devicePrices[item.room.device] || devicePrices.standard || devicePrices[fallbackDeviceKey()];
         const capacityBase = Number(config.ratedKw || 0) || (systemType === 'single' ? 3.5 : 2.5);
         const capacitySurcharge = Math.max(0, item.indoorKw - capacityBase) * (config.capacityStep || 210);
         const base = systemType === 'single' ? config.base : config.room;
         return { label: config.label, cost: Number(base || 0) + capacitySurcharge };
+      }
+
+      function offerPosition(label, qty, unit, unitPrice, options = {}) {
+        const normalizedQty = Number(qty) || 0;
+        const normalizedPrice = Number(unitPrice) || 0;
+        const total = Object.prototype.hasOwnProperty.call(options, 'total') ? Number(options.total) || 0 : normalizedQty * normalizedPrice;
+        return { label, qty: normalizedQty, unit, unitPrice: normalizedPrice, total };
+      }
+
+      function formatQuantity(value) {
+        const numberValue = Number(value) || 0;
+        return numberValue.toLocaleString('de-DE', {
+          minimumFractionDigits: Number.isInteger(numberValue) ? 0 : 1,
+          maximumFractionDigits: 2
+        });
       }
 
       function selectedRisks() {
@@ -2458,8 +2535,10 @@ window.initKlimaCalculator = () => {
         const systemType = currentSystemType();
         const systemLabel = systemFor(systemType, rooms);
         const device = devicePrices.standard || devicePrices[fallbackDeviceKey()];
-        const outdoorUnit = outdoorUnitPrices[fields.klasse.value] || outdoorUnitPrices[fallbackOutdoorKey()];
+        const outdoorKey = outdoorUnitPrices[fields.klasse.value] ? fields.klasse.value : fallbackOutdoorKey();
+        const outdoorUnit = outdoorUnitPrices[outdoorKey];
         const plan = loadPlan(roomDetails, systemType);
+        const outdoorCheck = outdoorUnitCheck(plan, outdoorUnit, systemType, outdoorKey);
         const kw = plan.outdoorKw;
         const roomDeviceCosts = plan.perRoom.map((item) => deviceCostForRoom(item, systemType));
         const outdoorBaseKw = Number(outdoorUnit.ratedKw || 0) || 4.2;
@@ -2484,20 +2563,33 @@ window.initKlimaCalculator = () => {
         const electric = mountingPrices.power[fields.strom.value];
         const pump = fields.kondensat.value === 'pumpe' ? mountingPrices.condensatePump : 0;
         const risks = selectedRisks();
-        const baseLines = [
-          [systemType === 'multi' ? `Außengerät ${outdoorUnit.label} + Innengeräte` : 'Single-Split Sets je Raum', deviceCost],
-          ['Montage und Inbetriebnahme', baseInstall],
-          ['Leitungen und Kabelkanal', line + channel],
-          ['Wanddurchbruch und Außengerät-Standort', drilling + outside]
-        ];
-        if (deviceDiscount > 0) baseLines.splice(1, 0, [`Geräterabatt ${discountPercent.toLocaleString('de-DE', { maximumFractionDigits: 1 })} %`, -deviceDiscount]);
-        if (electric > 0) baseLines.push(['Stromzuleitung', electric]);
-        if (pump > 0) baseLines.push(['Kondensatpumpe', pump]);
-        risks.forEach((risk) => baseLines.push([`Montage-Zuschlag: ${risk.label}`, risk.cost]));
-        const beforeObjectFactor = baseLines.reduce((sum, lineItem) => sum + lineItem[1], 0);
+        const positions = [];
+        if (systemType === 'multi') {
+          const outdoorCost = (outdoorUnit.base || 0) + outdoorCapacitySurcharge;
+          positions.push(offerPosition(`Außengerät ${outdoorUnit.label}`, 1, 'Stk.', outdoorCost));
+          roomDeviceCosts.forEach((item, index) => {
+            const roomLabel = displayRoomName(plan.perRoom[index].room, plan.perRoom[index].index);
+            positions.push(offerPosition(`Innengerät ${roomLabel} - ${item.label}`, 1, 'Stk.', item.cost));
+          });
+        } else {
+          roomDeviceCosts.forEach((item, index) => {
+            const roomLabel = displayRoomName(plan.perRoom[index].room, plan.perRoom[index].index);
+            positions.push(offerPosition(`Single-Split Set ${roomLabel} - ${item.label}`, 1, 'Set', item.cost));
+          });
+        }
+        if (deviceDiscount > 0) positions.push(offerPosition(`Geräterabatt ${discountPercent.toLocaleString('de-DE', { maximumFractionDigits: 1 })} % auf Geräte`, 1, 'Abzug', -deviceDiscount));
+        positions.push(offerPosition('Montage und Inbetriebnahme', systemType === 'single' ? rooms : 1, systemType === 'single' ? 'Set' : 'Pauschal', systemType === 'single' ? mountingPrices.baseInstall : baseInstall, { total: baseInstall }));
+        if (line > 0) positions.push(offerPosition('Kältemittelleitung und Steuerleitung', number(fields.leitung), 'm', mountingPrices.lineMeter));
+        if (channel > 0) positions.push(offerPosition('Kabelkanal sichtbar', number(fields.kanal), 'm', mountingPrices.channelMeter));
+        if (drilling > 0) positions.push(offerPosition('Kernbohrung / Wanddurchbruch', drillingUnits, 'Stk.', mountingPrices.drilling));
+        if (outside > 0) positions.push(offerPosition('Außengerät-Standort und Montagekonsole', systemType === 'single' ? rooms : 1, 'Stk.', mountingPrices.outdoor[fields.aussen.value], { total: outside }));
+        if (electric > 0) positions.push(offerPosition('Stromzuleitung', 1, 'Pauschal', electric));
+        if (pump > 0) positions.push(offerPosition('Kondensatpumpe', 1, 'Stk.', pump));
+        risks.forEach((risk) => positions.push(offerPosition(`Montage-Zuschlag: ${risk.label}`, 1, 'Pauschal', risk.cost)));
+        const beforeObjectFactor = positions.reduce((sum, position) => sum + position.total, 0);
         const objectSurcharge = beforeObjectFactor * (objectFactor[fields.objekt.value] - 1);
-        if (objectSurcharge > 0) baseLines.push(['Objekt-/Gewerbeaufschlag', objectSurcharge]);
-        const subtotal = baseLines.reduce((sum, lineItem) => sum + lineItem[1], 0);
+        if (objectSurcharge > 0) positions.push(offerPosition('Objekt-/Gewerbeaufschlag', 1, 'Pauschal', objectSurcharge));
+        const subtotal = positions.reduce((sum, position) => sum + position.total, 0);
         const net = subtotal * serviceFactor;
         const taxRate = taxRates.at;
         const tax = net * taxRate;
@@ -2507,7 +2599,7 @@ window.initKlimaCalculator = () => {
         const complexity = Math.min(0.24, 0.08 + Math.max(0, rooms - 1) * 0.015 + (fields.aussen.value === 'dach' ? 0.06 : 0) + (number(fields.leitung) > 15 ? 0.035 : 0) + (hasAttic ? 0.02 : 0) + riskComplexity);
         const low = gross * (1 - complexity);
         const high = gross * (1 + complexity + 0.04);
-        const lines = baseLines;
+        const lines = positions.map((position) => [position.label, position.total]);
 
         out.flaeche.value = `${area} m2`;
         out.raeume.value = rooms;
@@ -2586,7 +2678,14 @@ window.initKlimaCalculator = () => {
             <span class="kr-price">${item.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW Last</span>
           </div>
         `).join('');
-        return { area, roomDetails, rooms, kw, plan, risks, lines, net, tax, gross, low, high, device, outdoorUnit, discountPercent, deviceDiscount, systemType, systemLabel };
+        out.outdoorCheck.classList.toggle('kr-hidden', systemType !== 'multi');
+        out.outdoorCheck.classList.toggle('kr-check-warning', systemType === 'multi' && !outdoorCheck.ok);
+        out.outdoorCheck.classList.toggle('kr-check-ok', systemType === 'multi' && outdoorCheck.ok);
+        out.outdoorCheck.textContent = systemType === 'multi' ? outdoorCheck.message : '';
+        out.status.textContent = systemType === 'multi' && !outdoorCheck.ok
+          ? outdoorCheck.message
+          : 'Der finale Preis wird nach Besichtigung bestätigt.';
+        return { area, roomDetails, rooms, kw, plan, risks, lines, positions, net, tax, gross, low, high, device, outdoorUnit, outdoorCheck, discountPercent, deviceDiscount, systemType, systemLabel };
       }
 
       function requestText() {
@@ -2677,13 +2776,14 @@ window.initKlimaCalculator = () => {
             </tr>
           `;
         }).join('');
-        const costRows = result.lines.map((lineItem, index) => `
+        const costRows = result.positions.map((position, index) => `
           <tr>
             <td class="kr-print-pos">${index + 1}</td>
-            <td>${escapeHtml(lineItem[0])}</td>
-            <td class="kr-print-qty">1</td>
-            <td class="kr-print-unit">Pauschal</td>
-            <td class="kr-print-money">${euro(lineItem[1] * serviceFactor)}</td>
+            <td>${escapeHtml(position.label)}</td>
+            <td class="kr-print-qty">${formatQuantity(position.qty)}</td>
+            <td class="kr-print-unit">${escapeHtml(position.unit)}</td>
+            <td class="kr-print-money">${euro(position.unitPrice * serviceFactor)}</td>
+            <td class="kr-print-money">${euro(position.total * serviceFactor)}</td>
           </tr>
         `).join('');
         const riskText = result.risks.length
@@ -2720,6 +2820,7 @@ window.initKlimaCalculator = () => {
                 <tr><th>Gebäudezustand</th><td>${escapeHtml(buildingLabel)}</td><th>Außengerät-Standort</th><td>${escapeHtml(outsideLabel)}</td></tr>
                 <tr><th>Rohrlänge gesamt</th><td>${number(fields.leitung).toLocaleString('de-DE')} m</td><th>Kabelkanal sichtbar</th><td>${number(fields.kanal).toLocaleString('de-DE')} m</td></tr>
                 <tr><th>Berechnete Raumlast</th><td>${result.plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td><th>Innengeräte gesamt</th><td>${result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td></tr>
+                ${result.systemType === 'multi' ? `<tr><th>Außengerät-Prüfung</th><td colspan="3">${escapeHtml(result.outdoorCheck.message)}</td></tr>` : ''}
                 <tr><th>Montagehinweise</th><td colspan="3">${escapeHtml(riskText)}</td></tr>
               </tbody>
             </table>
@@ -2746,19 +2847,20 @@ window.initKlimaCalculator = () => {
             <table class="kr-print-table kr-print-position-table">
               <colgroup>
                 <col style="width:8%">
-                <col style="width:52%">
+                <col style="width:42%">
                 <col style="width:10%">
+                <col style="width:12%">
                 <col style="width:14%">
-                <col style="width:16%">
+                <col style="width:14%">
               </colgroup>
               <thead>
-                <tr><th>Pos.</th><th>Leistung</th><th>Menge</th><th>Einheit</th><th class="kr-print-money">Betrag netto</th></tr>
+                <tr><th>Pos.</th><th>Leistung</th><th>Menge</th><th>Einheit</th><th class="kr-print-money">Einzel netto</th><th class="kr-print-money">Gesamt netto</th></tr>
               </thead>
               <tbody>
                 ${costRows}
-                <tr><th colspan="4">Richtpreis netto</th><td class="kr-print-money">${euro(result.net)}</td></tr>
-                <tr><th colspan="4">USt. ${Math.round(taxRates.at * 100)} Prozent</th><td class="kr-print-money">${euro(result.tax)}</td></tr>
-                <tr class="kr-print-total"><th colspan="4">Unverbindlicher Richtpreis</th><td class="kr-print-money">${euro(result.gross)}</td></tr>
+                <tr><th colspan="5">Richtpreis netto</th><td class="kr-print-money">${euro(result.net)}</td></tr>
+                <tr><th colspan="5">USt. ${Math.round(taxRates.at * 100)} Prozent</th><td class="kr-print-money">${euro(result.tax)}</td></tr>
+                <tr class="kr-print-total"><th colspan="5">Unverbindlicher Richtpreis</th><td class="kr-print-money">${euro(result.gross)}</td></tr>
               </tbody>
             </table>
           </div>
@@ -2790,6 +2892,7 @@ window.initKlimaCalculator = () => {
           `Räume / Fläche: ${result.rooms} / ${result.area} m2`,
           `Anlagentyp: ${result.systemLabel}`,
           `Außengerät: ${outdoorDeviceLabel}`,
+          result.systemType === 'multi' ? `Außengerät-Prüfung: ${result.outdoorCheck.message}` : null,
           result.discountPercent > 0 ? `Geräterabatt: ${result.discountPercent.toLocaleString('de-DE', { maximumFractionDigits: 1 })} %` : null,
           `Außengerät-Standort: ${outsideLabel}`,
           `Rohrlänge gesamt: ${number(fields.leitung)} m`,
@@ -2806,7 +2909,7 @@ window.initKlimaCalculator = () => {
           }),
           '',
           'Kostenübersicht:',
-          ...result.lines.map((lineItem) => `${lineItem[0]}: ${euro(lineItem[1] * serviceFactor)}`),
+          ...result.positions.map((position, index) => `${index + 1}. ${position.label}: ${formatQuantity(position.qty)} ${position.unit}, Einzel ${euro(position.unitPrice * serviceFactor)}, Gesamt ${euro(position.total * serviceFactor)}`),
           `Richtpreis netto: ${euro(result.net)}`,
           `USt. ${Math.round(taxRates.at * 100)} Prozent: ${euro(result.tax)}`,
           `Unverbindlicher Richtpreis: ${euro(result.gross)}`,
@@ -2836,6 +2939,8 @@ window.initKlimaCalculator = () => {
           buildingLabel: fields.gebaeude.options[fields.gebaeude.selectedIndex].text,
           outsideLabel: fields.aussen.options[fields.aussen.selectedIndex].text,
           outdoorDeviceLabel: result.systemType === 'multi' ? result.outdoorUnit.label : 'je Raum eigenes Außengerät',
+          outdoorCheckLabel: result.systemType === 'multi' && !result.outdoorCheck.ok ? 'Außengerät prüfen' : 'Passende Geräteklasse',
+          outdoorCheckText: result.systemType === 'multi' ? result.outdoorCheck.message : 'Single-Split: jedes Set bringt ein eigenes Außengerät mit.',
           discountLabel: result.discountPercent > 0 ? `${result.discountPercent.toLocaleString('de-DE', { maximumFractionDigits: 1 })} % nur auf Geräte` : 'kein Geräterabatt',
           note: fields.notiz.value.trim(),
           riskText: result.risks.length ? result.risks.map((risk) => risk.label).join(', ') : 'keine Zusatzarbeiten ausgewählt',
@@ -2860,7 +2965,14 @@ window.initKlimaCalculator = () => {
             };
           }),
           costs: [
-            ...result.lines.map((lineItem, index) => ({ pos: String(index + 1), label: lineItem[0], qty: '1', unit: 'Pauschal', value: euro(lineItem[1] * serviceFactor) })),
+            ...result.positions.map((position, index) => ({
+              pos: String(index + 1),
+              label: position.label,
+              qty: formatQuantity(position.qty),
+              unit: position.unit,
+              unitPrice: euro(position.unitPrice * serviceFactor),
+              value: euro(position.total * serviceFactor)
+            })),
             { label: 'Richtpreis netto', value: euro(result.net) },
             { label: `USt. ${Math.round(taxRates.at * 100)} Prozent`, value: euro(result.tax) },
             { label: 'Unverbindlicher Richtpreis', value: euro(result.gross), total: true }
@@ -3069,8 +3181,8 @@ window.initKlimaCalculator = () => {
           rect(586, 164, 180, 48, '0.11 0.40 0.41');
           circle(604, 188, 13, color.soft);
           text('*', 600, 184, 14, 'F2', color.primary);
-          text('Passende Geräteklasse', 625, 193, 10, 'F2', color.white);
-          text('ausreichend Reserve an heißen Tagen', 625, 178, 6.6, 'F1', '0.78 0.89 0.86');
+          text(data.outdoorCheckLabel, 625, 193, 10, 'F2', color.white);
+          wrapText(data.outdoorCheckText, 38).slice(0, 2).forEach((item, index) => text(item, 625, 178 - index * 9, 6.6, 'F1', '0.78 0.89 0.86'));
           rect(586, 102, 180, 36, '0.13 0.42 0.42');
           text('Effizient dimensioniert und optisch klar', 604, 122, 7.2, 'F1', color.white);
           text('aufbereitet für Kunden und Angebot.', 604, 111, 7.2, 'F1', color.white);
@@ -3099,7 +3211,8 @@ window.initKlimaCalculator = () => {
           labelValue('Berechnete Raumlast', `${data.result.plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`, 66, 255);
           labelValue('Innengeräte gesamt', `${data.result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`, 300, 255);
           line(62, 236, 526, 236);
-          labelValue('Montagehinweise', data.riskText, 66, 219, 96, 70);
+          labelValue('Außengerät-Prüfung', data.outdoorCheckText, 66, 219, 96, 70);
+          labelValue('Montagehinweise', data.riskText, 300, 219, 96, 40);
         }
 
         function drawRoomsAndCosts() {
@@ -3168,9 +3281,10 @@ window.initKlimaCalculator = () => {
           y -= 28;
           text('Pos.', 66, y, 7.4, 'F2', color.muted);
           text('Leistung', 104, y, 7.4, 'F2', color.muted);
-          text('Menge', 585, y, 7.4, 'F2', color.muted);
-          text('Einheit', 642, y, 7.4, 'F2', color.muted);
-          textRight('Betrag netto', 760, y, 7.4, 'F2', color.muted);
+          text('Menge', 500, y, 7.4, 'F2', color.muted);
+          text('Einheit', 555, y, 7.4, 'F2', color.muted);
+          textRight('Einzel netto', 690, y, 7.4, 'F2', color.muted);
+          textRight('Gesamt netto', 760, y, 7.4, 'F2', color.muted);
           line(62, y - 8, 780, y - 8);
           y -= 22;
           data.costs.forEach((item) => {
@@ -3183,10 +3297,11 @@ window.initKlimaCalculator = () => {
               return;
             }
             text(item.pos, 72, y - 2, 8, 'F2', color.primary);
-            const labelLines = wrapText(item.label, 68).slice(0, 2);
+            const labelLines = wrapText(item.label, 56).slice(0, 2);
             labelLines.forEach((lineItem, index) => text(lineItem, 104, y - 2 - index * 9, 7.8, 'F1', color.text));
-            text(item.qty || '1', 590, y - 2, 7.8, 'F1', color.text);
-            text(item.unit || 'Pauschal', 642, y - 2, 7.8, 'F1', color.text);
+            text(item.qty || '1', 505, y - 2, 7.8, 'F1', color.text);
+            text(item.unit || 'Pauschal', 555, y - 2, 7.8, 'F1', color.text);
+            textRight(item.unitPrice || item.value, 690, y - 2, 8, 'F1', color.text);
             textRight(item.value, 760, y - 2, 8, 'F1', color.text);
             y -= labelLines.length > 1 ? 25 : 17;
           });
