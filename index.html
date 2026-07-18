@@ -1186,7 +1186,7 @@ window.initKlimaCalculator = () => {
         { name: 'Raum 6', area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' }
       ];
       const defaultPriceConfig = {
-        "version": 6,
+        "version": 7,
         "currency": "EUR",
         "admin": {
                 "updateCode": "KLIMA2026"
@@ -2036,6 +2036,16 @@ window.initKlimaCalculator = () => {
         return result;
       }
 
+      function mergePriceConfig(base, override) {
+        const merged = mergeConfig(base, override || {});
+        ['devicePackages', 'outdoorUnits', 'risks'].forEach((key) => {
+          if (override && Object.prototype.hasOwnProperty.call(override, key)) {
+            merged[key] = cloneConfig(override[key]);
+          }
+        });
+        return merged;
+      }
+
       function escapeHtml(value) {
         return String(value).replace(/[&<>"']/g, (char) => ({
           '&': '&amp;',
@@ -2130,7 +2140,7 @@ window.initKlimaCalculator = () => {
       }
 
       function setRuntimeConfig(config) {
-        priceConfig = mergeConfig(defaultPriceConfig, config || {});
+        priceConfig = mergePriceConfig(defaultPriceConfig, config || {});
         validateConfig(priceConfig);
         devicePrices = priceConfig.devicePackages;
         outdoorUnitPrices = priceConfig.outdoorUnits;
@@ -3529,7 +3539,7 @@ window.initKlimaCalculator = () => {
         }
         try {
           updateEditorConfigFromInputs();
-          const merged = mergeConfig(defaultPriceConfig, editorConfig);
+          const merged = mergePriceConfig(defaultPriceConfig, editorConfig);
           validateConfig(merged);
           localStorage.setItem(DATABASE_STORAGE_KEY, JSON.stringify(merged));
           setRuntimeConfig(merged);
@@ -3550,7 +3560,7 @@ window.initKlimaCalculator = () => {
         }
         try {
           const parsed = JSON.parse(out.dbJson.value);
-          const merged = mergeConfig(defaultPriceConfig, parsed);
+          const merged = mergePriceConfig(defaultPriceConfig, parsed);
           validateConfig(merged);
           editorConfig = cloneConfig(merged);
           renderDatabaseEditor();
