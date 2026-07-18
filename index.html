@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="Klima Rechner">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="format-detection" content="telephone=no">
-  <meta name="description" content="Kunden-Rechner fuer Klimaanlagen mit Richtpreis, Raumlast und Anfrage-Text.">
+  <meta name="description" content="Kunden-Rechner für Klimaanlagen mit Richtpreis, Raumlast und Anfrage-Text.">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
@@ -17,21 +17,21 @@
   <style>
 :root {
   color-scheme: light;
-  --background: #f6f7f9;
-  --foreground: #172027;
-  --card: #ffffff;
+  --background: #f2efe8;
+  --foreground: #142b30;
+  --card: #fffdf8;
   --card-foreground: #172027;
   --primary: #176b87;
   --primary-foreground: #ffffff;
-  --secondary: #e7eef2;
-  --secondary-foreground: #172027;
-  --muted: #e8edf0;
+  --secondary: #e6efec;
+  --secondary-foreground: #142b30;
+  --muted: #e8ebe5;
   --muted-foreground: #5b6872;
-  --accent: #dceef4;
-  --accent-foreground: #172027;
+  --accent: #dcefeb;
+  --accent-foreground: #142b30;
   --destructive: #b42318;
-  --border: #d6dde2;
-  --input: #cbd5dc;
+  --border: #d7d0c5;
+  --input: #cfc8bd;
   --ring: #176b87;
   --viz-series-1: #176b87;
   --font-size-base: 16px;
@@ -76,16 +76,17 @@ body {
   min-height: 100vh;
   min-height: 100svh;
   overflow-x: hidden;
-  background: var(--background);
+  background:
+    linear-gradient(180deg, #f8f5ee 0%, var(--background) 42%, #e9e5dc 100%);
   color: var(--foreground);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: var(--font-size-base);
 }
 
 .app-shell {
-  width: min(1180px, 100%);
+  width: min(1240px, 100%);
   margin: 0 auto;
-  padding: 18px;
+  padding: 22px 18px 24px;
   padding-left: max(18px, env(safe-area-inset-left));
   padding-right: max(18px, env(safe-area-inset-right));
 }
@@ -95,7 +96,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .app-brand {
@@ -106,8 +107,8 @@ body {
 }
 
 .app-logo {
-  width: 58px;
-  height: 52px;
+  width: 62px;
+  height: 56px;
   object-fit: contain;
   flex: 0 0 auto;
 }
@@ -120,6 +121,7 @@ body {
 
 .app-title strong {
   font-weight: 600;
+  letter-spacing: 0;
 }
 
 .app-main {
@@ -173,7 +175,7 @@ textarea.form-control {
   border-radius: 8px;
   background: var(--card);
   color: var(--foreground);
-  padding: 10px 11px;
+  padding: 11px 12px;
   font: inherit;
   font-size: 16px;
 }
@@ -209,7 +211,7 @@ textarea.form-control {
   min-height: 44px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--secondary);
+  background: color-mix(in srgb, var(--secondary) 92%, var(--card));
   color: var(--secondary-foreground);
   padding: 8px 12px;
   font: inherit;
@@ -301,27 +303,89 @@ textarea:focus-visible {
       font-size: var(--font-size-base);
       max-width: 100%;
       overflow-wrap: anywhere;
+      --kr-panel: var(--card);
+      --kr-soft: color-mix(in srgb, var(--accent) 36%, var(--card));
+      --kr-soft-strong: color-mix(in srgb, var(--accent) 56%, var(--card));
+      --kr-deep: #0f5f65;
+      --kr-deep-2: #0b3f49;
+      --kr-deep-text: #f7fbf8;
+      --kr-deep-muted: rgba(247, 251, 248, .72);
+      --kr-deep-border: rgba(247, 251, 248, .20);
+      --kr-warm-line: color-mix(in srgb, var(--border) 70%, #d8cbb7);
     }
     #klima-kundenrechner * {
       box-sizing: border-box;
     }
     #klima-kundenrechner .kr-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.04fr) minmax(280px, .96fr);
-      gap: 16px;
-      align-items: start;
+      grid-template-columns: minmax(0, 1.35fr) minmax(320px, .72fr);
+      gap: 0;
+      align-items: stretch;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--kr-panel);
+      box-shadow: 0 28px 70px rgba(18, 48, 54, .12);
     }
     #klima-kundenrechner .kr-form,
     #klima-kundenrechner .kr-result {
       display: grid;
-      gap: 12px;
+      gap: 18px;
       min-width: 0;
       align-content: start;
+    }
+    #klima-kundenrechner .kr-form {
+      counter-reset: kr-step;
+      padding: 28px;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--card) 96%, var(--accent)), var(--card));
+    }
+    #klima-kundenrechner .kr-result {
+      position: relative;
+      padding: 28px;
+      color: var(--kr-deep-text);
+      background:
+        linear-gradient(145deg, color-mix(in srgb, var(--kr-deep) 94%, white), var(--kr-deep-2));
     }
     #klima-kundenrechner .kr-section {
       display: grid;
       gap: 10px;
       min-width: 0;
+    }
+    #klima-kundenrechner .kr-form > .kr-section {
+      position: relative;
+      padding: 44px 0 24px 58px;
+      border-bottom: 1px solid var(--kr-warm-line);
+    }
+    #klima-kundenrechner .kr-form > .kr-section:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+    #klima-kundenrechner .kr-form > .kr-section::before {
+      counter-increment: kr-step;
+      content: counter(kr-step, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: 37px;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--primary);
+      background: var(--card);
+      font-size: .78rem;
+      font-weight: 500;
+    }
+    #klima-kundenrechner .kr-form > .kr-section::after {
+      content: attr(aria-label);
+      position: absolute;
+      left: 58px;
+      top: 2px;
+      color: var(--foreground);
+      font-size: 1.35rem;
+      line-height: 1.2;
+      font-weight: 500;
     }
     #klima-kundenrechner .kr-fields {
       display: grid;
@@ -342,10 +406,14 @@ textarea:focus-visible {
     #klima-kundenrechner .kr-room {
       display: grid;
       gap: 10px;
-      padding-top: 2px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--accent) 18%, var(--card));
     }
     #klima-kundenrechner .kr-room-title {
       font-weight: 500;
+      color: var(--primary);
     }
     #klima-kundenrechner .kr-hidden {
       display: none !important;
@@ -363,8 +431,35 @@ textarea:focus-visible {
     }
     #klima-kundenrechner .kr-summary {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    #klima-kundenrechner .kr-result .card {
+      border-color: var(--kr-deep-border);
+      background: rgba(255, 255, 255, .08);
+      color: var(--kr-deep-text);
+      backdrop-filter: blur(2px);
+    }
+    #klima-kundenrechner .kr-result .text-muted,
+    #klima-kundenrechner .kr-result .kr-note {
+      color: var(--kr-deep-muted);
+    }
+    #klima-kundenrechner .kr-main-stat {
+      padding: 18px;
+    }
+    #klima-kundenrechner .kr-main-stat .viz-stat-value {
+      font-size: clamp(2.7rem, 8vw, 4.8rem);
+      letter-spacing: 0;
+      line-height: .95;
+    }
+    #klima-kundenrechner .kr-main-stat .viz-stat-value::after {
+      content: "";
+      display: block;
+      width: 44px;
+      height: 2px;
+      margin-top: 12px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--primary-foreground) 52%, transparent);
     }
     #klima-kundenrechner .kr-list {
       display: grid;
@@ -401,13 +496,22 @@ textarea:focus-visible {
       border-radius: inherit;
       background: var(--viz-series-1);
     }
+    #klima-kundenrechner .kr-result .kr-load-track {
+      background: rgba(255, 255, 255, .16);
+    }
+    #klima-kundenrechner .kr-result .kr-load-fill {
+      background: color-mix(in srgb, var(--primary-foreground) 72%, var(--primary));
+    }
     #klima-kundenrechner .kr-line {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 96px;
       gap: 10px;
-      padding: 8px 0;
+      padding: 9px 0;
       border-bottom: 1px solid var(--border);
       align-items: start;
+    }
+    #klima-kundenrechner .kr-result .kr-line {
+      border-color: var(--kr-deep-border);
     }
     #klima-kundenrechner .kr-line > span:first-child {
       min-width: 0;
@@ -424,6 +528,8 @@ textarea:focus-visible {
     #klima-kundenrechner .kr-total {
       display: grid;
       gap: 6px;
+      padding-top: 12px;
+      border-top: 1px solid var(--kr-deep-border);
     }
     #klima-kundenrechner .kr-total-line {
       display: flex;
@@ -434,6 +540,7 @@ textarea:focus-visible {
     }
     #klima-kundenrechner .kr-grand {
       font-weight: 500;
+      font-size: 1.08rem;
     }
     #klima-kundenrechner .kr-actions {
       display: flex;
@@ -447,9 +554,27 @@ textarea:focus-visible {
       display: grid;
       gap: 6px;
     }
+    #klima-kundenrechner .kr-risk-list .form-check {
+      align-items: flex-start;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--card);
+    }
+    #klima-kundenrechner .kr-risk-list .form-check:has(.form-check-input:checked) {
+      border-color: var(--primary);
+      background: var(--kr-soft);
+    }
     #klima-kundenrechner .kr-db-panel {
       display: grid;
       gap: 12px;
+    }
+    #klima-kundenrechner .kr-result .kr-db-panel {
+      background: var(--card);
+      color: var(--foreground);
+    }
+    #klima-kundenrechner .kr-result .kr-db-panel .kr-note {
+      color: var(--muted-foreground);
     }
     #klima-kundenrechner .kr-db-editor {
       display: grid;
@@ -519,9 +644,19 @@ textarea:focus-visible {
       justify-content: space-between;
       gap: 18px;
       align-items: flex-start;
-      border-bottom: 2px solid #172027;
-      padding-bottom: 12px;
+      border-bottom: 2px solid #176b87;
+      padding: 0 0 12px;
       margin-bottom: 16px;
+    }
+    #klima-kundenrechner .kr-print-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #klima-kundenrechner .kr-print-logo {
+      width: 52px;
+      height: 46px;
+      object-fit: contain;
     }
     #klima-kundenrechner .kr-print-title {
       font-size: 24pt;
@@ -542,8 +677,10 @@ textarea:focus-visible {
     }
     #klima-kundenrechner .kr-print-box {
       border: 1px solid #c8d2d8;
+      border-left: 3px solid #176b87;
       padding: 8px;
       min-height: 52px;
+      background: #f3faf8;
     }
     #klima-kundenrechner .kr-print-label {
       display: block;
@@ -578,6 +715,7 @@ textarea:focus-visible {
     #klima-kundenrechner .kr-print-table th {
       color: #53616b;
       font-weight: 700;
+      background: #f6f8f7;
     }
     #klima-kundenrechner .kr-print-money {
       text-align: right !important;
@@ -586,6 +724,7 @@ textarea:focus-visible {
     #klima-kundenrechner .kr-print-total {
       font-size: 12pt;
       font-weight: 700;
+      background: #edf7f4;
     }
     #klima-kundenrechner .kr-print-note {
       margin-top: 12px;
@@ -602,8 +741,29 @@ textarea:focus-visible {
       #klima-kundenrechner .kr-layout {
         grid-template-columns: 1fr;
       }
+      #klima-kundenrechner .kr-result {
+        position: static;
+      }
     }
     @media (max-width: 680px) {
+      #klima-kundenrechner .kr-layout {
+        box-shadow: 0 18px 46px rgba(18, 48, 54, .10);
+      }
+      #klima-kundenrechner .kr-form,
+      #klima-kundenrechner .kr-result {
+        padding: 20px;
+      }
+      #klima-kundenrechner .kr-form > .kr-section {
+        padding-left: 0;
+        padding-top: 58px;
+      }
+      #klima-kundenrechner .kr-form > .kr-section::before {
+        top: 8px;
+      }
+      #klima-kundenrechner .kr-form > .kr-section::after {
+        left: 48px;
+        top: 14px;
+      }
       #klima-kundenrechner .kr-fields,
       #klima-kundenrechner .kr-summary,
       #klima-kundenrechner .kr-db-grid {
@@ -626,6 +786,13 @@ textarea:focus-visible {
       }
     }
     @media (max-width: 420px) {
+      #klima-kundenrechner .kr-form,
+      #klima-kundenrechner .kr-result {
+        padding: 16px;
+      }
+      #klima-kundenrechner .kr-form > .kr-section::after {
+        font-size: 1.16rem;
+      }
       #klima-kundenrechner .kr-line {
         grid-template-columns: 1fr;
         gap: 4px;
@@ -694,20 +861,19 @@ textarea:focus-visible {
       <div class="viz-controls kr-section" aria-label="Projekt">
         <div class="kr-fields">
           <label class="form-label">
-            Was soll gekuehlt werden?
+            Was soll gekühlt werden?
             <select id="kr-objekt" class="form-select">
               <option value="wohnung">Wohnung</option>
               <option value="haus">Haus</option>
-              <option value="buero">Buero / Praxis</option>
-              <option value="laden">Ladenflaeche</option>
+              <option value="buero">Büro / Praxis</option>
+              <option value="laden">Ladenfläche</option>
             </select>
           </label>
           <label class="form-label">
-            Standardgeraet
-            <select id="kr-klasse" class="form-select">
-              <option value="basis">Preisbewusst</option>
-              <option value="standard" selected>Leise & effizient</option>
-              <option value="premium">Premium Design</option>
+            Anlagentyp
+            <select id="kr-systemtyp" class="form-select">
+              <option value="single" selected>Single-Split je Raum</option>
+              <option value="multi">Multi-Split mit einem Außengerät</option>
             </select>
           </label>
           <label class="form-label">
@@ -718,7 +884,7 @@ textarea:focus-visible {
             </select>
           </label>
           <label class="form-label">
-            Gebaeudezustand
+            Gebäudezustand
             <select id="kr-gebaeude" class="form-select">
               <option value="neubau">Neubau / sehr gut</option>
               <option value="saniert" selected>Saniert / normal</option>
@@ -728,29 +894,28 @@ textarea:focus-visible {
         </div>
         <div class="kr-fields">
           <label class="form-label">
-            <span class="kr-inline">Raeume <output id="kr-raeume-out">1</output></span>
+            <span class="kr-inline">Räume <output id="kr-raeume-out">1</output></span>
             <input id="kr-raeume" class="form-range" type="range" min="1" max="6" step="1" value="1">
           </label>
           <div class="form-label">
-            <span class="kr-inline">Gesamtflaeche <output id="kr-flaeche-out">25 m2</output></span>
+            <span class="kr-inline">Gesamtfläche <output id="kr-flaeche-out">25 m2</output></span>
             <span class="text-small kr-note">Jeder Raum wird einzeln abgefragt.</span>
           </div>
-          <label id="kr-systemtyp-wrap" class="form-label kr-hidden">
-            Anlagentyp
-            <select id="kr-systemtyp" class="form-select">
-              <option value="multi" selected>Multi-Split mit einem Aussengeraet</option>
-              <option value="single">Single-Split je Raum</option>
+          <label id="kr-outdoor-device-wrap" class="form-label kr-hidden">
+            Außengerät bei Multi-Split
+            <select id="kr-klasse" class="form-select">
+              <option value="standard" selected>Komfort-Paket leise/effizient</option>
             </select>
           </label>
         </div>
         <div id="kr-room-areas" class="kr-room-areas kr-full" aria-label="Raumdaten je Raum"></div>
-        <div id="kr-mode-note" class="text-small kr-note">Basis nutzt Richtwerte fuer U-Wert, Raumhoehe und Daemmung.</div>
+        <div id="kr-mode-note" class="text-small kr-note">Basis nutzt Richtwerte für U-Wert, Raumhöhe und Dämmung.</div>
       </div>
 
       <div class="viz-controls kr-section" aria-label="Montage">
         <div class="kr-fields">
           <label class="form-label">
-            Wo steht das Aussengeraet?
+            Wo steht das Außengerät?
             <select id="kr-aussen" class="form-select">
               <option value="balkon">Balkon / Terrasse</option>
               <option value="wand">Hauswand</option>
@@ -762,14 +927,14 @@ textarea:focus-visible {
             Wanddurchbruch
             <select id="kr-bohrung" class="form-select">
               <option value="1" selected>Ja, 1 Durchbruch</option>
-              <option value="0">Nicht noetig</option>
-              <option value="2">Mehrere Durchbrueche</option>
+              <option value="0">Nicht nötig</option>
+              <option value="2">Mehrere Durchbrüche</option>
             </select>
           </label>
         </div>
         <div class="kr-fields">
           <label class="form-label">
-            <span class="kr-inline">Rohrlaenge gesamt <output id="kr-leitung-out">5 m</output></span>
+            <span class="kr-inline">Rohrlänge gesamt <output id="kr-leitung-out">5 m</output></span>
             <input id="kr-leitung" class="form-range" type="range" min="1" max="60" step="1" value="5">
           </label>
           <label class="form-label">
@@ -788,61 +953,65 @@ textarea:focus-visible {
           <label class="form-label">
             Stromanschluss
             <select id="kr-strom" class="form-select">
-              <option value="nah" selected>Steckdose / Anschluss in der Naehe</option>
+              <option value="nah" selected>Steckdose / Anschluss in der Nähe</option>
               <option value="mittel">Zuleitung bis 10 m</option>
-              <option value="weit">Zuleitung ueber 10 m</option>
+              <option value="weit">Zuleitung über 10 m</option>
             </select>
           </label>
           <label class="form-label">
             Kondensat
             <select id="kr-kondensat" class="form-select">
-              <option value="frei" selected>Freier Ablauf moeglich</option>
-              <option value="pumpe">Pumpe vermutlich noetig</option>
+              <option value="frei" selected>Freier Ablauf möglich</option>
+              <option value="pumpe">Pumpe vermutlich nötig</option>
             </select>
+          </label>
+          <label class="form-label">
+            Geräterabatt in %
+            <input id="kr-rabatt" class="form-control" type="number" min="0" max="100" step="0.5" value="0" inputmode="decimal">
           </label>
         </div>
         <label class="form-label kr-full">
           Was ist noch wichtig?
-          <textarea id="kr-notiz" class="form-control" placeholder="z. B. Altgeraet abbauen, Denkmalschutz, sehr leise Anlage, schnelle Montage"></textarea>
+          <textarea id="kr-notiz" class="form-control" placeholder="z. B. Altgerät abbauen, Denkmalschutz, sehr leise Anlage, schnelle Montage"></textarea>
         </label>
       </div>
     </section>
 
     <section class="kr-result" aria-label="Richtpreis und Anfrage">
       <div class="kr-summary">
-        <div class="card viz-stat">
-          <span class="text-muted">Geschaetzter Richtpreis</span>
-          <span id="kr-brutto" class="viz-stat-value">0 EUR</span>
-          <span id="kr-spanne" class="text-small kr-note">inkl. Montage und USt.</span>
-        </div>
-        <div class="card viz-stat">
+        <div class="card viz-stat kr-main-stat">
           <span class="text-muted">Empfehlung</span>
           <span id="kr-empfehlung" class="viz-stat-value">3,5 kW</span>
           <span id="kr-system" class="text-small kr-note">Single-Split Anlage</span>
         </div>
         <div class="card viz-stat">
+          <span class="text-muted">Geschätzter Richtpreis</span>
+          <span id="kr-brutto" class="viz-stat-value">0 EUR</span>
+          <span id="kr-spanne" class="text-small kr-note">inkl. Montage und USt.</span>
+        </div>
+        <div class="card viz-stat">
           <span class="text-muted">Raumlast</span>
           <span id="kr-last" class="viz-stat-value">0 kW</span>
-          <span id="kr-treiber" class="text-small kr-note">groesster Raum</span>
+          <span id="kr-treiber" class="text-small kr-note">größter Raum</span>
         </div>
       </div>
 
-      <div class="kr-load-lines" aria-label="Kuehllast je Raum">
-        <div class="text-small kr-note">Kuehllast je Raum</div>
+      <div class="kr-load-lines" aria-label="Kühllast je Raum">
+        <div class="text-small kr-note">Kühllast je Raum</div>
         <div id="kr-load-lines"></div>
       </div>
 
-      <div class="kr-plan" aria-label="Kuehllast-Aufbau">
-        <div class="text-small kr-note">Kuehllast-Aufbau</div>
+      <div class="kr-plan" aria-label="Kühllast-Aufbau">
+        <div class="text-small kr-note">Kühllast-Aufbau</div>
         <div id="kr-load-breakdown"></div>
       </div>
 
-      <div class="kr-plan" aria-label="Geraetevorschlag">
-        <div class="text-small kr-note">Geraetevorschlag je Raum</div>
+      <div class="kr-plan" aria-label="Gerätevorschlag">
+        <div class="text-small kr-note">Gerätevorschlag je Raum</div>
         <div id="kr-device-plan"></div>
       </div>
 
-      <div class="kr-list" aria-label="Kostenuebersicht">
+      <div class="kr-list" aria-label="Kostenübersicht">
         <div id="kr-lines"></div>
       </div>
 
@@ -853,16 +1022,16 @@ textarea:focus-visible {
       </div>
 
       <div class="kr-actions">
-        <button id="kr-print" type="button" class="btn btn-primary">PDF drucken</button>
+        <button id="kr-print" type="button" class="btn btn-primary">PDF erstellen</button>
         <button id="kr-download-pdf" type="button" class="btn kr-hidden">PDF herunterladen</button>
         <button id="kr-reset" type="button" class="btn">Neu starten</button>
         <button id="kr-db-toggle" type="button" class="btn">Datenbank aktualisieren</button>
       </div>
-      <div id="kr-status" class="text-small kr-note" aria-live="polite">Der finale Preis wird nach Besichtigung bestaetigt.</div>
+      <div id="kr-status" class="text-small kr-note" aria-live="polite">Der finale Preis wird nach Besichtigung bestätigt.</div>
       <div id="kr-db-panel" class="card kr-db-panel kr-hidden" aria-label="Datenbank aktualisieren">
         <div id="kr-db-login">
           <label class="form-label">
-            Passwort fuer Preisliste
+            Passwort für Preisliste
             <input id="kr-db-code" class="form-control" type="password" autocomplete="off" placeholder="Passwort eingeben">
           </label>
           <div class="kr-actions">
@@ -872,10 +1041,18 @@ textarea:focus-visible {
         <div id="kr-db-editor" class="kr-db-editor kr-hidden">
           <div class="kr-editor-section">
             <div class="kr-section-head">
-              <strong>Geraetepakete</strong>
-              <button id="kr-db-add-device" type="button" class="btn">Geraet hinzufuegen</button>
+              <strong>Innengeräte / Single-Split Sets</strong>
+              <button id="kr-db-add-device" type="button" class="btn">Innengerät hinzufügen</button>
             </div>
             <div id="kr-db-devices" class="kr-editor-list"></div>
+          </div>
+
+          <div class="kr-editor-section">
+            <div class="kr-section-head">
+              <strong>Außengeräte Multi-Split</strong>
+              <button id="kr-db-add-outdoor" type="button" class="btn">Außengerät hinzufügen</button>
+            </div>
+            <div id="kr-db-outdoor-units" class="kr-editor-list"></div>
           </div>
 
           <div class="kr-editor-section">
@@ -888,14 +1065,14 @@ textarea:focus-visible {
           <div class="kr-editor-section">
             <div class="kr-section-head">
               <strong>Zusatzarbeiten</strong>
-              <button id="kr-db-add-risk" type="button" class="btn">Zusatzarbeit hinzufuegen</button>
+              <button id="kr-db-add-risk" type="button" class="btn">Zusatzarbeit hinzufügen</button>
             </div>
             <div id="kr-db-risks" class="kr-editor-list"></div>
           </div>
 
           <div class="kr-editor-section">
             <div class="kr-section-head">
-              <strong>Einstellwerte Kuehllast</strong>
+              <strong>Einstellwerte Kühllast</strong>
             </div>
             <div id="kr-db-settings" class="kr-db-grid"></div>
           </div>
@@ -908,13 +1085,13 @@ textarea:focus-visible {
             </label>
             <div class="kr-actions">
               <button id="kr-db-template" type="button" class="btn">Aktuelle Daten laden</button>
-              <button id="kr-db-import-json" type="button" class="btn">JSON in Formular uebernehmen</button>
+              <button id="kr-db-import-json" type="button" class="btn">JSON in Formular übernehmen</button>
             </div>
           </details>
 
           <div class="kr-actions">
-            <button id="kr-db-save" type="button" class="btn btn-primary">Aenderungen speichern</button>
-            <button id="kr-db-reset" type="button" class="btn">Lokale Daten loeschen</button>
+            <button id="kr-db-save" type="button" class="btn btn-primary">Änderungen speichern</button>
+            <button id="kr-db-reset" type="button" class="btn">Lokale Daten löschen</button>
           </div>
         </div>
         <div id="kr-db-status" class="text-small kr-note" aria-live="polite">Freigabecode erforderlich.</div>
@@ -943,6 +1120,7 @@ window.initKlimaCalculator = () => {
         kanal: $('#kr-kanal'),
         strom: $('#kr-strom'),
         kondensat: $('#kr-kondensat'),
+        rabatt: $('#kr-rabatt'),
         notiz: $('#kr-notiz')
       };
       const out = {
@@ -966,12 +1144,13 @@ window.initKlimaCalculator = () => {
         final: $('#kr-final'),
         status: $('#kr-status'),
         modeNote: $('#kr-mode-note'),
-        systemWrap: $('#kr-systemtyp-wrap'),
+        systemWrap: $('#kr-outdoor-device-wrap'),
         dbPanel: $('#kr-db-panel'),
         dbCode: $('#kr-db-code'),
         dbLogin: $('#kr-db-login'),
         dbEditor: $('#kr-db-editor'),
         dbDevices: $('#kr-db-devices'),
+        dbOutdoorUnits: $('#kr-db-outdoor-units'),
         dbMounting: $('#kr-db-mounting'),
         dbRisks: $('#kr-db-risks'),
         dbSettings: $('#kr-db-settings'),
@@ -981,55 +1160,883 @@ window.initKlimaCalculator = () => {
         downloadPdf: $('#kr-download-pdf')
       };
       const roomData = [
-        { area: 25, height: 2.6, window: 5, u: 1.3, sun: 'sued', shade: 'none', insulation: 'normal', persons: 2, attic: 'no', device: 'standard' },
-        { area: 18, height: 2.6, window: 3, u: 1.3, sun: 'west', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
-        { area: 16, height: 2.6, window: 3, u: 1.3, sun: 'ost', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
-        { area: 14, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
-        { area: 12, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
-        { area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' }
+        { name: 'Raum 1', area: 25, height: 2.6, window: 5, u: 1.3, sun: 'sued', shade: 'none', insulation: 'normal', persons: 2, attic: 'no', device: 'standard' },
+        { name: 'Raum 2', area: 18, height: 2.6, window: 3, u: 1.3, sun: 'west', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+        { name: 'Raum 3', area: 16, height: 2.6, window: 3, u: 1.3, sun: 'ost', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+        { name: 'Raum 4', area: 14, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+        { name: 'Raum 5', area: 12, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+        { name: 'Raum 6', area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' }
       ];
       const defaultPriceConfig = {
-        version: 3,
-        admin: { updateCode: 'KLIMA2026' },
-        devicePackages: {
-          basis: { label: 'Basis-Paket Wandgeraet', base: 980, room: 740, capacityStep: 210 },
-          standard: { label: 'Komfort-Paket leise/effizient', base: 1280, room: 890, capacityStep: 230 },
-          premium: { label: 'Premium-Paket Design/leise', base: 1780, room: 1120, capacityStep: 260 }
+        "version": 5,
+        "currency": "EUR",
+        "admin": {
+                "updateCode": "KLIMA2026"
         },
-        mounting: {
-          baseInstall: 760,
-          additionalIndoor: 340,
-          drilling: 125,
-          lineMeter: 44,
-          channelMeter: 26,
-          outdoor: { balkon: 170, wand: 230, boden: 260, dach: 620 },
-          power: { nah: 0, mittel: 330, weit: 620 },
-          condensatePump: 280
+        "devicePackages": {
+                "basis": {
+                        "label": "Basis-Paket Wandgerät",
+                        "base": 980,
+                        "room": 740,
+                        "capacityStep": 210,
+                        "system": "both",
+                        "ratedKw": 3.5
+                },
+                "standard": {
+                        "label": "Komfort-Paket leise/effizient",
+                        "base": 1280,
+                        "room": 890,
+                        "capacityStep": 230,
+                        "system": "both",
+                        "ratedKw": 3.5
+                },
+                "premium": {
+                        "label": "Premium-Paket Design/leise",
+                        "base": 1780,
+                        "room": 1120,
+                        "capacityStep": 260,
+                        "system": "both",
+                        "ratedKw": 3.5
+                },
+                "single_split_klimaanlage_2_5_kw_inkl_innengeraet_und": {
+                        "label": "Split-Klimaanlage 2,5 kW inkl. Innengerät und Außengerät",
+                        "system": "single",
+                        "ratedKw": 2.5,
+                        "base": 990.0,
+                        "room": 990.0,
+                        "capacityStep": 230
+                },
+                "single_split_klimaanlage_3_5_kw_inkl_innengeraet_und": {
+                        "label": "Split-Klimaanlage 3,5 kW inkl. Innengerät und Außengerät",
+                        "system": "single",
+                        "ratedKw": 3.5,
+                        "base": 1190.0,
+                        "room": 1190.0,
+                        "capacityStep": 230
+                },
+                "single_split_klimaanlage_5_0_kw_inkl_innengeraet_und": {
+                        "label": "Split-Klimaanlage 5,0 kW inkl. Innengerät und Außengerät",
+                        "system": "single",
+                        "ratedKw": 5.0,
+                        "base": 1690.0,
+                        "room": 1690.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_standard_ii_2_5_kw": {
+                        "label": "LG Single-Split Standard II 2,5 kW",
+                        "system": "single",
+                        "ratedKw": 2.5,
+                        "base": 1145.0,
+                        "room": 1145.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_standard_ii_3_5_kw": {
+                        "label": "LG Single-Split Standard II 3,5 kW",
+                        "system": "single",
+                        "ratedKw": 3.5,
+                        "base": 1248.0,
+                        "room": 1248.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_standard_ii_5_0_kw": {
+                        "label": "LG Single-Split Standard II 5,0 kW",
+                        "system": "single",
+                        "ratedKw": 5.0,
+                        "base": 1473.0,
+                        "room": 1473.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_standard_ii_6_6_kw": {
+                        "label": "LG Single-Split Standard II 6,6 kW",
+                        "system": "single",
+                        "ratedKw": 6.6,
+                        "base": 1763.0,
+                        "room": 1763.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_standard_plus_2_5_kw": {
+                        "label": "LG Single-Split Standard Plus 2,5 kW",
+                        "system": "single",
+                        "ratedKw": 2.5,
+                        "base": 1393.0,
+                        "room": 1393.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_standard_plus_3_5_kw": {
+                        "label": "LG Single-Split Standard Plus 3,5 kW",
+                        "system": "single",
+                        "ratedKw": 3.5,
+                        "base": 1537.0,
+                        "room": 1537.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_standard_plus_5_0_kw": {
+                        "label": "LG Single-Split Standard Plus 5,0 kW",
+                        "system": "single",
+                        "ratedKw": 5.0,
+                        "base": 1816.0,
+                        "room": 1816.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_standard_plus_6_5_kw": {
+                        "label": "LG Single-Split Standard Plus 6,5 kW",
+                        "system": "single",
+                        "ratedKw": 6.5,
+                        "base": 2026.0,
+                        "room": 2026.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_deluxe_2_5_kw": {
+                        "label": "LG Single-Split Deluxe 2,5 kW",
+                        "system": "single",
+                        "ratedKw": 2.5,
+                        "base": 1537.0,
+                        "room": 1537.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_deluxe_3_5_kw": {
+                        "label": "LG Single-Split Deluxe 3,5 kW",
+                        "system": "single",
+                        "ratedKw": 3.5,
+                        "base": 1783.0,
+                        "room": 1783.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_deluxe_5_0_kw": {
+                        "label": "LG Single-Split Deluxe 5,0 kW",
+                        "system": "single",
+                        "ratedKw": 5.0,
+                        "base": 2080.0,
+                        "room": 2080.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_deluxe_6_5_kw": {
+                        "label": "LG Single-Split Deluxe 6,5 kW",
+                        "system": "single",
+                        "ratedKw": 6.5,
+                        "base": 2495.0,
+                        "room": 2495.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_dualcool_premium_2_5_kw": {
+                        "label": "LG Single-Split DualCool Premium 2,5 kW",
+                        "system": "single",
+                        "ratedKw": 2.5,
+                        "base": 1882.0,
+                        "room": 1882.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_dualcool_premium_3_5_kw": {
+                        "label": "LG Single-Split DualCool Premium 3,5 kW",
+                        "system": "single",
+                        "ratedKw": 3.5,
+                        "base": 2182.0,
+                        "room": 2182.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_artcool_mirror_2_5_kw": {
+                        "label": "LG Single-Split ArtCool Mirror 2,5 kW",
+                        "system": "single",
+                        "ratedKw": 2.5,
+                        "base": 2019.0,
+                        "room": 2019.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_artcool_mirror_3_5_kw": {
+                        "label": "LG Single-Split ArtCool Mirror 3,5 kW",
+                        "system": "single",
+                        "ratedKw": 3.5,
+                        "base": 2290.0,
+                        "room": 2290.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_artcool_mirror_5_0_kw": {
+                        "label": "LG Single-Split ArtCool Mirror 5,0 kW",
+                        "system": "single",
+                        "ratedKw": 5.0,
+                        "base": 2619.0,
+                        "room": 2619.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_artcool_mirror_6_6_kw": {
+                        "label": "LG Single-Split ArtCool Mirror 6,6 kW",
+                        "system": "single",
+                        "ratedKw": 6.6,
+                        "base": 3080.0,
+                        "room": 3080.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_artcool_gallery_premium_2_6": {
+                        "label": "LG Single-Split ArtCool Gallery Premium 2,6 kW",
+                        "system": "single",
+                        "ratedKw": 2.6,
+                        "base": 3537.0,
+                        "room": 3537.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_artcool_gallery_premium_3_7": {
+                        "label": "LG Single-Split ArtCool Gallery Premium 3,7 kW",
+                        "system": "single",
+                        "ratedKw": 3.7,
+                        "base": 4012.0,
+                        "room": 4012.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_artcool_gallery_special_2_6": {
+                        "label": "LG Single-Split ArtCool Gallery Special 2,6 kW",
+                        "system": "single",
+                        "ratedKw": 2.6,
+                        "base": 2584.0,
+                        "room": 2584.0,
+                        "capacityStep": 230
+                },
+                "single_lg_single_split_artcool_gallery_special_3_7": {
+                        "label": "LG Single-Split ArtCool Gallery Special 3,7 kW",
+                        "system": "single",
+                        "ratedKw": 3.7,
+                        "base": 2752.0,
+                        "room": 2752.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_standard_ii_2_5_kw": {
+                        "label": "LG Multi Innengerät Standard II 2,5 kW",
+                        "system": "multi",
+                        "ratedKw": 2.5,
+                        "base": 419.0,
+                        "room": 419.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_standard_ii_3_5_kw": {
+                        "label": "LG Multi Innengerät Standard II 3,5 kW",
+                        "system": "multi",
+                        "ratedKw": 3.5,
+                        "base": 461.0,
+                        "room": 461.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_standard_ii_5_0_kw": {
+                        "label": "LG Multi Innengerät Standard II 5,0 kW",
+                        "system": "multi",
+                        "ratedKw": 5.0,
+                        "base": 566.0,
+                        "room": 566.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_standard_ii_6_6_kw": {
+                        "label": "LG Multi Innengerät Standard II 6,6 kW",
+                        "system": "multi",
+                        "ratedKw": 6.6,
+                        "base": 673.0,
+                        "room": 673.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_standard_plus_2_1_kw": {
+                        "label": "LG Multi Innengerät Standard Plus 2,1 kW",
+                        "system": "multi",
+                        "ratedKw": 2.1,
+                        "base": 535.0,
+                        "room": 535.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_standard_plus_2_5_kw": {
+                        "label": "LG Multi Innengerät Standard Plus 2,5 kW",
+                        "system": "multi",
+                        "ratedKw": 2.5,
+                        "base": 574.0,
+                        "room": 574.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_standard_plus_3_5_kw": {
+                        "label": "LG Multi Innengerät Standard Plus 3,5 kW",
+                        "system": "multi",
+                        "ratedKw": 3.5,
+                        "base": 614.0,
+                        "room": 614.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_standard_plus_4_2_kw": {
+                        "label": "LG Multi Innengerät Standard Plus 4,2 kW",
+                        "system": "multi",
+                        "ratedKw": 4.2,
+                        "base": 614.0,
+                        "room": 614.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_standard_plus_5_0_kw": {
+                        "label": "LG Multi Innengerät Standard Plus 5,0 kW",
+                        "system": "multi",
+                        "ratedKw": 5.0,
+                        "base": 673.0,
+                        "room": 673.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_standard_plus_6_5_kw": {
+                        "label": "LG Multi Innengerät Standard Plus 6,5 kW",
+                        "system": "multi",
+                        "ratedKw": 6.5,
+                        "base": 766.0,
+                        "room": 766.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_dualcool_premium_2_5_kw": {
+                        "label": "LG Multi Innengerät DualCool Premium 2,5 kW",
+                        "system": "multi",
+                        "ratedKw": 2.5,
+                        "base": 878.0,
+                        "room": 878.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_dualcool_premium_3_5_kw": {
+                        "label": "LG Multi Innengerät DualCool Premium 3,5 kW",
+                        "system": "multi",
+                        "ratedKw": 3.5,
+                        "base": 999.0,
+                        "room": 999.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_deluxe_2_1_kw": {
+                        "label": "LG Multi Innengerät Deluxe 2,1 kW",
+                        "system": "multi",
+                        "ratedKw": 2.1,
+                        "base": 600.0,
+                        "room": 600.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_deluxe_2_5_kw": {
+                        "label": "LG Multi Innengerät Deluxe 2,5 kW",
+                        "system": "multi",
+                        "ratedKw": 2.5,
+                        "base": 636.0,
+                        "room": 636.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_deluxe_3_5_kw": {
+                        "label": "LG Multi Innengerät Deluxe 3,5 kW",
+                        "system": "multi",
+                        "ratedKw": 3.5,
+                        "base": 718.0,
+                        "room": 718.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_deluxe_5_0_kw": {
+                        "label": "LG Multi Innengerät Deluxe 5,0 kW",
+                        "system": "multi",
+                        "ratedKw": 5.0,
+                        "base": 858.0,
+                        "room": 858.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_deluxe_6_5_kw": {
+                        "label": "LG Multi Innengerät Deluxe 6,5 kW",
+                        "system": "multi",
+                        "ratedKw": 6.5,
+                        "base": 1094.0,
+                        "room": 1094.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_artcool_mirror_2_1_kw": {
+                        "label": "LG Multi Innengerät ArtCool Mirror 2,1 kW",
+                        "system": "multi",
+                        "ratedKw": 2.1,
+                        "base": 633.0,
+                        "room": 633.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_artcool_mirror_2_5_kw": {
+                        "label": "LG Multi Innengerät ArtCool Mirror 2,5 kW",
+                        "system": "multi",
+                        "ratedKw": 2.5,
+                        "base": 748.0,
+                        "room": 748.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_artcool_mirror_3_5_kw": {
+                        "label": "LG Multi Innengerät ArtCool Mirror 3,5 kW",
+                        "system": "multi",
+                        "ratedKw": 3.5,
+                        "base": 854.0,
+                        "room": 854.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_artcool_mirror_5_0_kw": {
+                        "label": "LG Multi Innengerät ArtCool Mirror 5,0 kW",
+                        "system": "multi",
+                        "ratedKw": 5.0,
+                        "base": 1026.0,
+                        "room": 1026.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_artcool_mirror_6_5_kw": {
+                        "label": "LG Multi Innengerät ArtCool Mirror 6,5 kW",
+                        "system": "multi",
+                        "ratedKw": 6.5,
+                        "base": 1155.0,
+                        "room": 1155.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_artcool_gallery_premium_2_6": {
+                        "label": "LG Multi Innengerät ArtCool Gallery Premium 2,6 kW",
+                        "system": "multi",
+                        "ratedKw": 2.6,
+                        "base": 1899.0,
+                        "room": 1899.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_artcool_gallery_premium_3_7": {
+                        "label": "LG Multi Innengerät ArtCool Gallery Premium 3,7 kW",
+                        "system": "multi",
+                        "ratedKw": 3.7,
+                        "base": 2299.0,
+                        "room": 2299.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_artcool_gallery_special_2_6": {
+                        "label": "LG Multi Innengerät ArtCool Gallery Special 2,6 kW",
+                        "system": "multi",
+                        "ratedKw": 2.6,
+                        "base": 946.0,
+                        "room": 946.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_lg_multi_innengeraet_artcool_gallery_special_3_7": {
+                        "label": "LG Multi Innengerät ArtCool Gallery Special 3,7 kW",
+                        "system": "multi",
+                        "ratedKw": 3.7,
+                        "base": 1039.0,
+                        "room": 1039.0,
+                        "capacityStep": 230
+                },
+                "single_samsung_single_cebu_living_2_5_kw": {
+                        "label": "Samsung Single Cebu Living 2,5 kW",
+                        "system": "single",
+                        "ratedKw": 2.5,
+                        "base": 1612.0,
+                        "room": 1612.0,
+                        "capacityStep": 230
+                },
+                "single_samsung_single_cebu_living_3_5_kw": {
+                        "label": "Samsung Single Cebu Living 3,5 kW",
+                        "system": "single",
+                        "ratedKw": 3.5,
+                        "base": 1703.0,
+                        "room": 1703.0,
+                        "capacityStep": 230
+                },
+                "single_samsung_single_cebu_living_5_0_kw": {
+                        "label": "Samsung Single Cebu Living 5,0 kW",
+                        "system": "single",
+                        "ratedKw": 5.0,
+                        "base": 2354.0,
+                        "room": 2354.0,
+                        "capacityStep": 230
+                },
+                "single_samsung_single_cebu_living_6_5_kw": {
+                        "label": "Samsung Single Cebu Living 6,5 kW",
+                        "system": "single",
+                        "ratedKw": 6.5,
+                        "base": 3134.0,
+                        "room": 3134.0,
+                        "capacityStep": 230
+                },
+                "single_samsung_single_windfree_standard_2_5_kw": {
+                        "label": "Samsung Single WindFree Standard 2,5 kW",
+                        "system": "single",
+                        "ratedKw": 2.5,
+                        "base": 2026.0,
+                        "room": 2026.0,
+                        "capacityStep": 230
+                },
+                "single_samsung_single_windfree_standard_3_5_kw": {
+                        "label": "Samsung Single WindFree Standard 3,5 kW",
+                        "system": "single",
+                        "ratedKw": 3.5,
+                        "base": 2151.0,
+                        "room": 2151.0,
+                        "capacityStep": 230
+                },
+                "single_samsung_single_windfree_standard_5_0_kw": {
+                        "label": "Samsung Single WindFree Standard 5,0 kW",
+                        "system": "single",
+                        "ratedKw": 5.0,
+                        "base": 2933.0,
+                        "room": 2933.0,
+                        "capacityStep": 230
+                },
+                "single_samsung_single_windfree_standard_6_5_kw": {
+                        "label": "Samsung Single WindFree Standard 6,5 kW",
+                        "system": "single",
+                        "ratedKw": 6.5,
+                        "base": 3627.0,
+                        "room": 3627.0,
+                        "capacityStep": 230
+                },
+                "single_samsung_single_windfree_exklusiv_2_5_kw": {
+                        "label": "Samsung Single WindFree Exklusiv 2,5 kW",
+                        "system": "single",
+                        "ratedKw": 2.5,
+                        "base": 2503.0,
+                        "room": 2503.0,
+                        "capacityStep": 230
+                },
+                "single_samsung_single_windfree_exklusiv_3_5_kw": {
+                        "label": "Samsung Single WindFree Exklusiv 3,5 kW",
+                        "system": "single",
+                        "ratedKw": 3.5,
+                        "base": 2682.0,
+                        "room": 2682.0,
+                        "capacityStep": 230
+                },
+                "single_samsung_single_windfree_exklusiv_5_0_kw": {
+                        "label": "Samsung Single WindFree Exklusiv 5,0 kW",
+                        "system": "single",
+                        "ratedKw": 5.0,
+                        "base": 3646.0,
+                        "room": 3646.0,
+                        "capacityStep": 230
+                },
+                "single_samsung_single_windfree_exklusiv_6_5_kw": {
+                        "label": "Samsung Single WindFree Exklusiv 6,5 kW",
+                        "system": "single",
+                        "ratedKw": 6.5,
+                        "base": 4778.0,
+                        "room": 4778.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_cebu_living_2_5_kw": {
+                        "label": "Samsung Multi Innengerät Cebu Living 2,5 kW",
+                        "system": "multi",
+                        "ratedKw": 2.5,
+                        "base": 676.0,
+                        "room": 676.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_cebu_living_3_5_kw": {
+                        "label": "Samsung Multi Innengerät Cebu Living 3,5 kW",
+                        "system": "multi",
+                        "ratedKw": 3.5,
+                        "base": 734.0,
+                        "room": 734.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_cebu_living_5_0_kw": {
+                        "label": "Samsung Multi Innengerät Cebu Living 5,0 kW",
+                        "system": "multi",
+                        "ratedKw": 5.0,
+                        "base": 866.0,
+                        "room": 866.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_cebu_living_6_5_kw": {
+                        "label": "Samsung Multi Innengerät Cebu Living 6,5 kW",
+                        "system": "multi",
+                        "ratedKw": 6.5,
+                        "base": 1178.0,
+                        "room": 1178.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_windfree_standard_2_5_kw": {
+                        "label": "Samsung Multi Innengerät WindFree Standard 2,5 kW",
+                        "system": "multi",
+                        "ratedKw": 2.5,
+                        "base": 730.0,
+                        "room": 730.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_windfree_standard_3_5_kw": {
+                        "label": "Samsung Multi Innengerät WindFree Standard 3,5 kW",
+                        "system": "multi",
+                        "ratedKw": 3.5,
+                        "base": 801.0,
+                        "room": 801.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_windfree_standard_5_0_kw": {
+                        "label": "Samsung Multi Innengerät WindFree Standard 5,0 kW",
+                        "system": "multi",
+                        "ratedKw": 5.0,
+                        "base": 1160.0,
+                        "room": 1160.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_windfree_standard_6_5_kw": {
+                        "label": "Samsung Multi Innengerät WindFree Standard 6,5 kW",
+                        "system": "multi",
+                        "ratedKw": 6.5,
+                        "base": 1518.0,
+                        "room": 1518.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_windfree_exklusiv_2_5_kw": {
+                        "label": "Samsung Multi Innengerät WindFree Exklusiv 2,5 kW",
+                        "system": "multi",
+                        "ratedKw": 2.5,
+                        "base": 1127.0,
+                        "room": 1127.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_windfree_exklusiv_3_5_kw": {
+                        "label": "Samsung Multi Innengerät WindFree Exklusiv 3,5 kW",
+                        "system": "multi",
+                        "ratedKw": 3.5,
+                        "base": 1217.0,
+                        "room": 1217.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_windfree_exklusiv_5_0_kw": {
+                        "label": "Samsung Multi Innengerät WindFree Exklusiv 5,0 kW",
+                        "system": "multi",
+                        "ratedKw": 5.0,
+                        "base": 1642.0,
+                        "room": 1642.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_windfree_exklusiv_6_5_kw": {
+                        "label": "Samsung Multi Innengerät WindFree Exklusiv 6,5 kW",
+                        "system": "multi",
+                        "ratedKw": 6.5,
+                        "base": 2151.0,
+                        "room": 2151.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_standtruhe_2_5_kw": {
+                        "label": "Samsung Multi Innengerät Standtruhe 2,5 kW",
+                        "system": "multi",
+                        "ratedKw": 2.5,
+                        "base": 1021.0,
+                        "room": 1021.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_standtruhe_3_5_kw": {
+                        "label": "Samsung Multi Innengerät Standtruhe 3,5 kW",
+                        "system": "multi",
+                        "ratedKw": 3.5,
+                        "base": 1139.0,
+                        "room": 1139.0,
+                        "capacityStep": 230
+                },
+                "multi_innen_samsung_multi_innengeraet_standtruhe_5_2_kw": {
+                        "label": "Samsung Multi Innengerät Standtruhe 5,2 kW",
+                        "system": "multi",
+                        "ratedKw": 5.2,
+                        "base": 1361.0,
+                        "room": 1361.0,
+                        "capacityStep": 230
+                }
         },
-        objectFactor: { wohnung: 1, haus: 1.04, buero: 1.08, laden: 1.12 },
-        risks: {
-          ladder: { label: 'Leiter/Geruest/Hoehe', cost: 380, complexity: 0.035 },
-          concrete: { label: 'Stahlbeton/Kernbohrung schwer', cost: 260, complexity: 0.025 },
-          permit: { label: 'Genehmigung/WEG/Denkmalschutz offen', cost: 180, complexity: 0.04 },
-          oldunit: { label: 'Altgeraet demontieren/entsorgen', cost: 220, complexity: 0.015 }
+        "outdoorUnits": {
+                "multi42": {
+                        "label": "Multi-Split Außengerät bis 4,2 kW",
+                        "base": 1450,
+                        "capacityStep": 230,
+                        "ratedKw": 4.2
+                },
+                "multi60": {
+                        "label": "Multi-Split Außengerät bis 6,0 kW",
+                        "base": 1850,
+                        "capacityStep": 250,
+                        "ratedKw": 6.0
+                },
+                "multi80": {
+                        "label": "Multi-Split Außengerät bis 8,0 kW",
+                        "base": 2450,
+                        "capacityStep": 280,
+                        "ratedKw": 8.0
+                },
+                "aussen_multisplit_aussengeraet_fuer_2_innengeraete": {
+                        "label": "Multisplit-Außengerät für 2 Innengeräte",
+                        "ratedKw": 5.0,
+                        "base": 1850.0,
+                        "capacityStep": 250
+                },
+                "aussen_lg_multi_aussengeraet_mu2r15": {
+                        "label": "LG Multi Außengerät MU2R15",
+                        "ratedKw": 4.4,
+                        "base": 1827.0,
+                        "capacityStep": 250
+                },
+                "aussen_lg_multi_aussengeraet_mu2r17": {
+                        "label": "LG Multi Außengerät MU2R17",
+                        "ratedKw": 5.0,
+                        "base": 2010.0,
+                        "capacityStep": 250
+                },
+                "aussen_lg_multi_aussengeraet_mu3r19": {
+                        "label": "LG Multi Außengerät MU3R19",
+                        "ratedKw": 5.6,
+                        "base": 2145.0,
+                        "capacityStep": 250
+                },
+                "aussen_lg_multi_aussengeraet_mu3r21": {
+                        "label": "LG Multi Außengerät MU3R21",
+                        "ratedKw": 6.2,
+                        "base": 2618.0,
+                        "capacityStep": 250
+                },
+                "aussen_lg_multi_aussengeraet_mu4r25": {
+                        "label": "LG Multi Außengerät MU4R25",
+                        "ratedKw": 7.3,
+                        "base": 3210.0,
+                        "capacityStep": 250
+                },
+                "aussen_lg_multi_aussengeraet_mu4r27": {
+                        "label": "LG Multi Außengerät MU4R27",
+                        "ratedKw": 7.9,
+                        "base": 3537.0,
+                        "capacityStep": 250
+                },
+                "aussen_lg_multi_aussengeraet_mu5r30": {
+                        "label": "LG Multi Außengerät MU5R30",
+                        "ratedKw": 8.8,
+                        "base": 3798.0,
+                        "capacityStep": 250
+                },
+                "aussen_lg_multi_aussengeraet_mu5r40": {
+                        "label": "LG Multi Außengerät MU5R40",
+                        "ratedKw": 11.7,
+                        "base": 5656.0,
+                        "capacityStep": 250
+                },
+                "aussen_samsung_multi_aussengeraet_aj040_2ig": {
+                        "label": "Samsung Multi Außengerät AJ040 (2IG)",
+                        "ratedKw": 4.0,
+                        "base": 2233.0,
+                        "capacityStep": 250
+                },
+                "aussen_samsung_multi_aussengeraet_aj050_2ig": {
+                        "label": "Samsung Multi Außengerät AJ050 (2IG)",
+                        "ratedKw": 5.0,
+                        "base": 2576.0,
+                        "capacityStep": 250
+                },
+                "aussen_samsung_multi_aussengeraet_aj052_3ig": {
+                        "label": "Samsung Multi Außengerät AJ052 (3IG)",
+                        "ratedKw": 5.2,
+                        "base": 2913.0,
+                        "capacityStep": 250
+                },
+                "aussen_samsung_multi_aussengeraet_aj068_3ig": {
+                        "label": "Samsung Multi Außengerät AJ068 (3IG)",
+                        "ratedKw": 6.8,
+                        "base": 3377.0,
+                        "capacityStep": 250
+                },
+                "aussen_samsung_multi_aussengeraet_aj080_4ig": {
+                        "label": "Samsung Multi Außengerät AJ080 (4IG)",
+                        "ratedKw": 8.0,
+                        "base": 4278.0,
+                        "capacityStep": 250
+                },
+                "aussen_samsung_multi_aussengeraet_aj100_5ig": {
+                        "label": "Samsung Multi Außengerät AJ100 (5IG)",
+                        "ratedKw": 10.0,
+                        "base": 5267.0,
+                        "capacityStep": 250
+                }
         },
-        taxRates: { at: 0.20 },
-        markupFactor: 1.22,
-        settings: {
-          baseWattsPerM2: { gut: 45, normal: 60, altbau: 80 },
-          buildingDefaults: {
-            neubau: { insulation: 'gut', u: 0.9, height: 2.5 },
-            saniert: { insulation: 'normal', u: 1.3, height: 2.6 },
-            unsaniert: { insulation: 'altbau', u: 2.4, height: 2.8 }
-          },
-          sunWatts: { nord: 20, ost: 65, sued: 85, west: 100, suedwest: 120, stark: 150 },
-          shadeFactors: { none: 1, inside: 0.85, outside: 0.55, shutter: 0.4 },
-          indoorSizes: [2.0, 2.5, 3.5, 4.2, 5.0, 6.0, 7.1, 10.0]
+        "mounting": {
+                "baseInstall": 760,
+                "additionalIndoor": 340,
+                "drilling": 125,
+                "lineMeter": 44,
+                "channelMeter": 26,
+                "outdoor": {
+                        "balkon": 170,
+                        "wand": 230,
+                        "boden": 260,
+                        "dach": 620
+                },
+                "power": {
+                        "nah": 0,
+                        "mittel": 330,
+                        "weit": 620
+                },
+                "condensatePump": 280
+        },
+        "objectFactor": {
+                "wohnung": 1,
+                "haus": 1.04,
+                "buero": 1.08,
+                "laden": 1.12
+        },
+        "risks": {
+                "ladder": {
+                        "label": "Leiter/Gerüst/Höhe",
+                        "cost": 380,
+                        "complexity": 0.035
+                },
+                "concrete": {
+                        "label": "Stahlbeton/Kernbohrung schwer",
+                        "cost": 260,
+                        "complexity": 0.025
+                },
+                "permit": {
+                        "label": "Genehmigung/WEG/Denkmalschutz offen",
+                        "cost": 180,
+                        "complexity": 0.04
+                },
+                "oldunit": {
+                        "label": "Altgerät demontieren/entsorgen",
+                        "cost": 220,
+                        "complexity": 0.015
+                }
+        },
+        "taxRates": {
+                "at": 0.2
+        },
+        "markupFactor": 1.22,
+        "settings": {
+                "baseWattsPerM2": {
+                        "gut": 45,
+                        "normal": 60,
+                        "altbau": 80
+                },
+                "buildingDefaults": {
+                        "neubau": {
+                                "insulation": "gut",
+                                "u": 0.9,
+                                "height": 2.5
+                        },
+                        "saniert": {
+                                "insulation": "normal",
+                                "u": 1.3,
+                                "height": 2.6
+                        },
+                        "unsaniert": {
+                                "insulation": "altbau",
+                                "u": 2.4,
+                                "height": 2.8
+                        }
+                },
+                "sunWatts": {
+                        "nord": 20,
+                        "ost": 65,
+                        "sued": 85,
+                        "west": 100,
+                        "suedwest": 120,
+                        "stark": 150
+                },
+                "shadeFactors": {
+                        "none": 1,
+                        "inside": 0.85,
+                        "outside": 0.55,
+                        "shutter": 0.4
+                },
+                "indoorSizes": [
+                        2.0,
+                        2.5,
+                        3.5,
+                        4.2,
+                        5.0,
+                        6.0,
+                        7.1,
+                        10.0
+                ]
         }
-      };
+};
       const DATABASE_STORAGE_KEY = 'klimaRechnerDatenbankV2';
       let priceConfig;
       let devicePrices;
+      let outdoorUnitPrices;
       let mountingPrices;
       let objectFactor;
       let baseWattsPerM2;
@@ -1121,12 +2128,28 @@ window.initKlimaCalculator = () => {
         }
       }
 
+      function bundledDatabase() {
+        return window.KLIMA_PRICE_CONFIG || defaultPriceConfig;
+      }
+
+      function activeDatabase() {
+        const stored = storedDatabase();
+        const bundled = bundledDatabase();
+        const storedVersion = Number(stored?.version || 0);
+        const bundledVersion = Number(bundled?.version || 0);
+        if (stored && storedVersion >= bundledVersion) return stored;
+        return bundled;
+      }
+
       function validateConfig(config) {
         if (!config || !config.devicePackages || !config.mounting || !config.settings) {
-          throw new Error('devicePackages, mounting und settings muessen vorhanden sein.');
+          throw new Error('devicePackages, outdoorUnits, mounting und settings müssen vorhanden sein.');
         }
         if (!Object.keys(config.devicePackages).length) {
-          throw new Error('Mindestens ein Geraetepaket ist erforderlich.');
+          throw new Error('Mindestens ein Innengerät ist erforderlich.');
+        }
+        if (!config.outdoorUnits || !Object.keys(config.outdoorUnits).length) {
+          throw new Error('Mindestens ein Außengerät ist erforderlich.');
         }
         if (!config.settings.baseWattsPerM2 || !config.settings.buildingDefaults || !config.settings.indoorSizes) {
           throw new Error('settings.baseWattsPerM2, settings.buildingDefaults und settings.indoorSizes sind erforderlich.');
@@ -1140,6 +2163,7 @@ window.initKlimaCalculator = () => {
         priceConfig = mergeConfig(defaultPriceConfig, config || {});
         validateConfig(priceConfig);
         devicePrices = priceConfig.devicePackages;
+        outdoorUnitPrices = priceConfig.outdoorUnits;
         mountingPrices = priceConfig.mounting;
         objectFactor = priceConfig.objectFactor;
         baseWattsPerM2 = priceConfig.settings.baseWattsPerM2;
@@ -1154,24 +2178,53 @@ window.initKlimaCalculator = () => {
         syncRiskOptions();
       }
 
-      function deviceOptions(selected) {
-        return Object.entries(devicePrices).map(([value, config]) => (
+      function deviceMatchesSystem(config, systemType) {
+        if (!config) return false;
+        const availability = config.system || config.availability || 'both';
+        if (availability === 'both' || availability === systemType) return true;
+        if (systemType === 'single') return availability !== 'multi' && Number(config.base || 0) > 0;
+        return availability !== 'single' && Number(config.room || 0) > 0;
+      }
+
+      function availableDeviceEntries(systemType = currentSystemType()) {
+        const entries = Object.entries(devicePrices).filter(([, config]) => deviceMatchesSystem(config, systemType));
+        return entries.length ? entries : Object.entries(devicePrices);
+      }
+
+      function deviceOptions(selected, systemType = currentSystemType()) {
+        const entries = availableDeviceEntries(systemType);
+        const active = entries.some(([value]) => value === selected) ? selected : fallbackDeviceKey(systemType);
+        return entries.map(([value, config]) => (
+          `<option value="${escapeHtml(value)}"${value === active ? ' selected' : ''}>${escapeHtml(config.label)}</option>`
+        )).join('');
+      }
+
+      function fallbackDeviceKey(systemType = currentSystemType()) {
+        const preferred = ['standard', 'basis', 'premium'].find((key) => deviceMatchesSystem(devicePrices[key], systemType));
+        if (preferred) return preferred;
+        return availableDeviceEntries(systemType)[0]?.[0] || Object.keys(devicePrices)[0];
+      }
+
+      function outdoorOptions(selected) {
+        return Object.entries(outdoorUnitPrices).map(([value, config]) => (
           `<option value="${escapeHtml(value)}"${value === selected ? ' selected' : ''}>${escapeHtml(config.label)}</option>`
         )).join('');
       }
 
-      function fallbackDeviceKey() {
-        return Object.keys(devicePrices)[0];
+      function fallbackOutdoorKey() {
+        return Object.keys(outdoorUnitPrices)[0];
       }
 
       function syncDeviceChoices() {
-        if (!fields.klasse || !devicePrices) return;
-        const fallback = fallbackDeviceKey();
-        const selected = devicePrices[fields.klasse.value] ? fields.klasse.value : fallback;
-        fields.klasse.innerHTML = deviceOptions(selected);
-        fields.klasse.value = selected;
+        if (!fields.klasse || !devicePrices || !outdoorUnitPrices) return;
+        const systemType = currentSystemType();
+        const roomFallback = fallbackDeviceKey(systemType);
+        const outdoorFallback = outdoorUnitPrices.multi42 ? 'multi42' : fallbackOutdoorKey();
+        const selectedOutdoor = outdoorUnitPrices[fields.klasse.value] ? fields.klasse.value : outdoorFallback;
+        fields.klasse.innerHTML = outdoorOptions(selectedOutdoor);
+        fields.klasse.value = selectedOutdoor;
         roomData.forEach((room) => {
-          if (!devicePrices[room.device]) room.device = selected;
+          if (!deviceMatchesSystem(devicePrices[room.device], systemType)) room.device = roomFallback;
         });
       }
 
@@ -1197,14 +2250,15 @@ window.initKlimaCalculator = () => {
 
       function syncSystemChoice() {
         const multiRoom = roomCount() > 1;
-        out.systemWrap.classList.toggle('kr-hidden', !multiRoom);
+        fields.systemtyp.disabled = !multiRoom;
         if (!multiRoom) fields.systemtyp.value = 'single';
         if (multiRoom && fields.systemtyp.value === 'single' && !fields.systemtyp.dataset.userSelected) {
           fields.systemtyp.value = 'multi';
         }
+        out.systemWrap.classList.toggle('kr-hidden', !(multiRoom && fields.systemtyp.value === 'multi'));
       }
 
-      setRuntimeConfig(storedDatabase() || window.KLIMA_PRICE_CONFIG || defaultPriceConfig);
+      setRuntimeConfig(activeDatabase());
 
       function number(field) {
         return Math.max(0, Number(field.value) || 0);
@@ -1214,6 +2268,19 @@ window.initKlimaCalculator = () => {
         return Math.max(1, number(fields.raeume));
       }
 
+      function deviceDiscountPercent() {
+        return Math.min(100, Math.max(0, normalizeNumber(fields.rabatt.value, 0)));
+      }
+
+      function defaultRoomName(index) {
+        return `Raum ${index + 1}`;
+      }
+
+      function displayRoomName(room, index) {
+        const name = String(room.name || '').trim();
+        return name || defaultRoomName(index);
+      }
+
       function applyMode() {
         const exact = fields.modus.value === 'genau';
         root.querySelectorAll('[data-advanced-room]').forEach((node) => {
@@ -1221,12 +2288,13 @@ window.initKlimaCalculator = () => {
         });
         out.modeNote.textContent = exact
           ? 'Genauer Modus nutzt die Werte je Raum.'
-          : 'Basis nutzt Richtwerte fuer U-Wert, Raumhoehe und Daemmung.';
+          : 'Basis nutzt Richtwerte für U-Wert, Raumhöhe und Dämmung.';
       }
 
       function renderRoomAreas() {
         const rooms = roomCount();
         syncSystemChoice();
+        const systemType = currentSystemType();
         Array.from(root.querySelectorAll('[data-room-field]')).forEach((input) => {
           const index = Number(input.dataset.roomIndex);
           const field = input.dataset.roomField;
@@ -1234,29 +2302,36 @@ window.initKlimaCalculator = () => {
           roomData[index][field] = input.type === 'range' || input.type === 'number' ? number(input) : input.value;
         });
         out.roomAreas.innerHTML = Array.from({ length: rooms }, (_, index) => {
-          const data = roomData[index] || { area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: fields.klasse.value };
-          if (!devicePrices[data.device]) data.device = fields.klasse.value;
+          const roomFallback = fallbackDeviceKey(systemType);
+          const data = roomData[index] || { name: defaultRoomName(index), area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: roomFallback };
+          if (!data.name) data.name = defaultRoomName(index);
+          if (!deviceMatchesSystem(devicePrices[data.device], systemType)) data.device = roomFallback;
           roomData[index] = data;
+          const roomLabel = displayRoomName(data, index);
           return `
             <div class="kr-room">
-              <div class="kr-room-title">Raum ${index + 1}</div>
+              <div class="kr-room-title">${escapeHtml(roomLabel)}</div>
               <div class="kr-fields">
                 <label class="form-label">
-                  Geraet fuer Raum ${index + 1}
+                  Raumbezeichnung
+                  <input class="form-control" data-room-field="name" data-room-index="${index}" type="text" value="${escapeHtml(data.name)}" placeholder="z. B. Wohnzimmer">
+                </label>
+                <label class="form-label">
+                  Innengerät für ${escapeHtml(roomLabel)}
                   <select class="form-select" data-room-field="device" data-room-index="${index}">
-                    ${deviceOptions(data.device)}
+                    ${deviceOptions(data.device, systemType)}
                   </select>
                 </label>
                 <label class="form-label">
-                  <span class="kr-inline">Flaeche <output id="kr-room-${index}-area-out">${data.area} m2</output></span>
+                  <span class="kr-inline">Fläche <output id="kr-room-${index}-area-out">${data.area} m2</output></span>
                   <input class="form-range" data-room-field="area" data-room-index="${index}" type="range" min="8" max="80" step="1" value="${data.area}">
                 </label>
                 <label class="form-label" data-advanced-room>
-                  <span class="kr-inline">Raumhoehe <output id="kr-room-${index}-height-out">${data.height.toLocaleString('de-DE')} m</output></span>
+                  <span class="kr-inline">Raumhöhe <output id="kr-room-${index}-height-out">${data.height.toLocaleString('de-DE')} m</output></span>
                   <input class="form-range" data-room-field="height" data-room-index="${index}" type="range" min="2.1" max="4.2" step="0.1" value="${data.height}">
                 </label>
                 <label class="form-label">
-                  <span class="kr-inline">Fensterflaeche <output id="kr-room-${index}-window-out">${data.window} m2</output></span>
+                  <span class="kr-inline">Fensterfläche <output id="kr-room-${index}-window-out">${data.window} m2</output></span>
                   <input class="form-range" data-room-field="window" data-room-index="${index}" type="range" min="0" max="30" step="0.5" value="${data.window}">
                 </label>
                 <label class="form-label" data-advanced-room>
@@ -1268,10 +2343,10 @@ window.initKlimaCalculator = () => {
                   <select class="form-select" data-room-field="sun" data-room-index="${index}">
                     <option value="nord"${data.sun === 'nord' ? ' selected' : ''}>Nord / wenig Sonne</option>
                     <option value="ost"${data.sun === 'ost' ? ' selected' : ''}>Ost</option>
-                    <option value="sued"${data.sun === 'sued' ? ' selected' : ''}>Sued</option>
+                    <option value="sued"${data.sun === 'sued' ? ' selected' : ''}>Süd</option>
                     <option value="west"${data.sun === 'west' ? ' selected' : ''}>West</option>
-                    <option value="suedwest"${data.sun === 'suedwest' ? ' selected' : ''}>Sued-West</option>
-                    <option value="stark"${data.sun === 'stark' ? ' selected' : ''}>Sehr sonnig / grosse Glasflaeche</option>
+                    <option value="suedwest"${data.sun === 'suedwest' ? ' selected' : ''}>Süd-West</option>
+                    <option value="stark"${data.sun === 'stark' ? ' selected' : ''}>Sehr sonnig / große Glasfläche</option>
                   </select>
                 </label>
                 <label class="form-label">
@@ -1279,16 +2354,16 @@ window.initKlimaCalculator = () => {
                   <select class="form-select" data-room-field="shade" data-room-index="${index}">
                     <option value="none"${data.shade === 'none' ? ' selected' : ''}>Keine</option>
                     <option value="inside"${data.shade === 'inside' ? ' selected' : ''}>Innenliegend / Vorhang</option>
-                    <option value="outside"${data.shade === 'outside' ? ' selected' : ''}>Aussenjalousie / Markise</option>
+                    <option value="outside"${data.shade === 'outside' ? ' selected' : ''}>Außenjalousie / Markise</option>
                     <option value="shutter"${data.shade === 'shutter' ? ' selected' : ''}>Rollladen / starke Verschattung</option>
                   </select>
                 </label>
                 <label class="form-label" data-advanced-room>
-                  Daemmung
+                  Dämmung
                   <select class="form-select" data-room-field="insulation" data-room-index="${index}">
-                    <option value="gut"${data.insulation === 'gut' ? ' selected' : ''}>Gut gedaemmt</option>
+                    <option value="gut"${data.insulation === 'gut' ? ' selected' : ''}>Gut gedämmt</option>
                     <option value="normal"${data.insulation === 'normal' ? ' selected' : ''}>Normal</option>
-                    <option value="altbau"${data.insulation === 'altbau' ? ' selected' : ''}>Altbau / schwach gedaemmt</option>
+                    <option value="altbau"${data.insulation === 'altbau' ? ' selected' : ''}>Altbau / schwach gedämmt</option>
                   </select>
                 </label>
                 <label class="form-label">
@@ -1313,7 +2388,9 @@ window.initKlimaCalculator = () => {
       function getRooms() {
         return Array.from(root.querySelectorAll('[data-room-field="area"]')).map((input) => {
           const index = Number(input.dataset.roomIndex);
+          const rawName = root.querySelector(`[data-room-index="${index}"][data-room-field="name"]`)?.value || '';
           return {
+            name: rawName.trim() || defaultRoomName(index),
             area: number(root.querySelector(`[data-room-index="${index}"][data-room-field="area"]`)),
             height: number(root.querySelector(`[data-room-index="${index}"][data-room-field="height"]`)),
             window: number(root.querySelector(`[data-room-index="${index}"][data-room-field="window"]`)),
@@ -1373,11 +2450,11 @@ window.initKlimaCalculator = () => {
       }
 
       function deviceCostForRoom(item, systemType) {
-        const config = devicePrices[item.room.device] || devicePrices[fields.klasse.value];
-        const capacityBase = systemType === 'single' ? 3.5 : 2.5;
+        const config = devicePrices[item.room.device] || devicePrices.standard || devicePrices[fallbackDeviceKey()];
+        const capacityBase = Number(config.ratedKw || 0) || (systemType === 'single' ? 3.5 : 2.5);
         const capacitySurcharge = Math.max(0, item.indoorKw - capacityBase) * (config.capacityStep || 210);
         const base = systemType === 'single' ? config.base : config.room;
-        return { label: config.label, cost: base + capacitySurcharge };
+        return { label: config.label, cost: Number(base || 0) + capacitySurcharge };
       }
 
       function selectedRisks() {
@@ -1393,13 +2470,20 @@ window.initKlimaCalculator = () => {
         syncSystemChoice();
         const systemType = currentSystemType();
         const systemLabel = systemFor(systemType, rooms);
-        const device = devicePrices[fields.klasse.value];
+        const device = devicePrices.standard || devicePrices[fallbackDeviceKey()];
+        const outdoorUnit = outdoorUnitPrices[fields.klasse.value] || outdoorUnitPrices[fallbackOutdoorKey()];
         const plan = loadPlan(roomDetails, systemType);
         const kw = plan.outdoorKw;
         const roomDeviceCosts = plan.perRoom.map((item) => deviceCostForRoom(item, systemType));
+        const outdoorBaseKw = Number(outdoorUnit.ratedKw || 0) || 4.2;
+        const outdoorCapacitySurcharge = systemType === 'multi'
+          ? Math.max(0, kw - outdoorBaseKw) * (outdoorUnit.capacityStep || 230)
+          : 0;
         const deviceCost = systemType === 'multi'
-          ? device.base + roomDeviceCosts.reduce((sum, item) => sum + item.cost, 0)
+          ? (outdoorUnit.base || 0) + outdoorCapacitySurcharge + roomDeviceCosts.reduce((sum, item) => sum + item.cost, 0)
           : roomDeviceCosts.reduce((sum, item) => sum + item.cost, 0);
+        const discountPercent = deviceDiscountPercent();
+        const deviceDiscount = deviceCost * discountPercent / 100;
         const baseInstall = systemType === 'multi'
           ? mountingPrices.baseInstall + Math.max(0, rooms - 1) * mountingPrices.additionalIndoor
           : mountingPrices.baseInstall * rooms;
@@ -1414,11 +2498,12 @@ window.initKlimaCalculator = () => {
         const pump = fields.kondensat.value === 'pumpe' ? mountingPrices.condensatePump : 0;
         const risks = selectedRisks();
         const baseLines = [
-          [systemType === 'multi' ? `${device.label} Multi-Split` : 'Single-Split Anlagen je Raum', deviceCost],
+          [systemType === 'multi' ? `Außengerät ${outdoorUnit.label} + Innengeräte` : 'Single-Split Sets je Raum', deviceCost],
           ['Montage und Inbetriebnahme', baseInstall],
           ['Leitungen und Kabelkanal', line + channel],
-          ['Wanddurchbruch und Aussengeraet', drilling + outside]
+          ['Wanddurchbruch und Außengerät-Standort', drilling + outside]
         ];
+        if (deviceDiscount > 0) baseLines.splice(1, 0, [`Geräterabatt ${discountPercent.toLocaleString('de-DE', { maximumFractionDigits: 1 })} %`, -deviceDiscount]);
         if (electric > 0) baseLines.push(['Stromzuleitung', electric]);
         if (pump > 0) baseLines.push(['Kondensatpumpe', pump]);
         risks.forEach((risk) => baseLines.push([`Montage-Zuschlag: ${risk.label}`, risk.cost]));
@@ -1462,7 +2547,7 @@ window.initKlimaCalculator = () => {
           ? `${systemLabel}, innen ${plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`
           : systemLabel;
         out.last.textContent = `${plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
-        out.treiber.textContent = `Raum ${plan.largest.index + 1}: ${plan.largest.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
+        out.treiber.textContent = `${displayRoomName(plan.largest.room, plan.largest.index)}: ${plan.largest.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
         out.netto.textContent = euro(net);
         out.ustLabel.textContent = `USt. ${Math.round(taxRate * 100)} Prozent`;
         out.ust.textContent = euro(tax);
@@ -1476,9 +2561,10 @@ window.initKlimaCalculator = () => {
         const maxRoomLoad = Math.max(...plan.perRoom.map((item) => item.rawKw), 1);
         out.loadLines.innerHTML = plan.perRoom.map((item) => {
           const width = Math.max(4, item.rawKw / maxRoomLoad * 100);
+          const roomLabel = displayRoomName(item.room, item.index);
           return `
             <div class="kr-load-row">
-              <span class="text-small">Raum ${item.index + 1}</span>
+              <span class="text-small">${escapeHtml(roomLabel)}</span>
               <span class="kr-load-track" aria-hidden="true"><span class="kr-load-fill" style="width:${width.toFixed(1)}%"></span></span>
               <span class="text-small">${item.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</span>
             </div>
@@ -1494,8 +2580,8 @@ window.initKlimaCalculator = () => {
           return totals;
         }, { volume: 0, solar: 0, window: 0, people: 0, attic: 0, reserve: 0 });
         const loadLines = [
-          ['Grundlast Gebaeude', loadTotals.volume],
-          ['Sonne / Glasflaechen', loadTotals.solar],
+          ['Grundlast Gebäude', loadTotals.volume],
+          ['Sonne / Glasflächen', loadTotals.solar],
           ['Fenster U-Wert', loadTotals.window],
           ['Personen', loadTotals.people],
           ['Dachgeschoss', loadTotals.attic],
@@ -1509,11 +2595,11 @@ window.initKlimaCalculator = () => {
         `).join('');
         out.devicePlan.innerHTML = plan.perRoom.map((item) => `
           <div class="kr-line">
-            <span>Raum ${item.index + 1}: ${escapeHtml((devicePrices[item.room.device] || device).label)}, Innengeraet ${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</span>
+            <span>${escapeHtml(displayRoomName(item.room, item.index))}: ${escapeHtml((devicePrices[item.room.device] || device).label)}, Innengerät ${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</span>
             <span class="kr-price">${item.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW Last</span>
           </div>
         `).join('');
-        return { area, roomDetails, rooms, kw, plan, risks, lines, net, tax, gross, low, high, device, systemType, systemLabel };
+        return { area, roomDetails, rooms, kw, plan, risks, lines, net, tax, gross, low, high, device, outdoorUnit, discountPercent, deviceDiscount, systemType, systemLabel };
       }
 
       function requestText() {
@@ -1522,36 +2608,38 @@ window.initKlimaCalculator = () => {
         const modeLabel = fields.modus.options[fields.modus.selectedIndex].text;
         const buildingLabel = fields.gebaeude.options[fields.gebaeude.selectedIndex].text;
         const outsideLabel = fields.aussen.options[fields.aussen.selectedIndex].text;
+        const outdoorDeviceLabel = result.systemType === 'multi' ? result.outdoorUnit.label : 'je Raum eigenes Außengerät';
         const note = fields.notiz.value.trim();
-        const sunLabels = { nord: 'Nord/wenig Sonne', ost: 'Ost', sued: 'Sued', west: 'West', suedwest: 'Sued-West', stark: 'sehr sonnig' };
-        const shadeLabels = { none: 'keine Verschattung', inside: 'innen verschattet', outside: 'aussen verschattet', shutter: 'stark verschattet' };
-        const insulationLabels = { gut: 'gut gedaemmt', normal: 'normal gedaemmt', altbau: 'Altbau/schwach gedaemmt' };
+        const sunLabels = { nord: 'Nord/wenig Sonne', ost: 'Ost', sued: 'Süd', west: 'West', suedwest: 'Süd-West', stark: 'sehr sonnig' };
+        const shadeLabels = { none: 'keine Verschattung', inside: 'innen verschattet', outside: 'außen verschattet', shutter: 'stark verschattet' };
+        const insulationLabels = { gut: 'gut gedämmt', normal: 'normal gedämmt', altbau: 'Altbau/schwach gedämmt' };
         const exact = fields.modus.value === 'genau';
         const defaults = buildingDefaults[fields.gebaeude.value];
         return [
           'Anfrage Klimaanlage',
           '',
           `Objekt: ${objectLabel}`,
-          'Standort: Oesterreich',
+          'Standort: Österreich',
           `Berechnung: ${modeLabel}`,
-          `Gebaeudezustand: ${buildingLabel}`,
-          `Raeume: ${result.rooms}`,
+          `Gebäudezustand: ${buildingLabel}`,
+          `Räume: ${result.rooms}`,
           `Anlagentyp: ${result.systemLabel}`,
           `Raumdaten: ${result.roomDetails.map((room, index) => {
             const height = exact ? room.height : defaults.height;
             const uValue = exact ? room.u : defaults.u;
             const insulation = exact ? room.insulation : defaults.insulation;
             const deviceLabel = (devicePrices[room.device] || result.device).label;
-            return `Raum ${index + 1}: ${room.area} m2, ${deviceLabel}, ${height.toLocaleString('de-DE')} m hoch, Fenster ${room.window.toLocaleString('de-DE')} m2, U-Wert ${uValue.toLocaleString('de-DE')}, ${sunLabels[room.sun]}, ${shadeLabels[room.shade]}, ${insulationLabels[insulation]}, ${room.persons} Personen, Dachgeschoss ${room.attic === 'yes' ? 'ja' : 'nein'}`;
+            return `${displayRoomName(room, index)}: ${room.area} m2, ${deviceLabel}, ${height.toLocaleString('de-DE')} m hoch, Fenster ${room.window.toLocaleString('de-DE')} m2, U-Wert ${uValue.toLocaleString('de-DE')}, ${sunLabels[room.sun]}, ${shadeLabels[room.shade]}, ${insulationLabels[insulation]}, ${room.persons} Personen, Dachgeschoss ${room.attic === 'yes' ? 'ja' : 'nein'}`;
           }).join(' | ')}`,
-          `Gesamtflaeche: ${result.area} m2`,
-          `Wunsch: ${result.device.label}`,
+          `Gesamtfläche: ${result.area} m2`,
+          `Außengerät: ${outdoorDeviceLabel}`,
+          result.discountPercent > 0 ? `Geräterabatt: ${result.discountPercent.toLocaleString('de-DE', { maximumFractionDigits: 1 })} %` : '',
           `Berechnete Raumlast: ${result.plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
-          `Innengeraete gesamt: ${result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
-          `Empfohlenes Aussengeraet: ${result.kw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
-          `Innengeraete je Raum: ${result.plan.perRoom.map((item) => `Raum ${item.index + 1}: ${(devicePrices[item.room.device] || result.device).label}, ${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`).join(', ')}`,
-          `Aussengeraet: ${outsideLabel}`,
-          `Rohrlaenge gesamt: ${number(fields.leitung)} m`,
+          `Innengeräte gesamt: ${result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
+          `Empfohlenes Außengerät: ${result.kw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
+          `Innengeräte je Raum: ${result.plan.perRoom.map((item) => `${displayRoomName(item.room, item.index)}: ${(devicePrices[item.room.device] || result.device).label}, ${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`).join(', ')}`,
+          `Außengerät-Standort: ${outsideLabel}`,
+          `Rohrlänge gesamt: ${number(fields.leitung)} m`,
           `Kabelkanal sichtbar: ${number(fields.kanal)} m`,
           result.risks.length ? `Montagehinweise: ${result.risks.map((risk) => risk.label).join(', ')}` : '',
           `Richtpreis brutto: ${euro(result.gross)}`,
@@ -1566,12 +2654,13 @@ window.initKlimaCalculator = () => {
         const modeLabel = fields.modus.options[fields.modus.selectedIndex].text;
         const buildingLabel = fields.gebaeude.options[fields.gebaeude.selectedIndex].text;
         const outsideLabel = fields.aussen.options[fields.aussen.selectedIndex].text;
+        const outdoorDeviceLabel = result.systemType === 'multi' ? result.outdoorUnit.label : 'je Raum eigenes Außengerät';
         const note = fields.notiz.value.trim();
         const exact = fields.modus.value === 'genau';
         const defaults = buildingDefaults[fields.gebaeude.value];
-        const sunLabels = { nord: 'Nord/wenig Sonne', ost: 'Ost', sued: 'Sued', west: 'West', suedwest: 'Sued-West', stark: 'sehr sonnig' };
-        const shadeLabels = { none: 'keine Verschattung', inside: 'innen verschattet', outside: 'aussen verschattet', shutter: 'stark verschattet' };
-        const insulationLabels = { gut: 'gut gedaemmt', normal: 'normal gedaemmt', altbau: 'Altbau/schwach gedaemmt' };
+        const sunLabels = { nord: 'Nord/wenig Sonne', ost: 'Ost', sued: 'Süd', west: 'West', suedwest: 'Süd-West', stark: 'sehr sonnig' };
+        const shadeLabels = { none: 'keine Verschattung', inside: 'innen verschattet', outside: 'außen verschattet', shutter: 'stark verschattet' };
+        const insulationLabels = { gut: 'gut gedämmt', normal: 'normal gedämmt', altbau: 'Altbau/schwach gedämmt' };
         const today = new Date().toLocaleDateString('de-DE');
         const roomRows = result.plan.perRoom.map((item) => {
           const room = item.room;
@@ -1581,7 +2670,7 @@ window.initKlimaCalculator = () => {
           const deviceLabel = (devicePrices[room.device] || result.device).label;
           return `
             <tr>
-              <td>Raum ${item.index + 1}</td>
+              <td>${escapeHtml(displayRoomName(room, item.index))}</td>
               <td>${room.area.toLocaleString('de-DE')} m2</td>
               <td>${escapeHtml(deviceLabel)}</td>
               <td>${height.toLocaleString('de-DE')} m</td>
@@ -1602,16 +2691,19 @@ window.initKlimaCalculator = () => {
         `).join('');
         const riskText = result.risks.length
           ? result.risks.map((risk) => risk.label).join(', ')
-          : 'keine Zusatzarbeiten ausgewaehlt';
+          : 'keine Zusatzarbeiten ausgewählt';
         return `
           <div class="kr-print-head">
-            <div>
-              <h1 class="kr-print-title">Richtangebot Klimaanlage</h1>
-              <div class="kr-print-note">Unverbindliche Vorkalkulation fuer Split-Klimaanlagen</div>
+            <div class="kr-print-brand">
+              <img class="kr-print-logo" src="./logo.png" alt="">
+              <div>
+                <h1 class="kr-print-title">Richtangebot Klimaanlage</h1>
+                <div class="kr-print-note">Unverbindliche Vorkalkulation für Split-Klimaanlagen</div>
+              </div>
             </div>
             <div class="kr-print-meta">
               <strong>Datum:</strong> ${today}<br>
-              <strong>Standort:</strong> Oesterreich<br>
+              <strong>Standort:</strong> Österreich<br>
               <strong>Berechnung:</strong> ${escapeHtml(modeLabel)}
             </div>
           </div>
@@ -1620,31 +2712,32 @@ window.initKlimaCalculator = () => {
             <div class="kr-print-box"><span class="kr-print-label">Preisspanne</span><span class="kr-print-value">${euro(result.low)} bis ${euro(result.high)}</span></div>
             <div class="kr-print-box"><span class="kr-print-label">Empfehlung</span><span class="kr-print-value">${result.systemType === 'single' && result.rooms > 1 ? `${result.rooms} Single-Split` : `${result.kw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`}</span></div>
             <div class="kr-print-box"><span class="kr-print-label">Objekt</span><span class="kr-print-value">${escapeHtml(objectLabel)}</span></div>
-            <div class="kr-print-box"><span class="kr-print-label">Raeume / Flaeche</span><span class="kr-print-value">${result.rooms} / ${result.area} m2</span></div>
+            <div class="kr-print-box"><span class="kr-print-label">Räume / Fläche</span><span class="kr-print-value">${result.rooms} / ${result.area} m2</span></div>
             <div class="kr-print-box"><span class="kr-print-label">Anlagentyp</span><span class="kr-print-value">${escapeHtml(result.systemLabel)}</span></div>
+            <div class="kr-print-box"><span class="kr-print-label">Außengerät</span><span class="kr-print-value">${escapeHtml(outdoorDeviceLabel)}</span></div>
           </div>
           <div class="kr-print-section">
             <h3>Projekt</h3>
             <table class="kr-print-table">
               <tbody>
-                <tr><th>Gebaeudezustand</th><td>${escapeHtml(buildingLabel)}</td><th>Aussengeraet</th><td>${escapeHtml(outsideLabel)}</td></tr>
-                <tr><th>Rohrlaenge gesamt</th><td>${number(fields.leitung).toLocaleString('de-DE')} m</td><th>Kabelkanal sichtbar</th><td>${number(fields.kanal).toLocaleString('de-DE')} m</td></tr>
-                <tr><th>Berechnete Raumlast</th><td>${result.plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td><th>Innengeraete gesamt</th><td>${result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td></tr>
+                <tr><th>Gebäudezustand</th><td>${escapeHtml(buildingLabel)}</td><th>Außengerät-Standort</th><td>${escapeHtml(outsideLabel)}</td></tr>
+                <tr><th>Rohrlänge gesamt</th><td>${number(fields.leitung).toLocaleString('de-DE')} m</td><th>Kabelkanal sichtbar</th><td>${number(fields.kanal).toLocaleString('de-DE')} m</td></tr>
+                <tr><th>Berechnete Raumlast</th><td>${result.plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td><th>Innengeräte gesamt</th><td>${result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td></tr>
                 <tr><th>Montagehinweise</th><td colspan="3">${escapeHtml(riskText)}</td></tr>
               </tbody>
             </table>
           </div>
           <div class="kr-print-section">
-            <h3>Raeume und Geraete</h3>
+            <h3>Räume und Geräte</h3>
             <table class="kr-print-table">
               <thead>
-                <tr><th>Raum</th><th>Flaeche</th><th>Geraet</th><th>Hoehe</th><th>Fenster</th><th>Sonne</th><th>Daemmung</th><th>Pers.</th><th>Last</th><th>Innen</th></tr>
+                <tr><th>Raum</th><th>Fläche</th><th>Innengerät / Set</th><th>Höhe</th><th>Fenster</th><th>Sonne</th><th>Dämmung</th><th>Pers.</th><th>Last</th><th>Innen</th></tr>
               </thead>
               <tbody>${roomRows}</tbody>
             </table>
           </div>
           <div class="kr-print-section">
-            <h3>Kostenuebersicht</h3>
+            <h3>Kostenübersicht</h3>
             <table class="kr-print-table">
               <tbody>
                 ${costRows}
@@ -1655,7 +2748,7 @@ window.initKlimaCalculator = () => {
             </table>
           </div>
           ${note ? `<div class="kr-print-section"><h3>Hinweis</h3><p>${escapeHtml(note)}</p></div>` : ''}
-          <p class="kr-print-note">Dieses Dokument ist ein Richtangebot auf Basis der eingegebenen Kundendaten. Der finale Preis wird nach Besichtigung, Herstellerdatenblatt, Montageort und Elektroanschluss bestaetigt.</p>
+          <p class="kr-print-note">Dieses Dokument ist ein Richtangebot auf Basis der eingegebenen Kundendaten. Der finale Preis wird nach Besichtigung, Herstellerdatenblatt, Montageort und Elektroanschluss bestätigt.</p>
         `;
       }
 
@@ -1665,36 +2758,39 @@ window.initKlimaCalculator = () => {
         const modeLabel = fields.modus.options[fields.modus.selectedIndex].text;
         const buildingLabel = fields.gebaeude.options[fields.gebaeude.selectedIndex].text;
         const outsideLabel = fields.aussen.options[fields.aussen.selectedIndex].text;
+        const outdoorDeviceLabel = result.systemType === 'multi' ? result.outdoorUnit.label : 'je Raum eigenes Außengerät';
         const note = fields.notiz.value.trim();
         const today = new Date().toLocaleDateString('de-DE');
         const riskText = result.risks.length
           ? result.risks.map((risk) => risk.label).join(', ')
-          : 'keine Zusatzarbeiten ausgewaehlt';
+          : 'keine Zusatzarbeiten ausgewählt';
         const lines = [
           'Richtangebot Klimaanlage',
           `Datum: ${today}`,
-          `Standort: Oesterreich`,
+          `Standort: Österreich`,
           `Berechnung: ${modeLabel}`,
           '',
           `Objekt: ${objectLabel}`,
-          `Gebaeudezustand: ${buildingLabel}`,
-          `Raeume / Flaeche: ${result.rooms} / ${result.area} m2`,
+          `Gebäudezustand: ${buildingLabel}`,
+          `Räume / Fläche: ${result.rooms} / ${result.area} m2`,
           `Anlagentyp: ${result.systemLabel}`,
-          `Aussengeraet: ${outsideLabel}`,
-          `Rohrlaenge gesamt: ${number(fields.leitung)} m`,
+          `Außengerät: ${outdoorDeviceLabel}`,
+          result.discountPercent > 0 ? `Geräterabatt: ${result.discountPercent.toLocaleString('de-DE', { maximumFractionDigits: 1 })} %` : null,
+          `Außengerät-Standort: ${outsideLabel}`,
+          `Rohrlänge gesamt: ${number(fields.leitung)} m`,
           `Kabelkanal sichtbar: ${number(fields.kanal)} m`,
           `Montagehinweise: ${riskText}`,
           '',
-          'Kuehllast und Geraete:',
+          'Kühllast und Geräte:',
           `Berechnete Raumlast: ${result.plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
-          `Innengeraete gesamt: ${result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
-          `Empfohlenes Aussengeraet: ${result.systemType === 'single' && result.rooms > 1 ? `${result.rooms} Single-Split` : `${result.kw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`}`,
+          `Innengeräte gesamt: ${result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
+          `Empfohlenes Außengerät: ${result.systemType === 'single' && result.rooms > 1 ? `${result.rooms} Single-Split` : `${result.kw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`}`,
           ...result.plan.perRoom.map((item) => {
             const deviceLabel = (devicePrices[item.room.device] || result.device).label;
-            return `Raum ${item.index + 1}: ${item.room.area} m2, ${deviceLabel}, Last ${item.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW, Innengeraet ${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
+            return `${displayRoomName(item.room, item.index)}: ${item.room.area} m2, ${deviceLabel}, Last ${item.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW, Innengerät ${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
           }),
           '',
-          'Kostenuebersicht:',
+          'Kostenübersicht:',
           ...result.lines.map((lineItem) => `${lineItem[0]}: ${euro(lineItem[1] * serviceFactor)}`),
           `Richtpreis netto: ${euro(result.net)}`,
           `USt. ${Math.round(taxRates.at * 100)} Prozent: ${euro(result.tax)}`,
@@ -1704,9 +2800,57 @@ window.initKlimaCalculator = () => {
           note ? `Hinweis: ${note}` : null,
           '',
           'Dieses Dokument ist ein Richtangebot auf Basis der eingegebenen Kundendaten.',
-          'Der finale Preis wird nach Besichtigung, Herstellerdatenblatt, Montageort und Elektroanschluss bestaetigt.'
+          'Der finale Preis wird nach Besichtigung, Herstellerdatenblatt, Montageort und Elektroanschluss bestätigt.'
         ];
         return lines.filter((line) => line !== null);
+      }
+
+      function offerPdfData() {
+        const result = calculate();
+        const exact = fields.modus.value === 'genau';
+        const defaults = buildingDefaults[fields.gebaeude.value];
+        const shadeLabels = { none: 'keine Verschattung', inside: 'innen verschattet', outside: 'aussen verschattet', shutter: 'stark verschattet' };
+        const insulationLabels = { gut: 'gut gedämmt', normal: 'normal gedämmt', altbau: 'Altbau / schwach gedämmt' };
+        const today = new Date().toLocaleDateString('de-DE');
+        const btu = Math.round(result.kw * 3412);
+        return {
+          result,
+          today,
+          modeLabel: fields.modus.options[fields.modus.selectedIndex].text,
+          objectLabel: fields.objekt.options[fields.objekt.selectedIndex].text,
+          buildingLabel: fields.gebaeude.options[fields.gebaeude.selectedIndex].text,
+          outsideLabel: fields.aussen.options[fields.aussen.selectedIndex].text,
+          outdoorDeviceLabel: result.systemType === 'multi' ? result.outdoorUnit.label : 'je Raum eigenes Außengerät',
+          discountLabel: result.discountPercent > 0 ? `${result.discountPercent.toLocaleString('de-DE', { maximumFractionDigits: 1 })} % nur auf Geräte` : 'kein Geräterabatt',
+          note: fields.notiz.value.trim(),
+          riskText: result.risks.length ? result.risks.map((risk) => risk.label).join(', ') : 'keine Zusatzarbeiten ausgewählt',
+          recommendation: result.systemType === 'single' && result.rooms > 1 ? `${result.rooms} Single-Split` : `${result.kw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
+          btu: btu.toLocaleString('de-DE'),
+          rooms: result.plan.perRoom.map((item) => {
+            const room = item.room;
+            const height = exact ? room.height : defaults.height;
+            const uValue = exact ? room.u : defaults.u;
+            const insulation = exact ? room.insulation : defaults.insulation;
+            return {
+              name: displayRoomName(room, item.index),
+              area: `${room.area.toLocaleString('de-DE')} m2`,
+              device: (devicePrices[room.device] || result.device).label,
+              height: `${height.toLocaleString('de-DE')} m`,
+              window: `${room.window.toLocaleString('de-DE')} m2 / U ${uValue.toLocaleString('de-DE')}`,
+              shade: shadeLabels[room.shade],
+              insulation: insulationLabels[insulation],
+              persons: String(room.persons),
+              load: `${item.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`,
+              indoor: `${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`
+            };
+          }),
+          costs: [
+            ...result.lines.map((lineItem) => ({ label: lineItem[0], value: euro(lineItem[1] * serviceFactor) })),
+            { label: 'Richtpreis netto', value: euro(result.net) },
+            { label: `USt. ${Math.round(taxRates.at * 100)} Prozent`, value: euro(result.tax) },
+            { label: 'Unverbindlicher Richtpreis', value: euro(result.gross), total: true }
+          ]
+        };
       }
 
       function pdfSafeText(value) {
@@ -1723,6 +2867,36 @@ window.initKlimaCalculator = () => {
 
       function pdfEscape(value) {
         return pdfSafeText(value).replace(/[\\()]/g, '\\$&');
+      }
+
+      function pdfWinAnsiByte(char) {
+        const code = char.charCodeAt(0);
+        if (code >= 32 && code <= 126) return code;
+        const map = {
+          '€': 0x80, '‚': 0x82, 'ƒ': 0x83, '„': 0x84, '…': 0x85, '†': 0x86, '‡': 0x87,
+          'ˆ': 0x88, '‰': 0x89, 'Š': 0x8A, '‹': 0x8B, 'Œ': 0x8C, 'Ž': 0x8E,
+          '‘': 0x91, '’': 0x92, '“': 0x93, '”': 0x94, '•': 0x95, '–': 0x96, '—': 0x97,
+          '˜': 0x98, '™': 0x99, 'š': 0x9A, '›': 0x9B, 'œ': 0x9C, 'ž': 0x9E, 'Ÿ': 0x9F,
+          'Ä': 0xC4, 'Ö': 0xD6, 'Ü': 0xDC, 'ß': 0xDF, 'ä': 0xE4, 'ö': 0xF6, 'ü': 0xFC,
+          'á': 0xE1, 'à': 0xE0, 'â': 0xE2, 'é': 0xE9, 'è': 0xE8, 'ê': 0xEA, 'í': 0xED,
+          'ó': 0xF3, 'ò': 0xF2, 'ô': 0xF4, 'ú': 0xFA, 'ù': 0xF9, 'û': 0xFB, 'ñ': 0xF1,
+          'Á': 0xC1, 'À': 0xC0, 'Â': 0xC2, 'É': 0xC9, 'È': 0xC8, 'Ê': 0xCA, 'Í': 0xCD,
+          'Ó': 0xD3, 'Ò': 0xD2, 'Ô': 0xD4, 'Ú': 0xDA, 'Ù': 0xD9, 'Û': 0xDB, 'Ñ': 0xD1
+        };
+        if (map[char]) return map[char];
+        const normalized = char.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+        const fallback = normalized && normalized.charCodeAt(0);
+        return fallback >= 32 && fallback <= 126 ? fallback : 0x3F;
+      }
+
+      function pdfText(value) {
+        const clean = String(value).replace(/\s+/g, ' ').trim();
+        const hex = Array.from(clean).map((char) => pdfWinAnsiByte(char).toString(16).padStart(2, '0')).join('');
+        return `<${hex}>`;
+      }
+
+      function pdfSafeText(value) {
+        return String(value).replace(/\s+/g, ' ').trim();
       }
 
       function wrapPdfLines(lines, maxChars = 92) {
@@ -1744,51 +2918,267 @@ window.initKlimaCalculator = () => {
         return wrapped;
       }
 
-      function createPdfBlob(lines) {
-        const pageWidth = 595;
-        const pageHeight = 842;
-        const margin = 42;
-        const lineHeight = 14;
-        const maxLines = Math.floor((pageHeight - margin * 2) / lineHeight);
-        const wrapped = wrapPdfLines(lines);
-        const pages = [];
-        for (let index = 0; index < wrapped.length; index += maxLines) {
-          pages.push(wrapped.slice(index, index + maxLines));
+      function createPdfBlob(data) {
+        const pageWidth = 842;
+        const pageHeight = 595;
+        const pageStreams = [];
+        let commands = [];
+
+        const color = {
+          page: '0.95 0.93 0.89',
+          panel: '1 0.99 0.96',
+          primary: '0.09 0.42 0.53',
+          deep: '0.04 0.29 0.31',
+          deep2: '0.03 0.22 0.25',
+          accent: '0.92 0.36 0.10',
+          soft: '0.88 0.94 0.92',
+          line: '0.78 0.82 0.81',
+          text: '0.06 0.13 0.15',
+          muted: '0.34 0.41 0.43',
+          white: '0.99 0.98 0.94'
+        };
+
+        function rect(x, y, width, height, fill, stroke = null, lineWidth = 1) {
+          commands.push(`${fill} rg`);
+          commands.push(`${x} ${y} ${width} ${height} re f`);
+          if (stroke) {
+            commands.push(`${lineWidth} w`);
+            commands.push(`${stroke} RG`);
+            commands.push(`${x} ${y} ${width} ${height} re S`);
+          }
         }
-        if (!pages.length) pages.push(['Richtangebot Klimaanlage']);
+
+        function line(x1, y1, x2, y2, stroke = color.line, lineWidth = 1) {
+          commands.push(`${lineWidth} w`);
+          commands.push(`${stroke} RG`);
+          commands.push(`${x1} ${y1} m ${x2} ${y2} l S`);
+        }
+
+        function circle(x, y, radius, fill, stroke = null) {
+          const c = radius * 0.5522847498;
+          commands.push(`${fill} rg`);
+          commands.push(`${x + radius} ${y} m`);
+          commands.push(`${x + radius} ${y + c} ${x + c} ${y + radius} ${x} ${y + radius} c`);
+          commands.push(`${x - c} ${y + radius} ${x - radius} ${y + c} ${x - radius} ${y} c`);
+          commands.push(`${x - radius} ${y - c} ${x - c} ${y - radius} ${x} ${y - radius} c`);
+          commands.push(`${x + c} ${y - radius} ${x + radius} ${y - c} ${x + radius} ${y} c f`);
+          if (stroke) {
+            commands.push(`${stroke} RG`);
+            commands.push(`${x + radius} ${y} m`);
+            commands.push(`${x + radius} ${y + c} ${x + c} ${y + radius} ${x} ${y + radius} c`);
+            commands.push(`${x - c} ${y + radius} ${x - radius} ${y + c} ${x - radius} ${y} c`);
+            commands.push(`${x - radius} ${y - c} ${x - c} ${y - radius} ${x} ${y - radius} c`);
+            commands.push(`${x + c} ${y - radius} ${x + radius} ${y - c} ${x + radius} ${y} c S`);
+          }
+        }
+
+        function text(value, x, y, size = 10, font = 'F1', fill = color.text) {
+          commands.push(`${fill} rg`);
+          commands.push('BT');
+          commands.push(`/${font} ${size} Tf`);
+          commands.push(`1 0 0 1 ${x} ${y} Tm`);
+          commands.push(`${pdfText(value)} Tj`);
+          commands.push('ET');
+        }
+
+        function textRight(value, x, y, size = 10, font = 'F1', fill = color.text) {
+          const safe = String(value).replace(/\s+/g, ' ').trim();
+          text(safe, x - safe.length * size * 0.48, y, size, font, fill);
+        }
+
+        function wrapText(value, chars) {
+          return wrapPdfLines([value], chars).filter(Boolean);
+        }
+
+        function metricBox(x, y, width, height, label, value) {
+          rect(x, y, width, height, '0.99 0.99 0.97', color.line);
+          rect(x, y, 3, height, color.primary);
+          text(label, x + 10, y + height - 13, 7.3, 'F1', color.muted);
+          const lines = wrapText(value, 23);
+          lines.slice(0, 2).forEach((item, index) => text(item, x + 10, y + 9 - index * 12, 11.5, 'F2', color.text));
+        }
+
+        function sectionNumber(number, x, y) {
+          circle(x, y, 14, '1 0.99 0.96', color.line);
+          text(String(number).padStart(2, '0'), x - 5.5, y - 3.5, 6.5, 'F2', color.primary);
+        }
+
+        function sectionTitle(number, title, subtitle, x, y) {
+          sectionNumber(number, x, y - 3);
+          text(title, x + 34, y + 2, 18, 'F2', color.text);
+          if (subtitle) text(subtitle, x + 34, y - 15, 8.5, 'F1', color.muted);
+        }
+
+        function labelValue(label, value, x, y, labelWidth = 96, maxChars = 34) {
+          text(label, x, y, 8.4, 'F2', color.text);
+          wrapText(value, maxChars).slice(0, 3).forEach((item, index) => text(item, x + labelWidth, y - index * 10, 8.3, 'F1', color.text));
+        }
+
+        function drawShell() {
+          rect(0, 0, pageWidth, pageHeight, color.page);
+          rect(34, 48, 520, 500, color.panel);
+          rect(554, 48, 254, 500, color.deep);
+          rect(574, 70, 214, 456, color.deep2);
+        }
+
+        function drawHeader() {
+          circle(66, 513, 16, color.soft, color.primary);
+          text('K', 60.5, 507.5, 15, 'F2', color.primary);
+          text('Richtangebot Klimaanlage', 96, 516, 21, 'F2', color.text);
+          text('Unverbindliche Vorkalkulation für Split-Klimaanlagen', 97, 497, 8.5, 'F1', color.muted);
+          textRight(`Datum: ${data.today}`, 526, 520, 8.5, 'F2', color.text);
+          textRight('Standort: Österreich', 526, 507, 8.5, 'F2', color.text);
+          line(62, 478, 526, 478, color.primary, 1.3);
+        }
+
+        function drawRightPanel() {
+          text('IHRE EMPFEHLUNG', 586, 505, 6.5, 'F2', color.white);
+          text('Empfohlene Kühlleistung', 586, 446, 8, 'F1', color.white);
+          text(data.recommendation, 586, 388, 42, 'F2', color.white);
+          text(`entspricht etwa ${data.btu} BTU/h`, 588, 371, 7, 'F1', '0.76 0.88 0.85');
+          line(588, 335, 765, 335, '0.55 0.77 0.75', 2.2);
+          circle(646, 335, 4, color.deep, '0.78 0.92 0.88');
+          text('2 kW', 588, 320, 6.5, 'F1', '0.72 0.84 0.82');
+          textRight('7+ kW', 765, 320, 6.5, 'F1', '0.72 0.84 0.82');
+          line(586, 292, 766, 292, '0.25 0.50 0.52', .8);
+          const rows = [
+            ['Berechneter Bedarf', `${data.result.plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`],
+            ['Innengeräte gesamt', `${data.result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`],
+            ['Richtpreis brutto', euro(data.result.gross)]
+          ];
+          rows.forEach((row, index) => {
+            const yy = 268 - index * 23;
+            text(row[0], 586, yy, 7.2, 'F1', '0.77 0.87 0.85');
+            textRight(row[1], 766, yy, 7.7, 'F2', color.white);
+          });
+          rect(586, 164, 180, 48, '0.11 0.40 0.41');
+          circle(604, 188, 13, color.soft);
+          text('*', 600, 184, 14, 'F2', color.primary);
+          text('Passende Geräteklasse', 625, 193, 10, 'F2', color.white);
+          text('ausreichend Reserve an heißen Tagen', 625, 178, 6.6, 'F1', '0.78 0.89 0.86');
+          rect(586, 102, 180, 36, '0.13 0.42 0.42');
+          text('Effizient dimensioniert und optisch klar', 604, 122, 7.2, 'F1', color.white);
+          text('aufbereitet für Kunden und Angebot.', 604, 111, 7.2, 'F1', color.white);
+          text('Richtwert zur Orientierung. Finale Bestätigung nach Besichtigung.', 586, 78, 6.2, 'F1', '0.68 0.80 0.78');
+        }
+
+        function drawMetricGrid() {
+          const x = 62;
+          const w = 148;
+          const gap = 8;
+          metricBox(x, 418, w, 42, 'Richtpreis brutto', euro(data.result.gross));
+          metricBox(x + (w + gap), 418, w, 42, 'Empfehlung', data.recommendation);
+          metricBox(x + (w + gap) * 2, 418, w, 42, 'Objekt', data.objectLabel);
+          metricBox(x, 367, w, 42, 'Räume / Fläche', `${data.result.rooms} / ${data.result.area} m2`);
+          metricBox(x + (w + gap), 367, w, 42, 'Anlagentyp', data.result.systemLabel);
+          metricBox(x + (w + gap) * 2, 367, w, 42, 'Außengerät', data.outdoorDeviceLabel);
+        }
+
+        function drawProject() {
+          text('Projekt', 62, 338, 12.5, 'F2', color.text);
+          labelValue('Gebäudezustand', data.buildingLabel, 66, 315);
+          labelValue('Außengerät-Standort', data.outsideLabel, 300, 315);
+          labelValue('Rohrlänge gesamt', `${number(fields.leitung).toLocaleString('de-DE')} m`, 66, 289);
+          labelValue('Kabelkanal sichtbar', `${number(fields.kanal).toLocaleString('de-DE')} m`, 300, 289);
+          line(62, 272, 526, 272);
+          labelValue('Berechnete Raumlast', `${data.result.plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`, 66, 255);
+          labelValue('Innengeräte gesamt', `${data.result.plan.indoorSumKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`, 300, 255);
+          line(62, 236, 526, 236);
+          labelValue('Montagehinweise', data.riskText, 66, 219, 96, 70);
+        }
+
+        function drawRoomsAndCosts() {
+          const roomStartY = 190;
+          text('Räume und Geräte', 62, roomStartY, 12.5, 'F2', color.text);
+          const headers = [
+            ['Raum', 66],
+            ['Fläche', 150],
+            ['Innen/Set', 205],
+            ['Fenster', 360],
+            ['Pers.', 430],
+            ['Last', 470],
+            ['Innen', 514]
+          ];
+          headers.forEach(([label, x]) => text(label, x, roomStartY - 22, 7.5, 'F2', color.text));
+          line(62, roomStartY - 31, 526, roomStartY - 31);
+          let y = roomStartY - 49;
+          data.rooms.slice(0, 4).forEach((room) => {
+            wrapText(room.name, 13).slice(0, 2).forEach((item, index) => text(item, 66, y - index * 9, 7.4, 'F1', color.text));
+            text(room.area, 150, y, 7.5, 'F1', color.text);
+            wrapText(room.device, 30).slice(0, 2).forEach((item, index) => text(item, 205, y - index * 9, 7.3, 'F1', color.text));
+            text(room.window, 360, y, 7.3, 'F1', color.text);
+            text(room.persons, 434, y, 7.3, 'F1', color.text);
+            text(room.load, 470, y, 7.3, 'F1', color.text);
+            text(room.indoor, 514, y, 7.3, 'F1', color.text);
+            y -= 24;
+          });
+          if (data.rooms.length > 4) text(`+ ${data.rooms.length - 4} weitere Räume auf Folgeseite`, 66, y + 4, 7.5, 'F1', color.muted);
+          line(62, 86, 526, 86);
+          text('Kostenübersicht', 62, 66, 11, 'F2', color.text);
+          textRight('Netto', 396, 66, 8, 'F1', color.muted);
+          textRight(euro(data.result.net), 526, 66, 8.5, 'F2', color.text);
+        }
+
+        function drawMainPage() {
+          commands = [];
+          drawShell();
+          drawHeader();
+          drawMetricGrid();
+          drawProject();
+          drawRoomsAndCosts();
+          drawRightPanel();
+          pageStreams.push(commands.join('\n'));
+        }
+
+        function drawDetailPage() {
+          commands = [];
+          rect(0, 0, pageWidth, pageHeight, color.page);
+          rect(34, 48, 774, 500, color.panel);
+          text('Details zum Richtangebot', 62, 512, 21, 'F2', color.text);
+          text(`Datum: ${data.today}   Standort: Österreich`, 62, 492, 8.5, 'F1', color.muted);
+          line(62, 476, 780, 476, color.primary, 1.3);
+          text('Alle Räume', 62, 446, 13, 'F2', color.text);
+          let y = 420;
+          data.rooms.forEach((room) => {
+            if (y < 118) return;
+            rect(62, y - 28, 718, 32, '0.99 0.99 0.97', color.line);
+            text(room.name, 72, y - 8, 8.4, 'F2', color.primary);
+            text(`${room.area}, ${room.height}, Fenster ${room.window}`, 132, y - 8, 8, 'F1', color.text);
+            wrapText(`${room.device}, ${room.shade}, ${room.insulation}, ${room.persons} Personen, Last ${room.load}, Innen ${room.indoor}`, 92)
+              .slice(0, 2)
+              .forEach((item, index) => text(item, 132, y - 20 - index * 9, 7.5, 'F1', color.text));
+            y -= 38;
+          });
+          text('Kostenübersicht', 62, y - 4, 13, 'F2', color.text);
+          y -= 28;
+          data.costs.forEach((item) => {
+            if (y < 64) return;
+            if (item.total) rect(62, y - 8, 718, 18, color.soft, color.primary);
+            text(item.label, item.total ? 76 : 66, y - 2, item.total ? 8.8 : 8, item.total ? 'F2' : 'F1', color.text);
+            textRight(item.value, 760, y - 2, item.total ? 9.2 : 8.2, item.total ? 'F2' : 'F1', color.text);
+            y -= item.total ? 22 : 16;
+          });
+          pageStreams.push(commands.join('\n'));
+        }
+
+        drawMainPage();
+        drawDetailPage();
 
         const objects = [
           '<< /Type /Catalog /Pages 2 0 R >>',
           '',
-          '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'
+          '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
+          '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'
         ];
         const kids = [];
-        pages.forEach((pageLines, pageIndex) => {
-          const pageObjectNumber = 4 + pageIndex * 2;
+        pageStreams.forEach((content, pageIndex) => {
+          const pageObjectNumber = 5 + pageIndex * 2;
           const contentObjectNumber = pageObjectNumber + 1;
           kids.push(`${pageObjectNumber} 0 R`);
-          const commands = [
-            'BT',
-            '/F1 10 Tf',
-            `${lineHeight} TL`,
-            `1 0 0 1 ${margin} ${pageHeight - margin} Tm`
-          ];
-          pageLines.forEach((line, lineIndex) => {
-            if (pageIndex === 0 && lineIndex === 0) {
-              commands.push('/F1 16 Tf');
-              commands.push(`(${pdfEscape(line)}) Tj`);
-              commands.push('/F1 10 Tf');
-            } else if (line) {
-              commands.push(`(${pdfEscape(line)}) Tj`);
-            }
-            commands.push('T*');
-          });
-          commands.push('ET');
-          const content = commands.join('\n');
-          objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /Font << /F1 3 0 R >> >> /Contents ${contentObjectNumber} 0 R >>`);
+          objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentObjectNumber} 0 R >>`);
           objects.push(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
         });
-        objects[1] = `<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${pages.length} >>`;
+        objects[1] = `<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${pageStreams.length} >>`;
 
         let pdf = '%PDF-1.4\n';
         const offsets = [0];
@@ -1807,7 +3197,7 @@ window.initKlimaCalculator = () => {
       }
 
       function downloadPdfOffer() {
-        const blob = createPdfBlob(offerPdfLines());
+        const blob = createPdfBlob(offerPdfData());
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         const date = new Date().toISOString().slice(0, 10);
@@ -1822,33 +3212,13 @@ window.initKlimaCalculator = () => {
       function printOffer() {
         out.printOffer.innerHTML = printableOfferHtml();
         out.downloadPdf.classList.add('kr-hidden');
-        out.printOffer.offsetHeight;
-        out.status.textContent = 'Druckfenster wird geoeffnet. Fuer PDF bitte "Als PDF speichern" waehlen.';
-        let printStarted = false;
-        const markPrintStarted = () => {
-          printStarted = true;
-        };
-        const showPdfFallback = () => {
-          out.downloadPdf.classList.remove('kr-hidden');
-          try {
-            downloadPdfOffer();
-            out.status.textContent = 'Das Druckfenster wurde vermutlich vom Browser blockiert. Die PDF-Datei wurde stattdessen erstellt.';
-          } catch (error) {
-            out.status.textContent = 'Druckfenster wurde blockiert. Bitte PDF herunterladen klicken oder Strg+P in Chrome/Edge verwenden.';
-          }
-        };
-        window.addEventListener('beforeprint', markPrintStarted, { once: true });
         try {
-          window.print();
+          downloadPdfOffer();
+          out.status.textContent = 'PDF-Datei wurde erstellt - ohne Kopfzeile, Fußzeile oder Datei-URL.';
         } catch (error) {
-          window.removeEventListener('beforeprint', markPrintStarted);
-          showPdfFallback();
-          return;
+          out.downloadPdf.classList.remove('kr-hidden');
+          out.status.textContent = 'PDF konnte nicht automatisch erstellt werden. Bitte PDF herunterladen klicken.';
         }
-        window.setTimeout(() => {
-          window.removeEventListener('beforeprint', markPrintStarted);
-          if (!printStarted) showPdfFallback();
-        }, 1200);
       }
 
       function databaseText(config = priceConfig) {
@@ -1884,6 +3254,18 @@ window.initKlimaCalculator = () => {
         `;
       }
 
+      function editorSelectField(label, path, choices) {
+        const value = String(getPath(editorConfig, path) ?? choices[0]?.value ?? '');
+        return `
+          <label class="form-label">
+            ${escapeHtml(label)}
+            <select class="form-select" data-db-type="text" data-db-path="${escapeHtml(path)}">
+              ${choices.map((choice) => `<option value="${escapeHtml(choice.value)}"${choice.value === value ? ' selected' : ''}>${escapeHtml(choice.label)}</option>`).join('')}
+            </select>
+          </label>
+        `;
+      }
+
       function editorListField(label, path) {
         const value = getPath(editorConfig, path);
         return `
@@ -1911,7 +3293,7 @@ window.initKlimaCalculator = () => {
         root.querySelectorAll('[data-db-path]').forEach((input) => {
           setPath(editorConfig, input.dataset.dbPath, editorValue(input));
         });
-        editorConfig.version = 3;
+        editorConfig.version = Number(priceConfig.version || 4);
       }
 
       function syncEditorJson() {
@@ -1934,12 +3316,18 @@ window.initKlimaCalculator = () => {
           <div class="kr-editor-row">
             <div class="kr-editor-row-head">
               <strong>${escapeHtml(item.label || key)}</strong>
-              <button type="button" class="btn" data-db-delete-device="${escapeHtml(key)}"${entries.length <= 1 ? ' disabled' : ''}>Loeschen</button>
+              <button type="button" class="btn" data-db-delete-device="${escapeHtml(key)}"${entries.length <= 1 ? ' disabled' : ''}>Löschen</button>
             </div>
             <div class="kr-db-grid">
               ${editorTextField('Bezeichnung', `devicePackages.${key}.label`)}
-              ${editorNumberField('Basispreis Single/Multi-Aussenteil', `devicePackages.${key}.base`, '1')}
-              ${editorNumberField('Preis je Innengeraet', `devicePackages.${key}.room`, '1')}
+              ${editorSelectField('Anlagentyp', `devicePackages.${key}.system`, [
+                { value: 'both', label: 'Single und Multi' },
+                { value: 'single', label: 'nur Single-Split' },
+                { value: 'multi', label: 'nur Multi-Split' }
+              ])}
+              ${editorNumberField('Nennleistung kW', `devicePackages.${key}.ratedKw`, '0.1')}
+              ${editorNumberField('Setpreis Single-Split je Raum', `devicePackages.${key}.base`, '1')}
+              ${editorNumberField('Gerätepreis Multi-Split (nur Innengerät)', `devicePackages.${key}.room`, '1')}
               ${editorNumberField('Zuschlag je kW Mehrleistung', `devicePackages.${key}.capacityStep`, '1')}
             </div>
             <div class="text-small kr-note">Interner Code: ${escapeHtml(key)}</div>
@@ -1949,7 +3337,7 @@ window.initKlimaCalculator = () => {
           button.addEventListener('click', () => {
             updateEditorConfigFromInputs();
             if (Object.keys(editorConfig.devicePackages).length <= 1) {
-              showDatabaseStatus('Mindestens ein Geraetepaket muss bleiben.');
+              showDatabaseStatus('Mindestens ein Innengerät muss bleiben.');
               return;
             }
             delete editorConfig.devicePackages[button.dataset.dbDeleteDevice];
@@ -1958,20 +3346,50 @@ window.initKlimaCalculator = () => {
         });
       }
 
+      function renderOutdoorEditor() {
+        const entries = Object.entries(editorConfig.outdoorUnits || {});
+        out.dbOutdoorUnits.innerHTML = entries.map(([key, item]) => `
+          <div class="kr-editor-row">
+            <div class="kr-editor-row-head">
+              <strong>${escapeHtml(item.label || key)}</strong>
+              <button type="button" class="btn" data-db-delete-outdoor="${escapeHtml(key)}"${entries.length <= 1 ? ' disabled' : ''}>Löschen</button>
+            </div>
+            <div class="kr-db-grid">
+              ${editorTextField('Bezeichnung', `outdoorUnits.${key}.label`)}
+              ${editorNumberField('Nennleistung kW', `outdoorUnits.${key}.ratedKw`, '0.1')}
+              ${editorNumberField('Basispreis Außengerät', `outdoorUnits.${key}.base`, '1')}
+              ${editorNumberField('Zuschlag je kW Mehrleistung', `outdoorUnits.${key}.capacityStep`, '1')}
+            </div>
+            <div class="text-small kr-note">Interner Code: ${escapeHtml(key)}</div>
+          </div>
+        `).join('');
+        out.dbOutdoorUnits.querySelectorAll('[data-db-delete-outdoor]').forEach((button) => {
+          button.addEventListener('click', () => {
+            updateEditorConfigFromInputs();
+            if (Object.keys(editorConfig.outdoorUnits).length <= 1) {
+              showDatabaseStatus('Mindestens ein Außengerät muss bleiben.');
+              return;
+            }
+            delete editorConfig.outdoorUnits[button.dataset.dbDeleteOutdoor];
+            renderDatabaseEditor();
+          });
+        });
+      }
+
       function renderMountingEditor() {
         out.dbMounting.innerHTML = [
           editorNumberField('Montage Grundpreis', 'mounting.baseInstall', '1'),
-          editorNumberField('Weiteres Innengeraet', 'mounting.additionalIndoor', '1'),
-          editorNumberField('Kernbohrung je Stueck', 'mounting.drilling', '1'),
+          editorNumberField('Weiteres Innengerät', 'mounting.additionalIndoor', '1'),
+          editorNumberField('Kernbohrung je Stück', 'mounting.drilling', '1'),
           editorNumberField('Rohrleitung je Meter', 'mounting.lineMeter', '1'),
           editorNumberField('Kabelkanal je Meter', 'mounting.channelMeter', '1'),
-          editorNumberField('Aussengeraet Balkon', 'mounting.outdoor.balkon', '1'),
-          editorNumberField('Aussengeraet Wand', 'mounting.outdoor.wand', '1'),
-          editorNumberField('Aussengeraet Boden', 'mounting.outdoor.boden', '1'),
-          editorNumberField('Aussengeraet Dach', 'mounting.outdoor.dach', '1'),
+          editorNumberField('Außengerät-Standort Balkon', 'mounting.outdoor.balkon', '1'),
+          editorNumberField('Außengerät-Standort Wand', 'mounting.outdoor.wand', '1'),
+          editorNumberField('Außengerät-Standort Boden', 'mounting.outdoor.boden', '1'),
+          editorNumberField('Außengerät-Standort Dach', 'mounting.outdoor.dach', '1'),
           editorNumberField('Strom nah', 'mounting.power.nah', '1'),
           editorNumberField('Strom bis 10 m', 'mounting.power.mittel', '1'),
-          editorNumberField('Strom ueber 10 m', 'mounting.power.weit', '1'),
+          editorNumberField('Strom über 10 m', 'mounting.power.weit', '1'),
           editorNumberField('Kondensatpumpe', 'mounting.condensatePump', '1'),
           editorNumberField('Kalkulationsaufschlag Faktor', 'markupFactor', '0.01', '1')
         ].join('');
@@ -1983,7 +3401,7 @@ window.initKlimaCalculator = () => {
           <div class="kr-editor-row">
             <div class="kr-editor-row-head">
               <strong>${escapeHtml(risk.label || key)}</strong>
-              <button type="button" class="btn" data-db-delete-risk="${escapeHtml(key)}">Loeschen</button>
+              <button type="button" class="btn" data-db-delete-risk="${escapeHtml(key)}">Löschen</button>
             </div>
             <div class="kr-db-grid">
               ${editorTextField('Bezeichnung', `risks.${key}.label`)}
@@ -2004,32 +3422,33 @@ window.initKlimaCalculator = () => {
 
       function renderSettingsEditor() {
         out.dbSettings.innerHTML = [
-          editorNumberField('W/m2 gut gedaemmt', 'settings.baseWattsPerM2.gut', '1'),
+          editorNumberField('W/m2 gut gedämmt', 'settings.baseWattsPerM2.gut', '1'),
           editorNumberField('W/m2 normal', 'settings.baseWattsPerM2.normal', '1'),
           editorNumberField('W/m2 Altbau', 'settings.baseWattsPerM2.altbau', '1'),
           editorNumberField('U-Wert Neubau', 'settings.buildingDefaults.neubau.u', '0.1'),
-          editorNumberField('Raumhoehe Neubau', 'settings.buildingDefaults.neubau.height', '0.1'),
+          editorNumberField('Raumhöhe Neubau', 'settings.buildingDefaults.neubau.height', '0.1'),
           editorNumberField('U-Wert saniert', 'settings.buildingDefaults.saniert.u', '0.1'),
-          editorNumberField('Raumhoehe saniert', 'settings.buildingDefaults.saniert.height', '0.1'),
+          editorNumberField('Raumhöhe saniert', 'settings.buildingDefaults.saniert.height', '0.1'),
           editorNumberField('U-Wert unsaniert', 'settings.buildingDefaults.unsaniert.u', '0.1'),
-          editorNumberField('Raumhoehe unsaniert', 'settings.buildingDefaults.unsaniert.height', '0.1'),
+          editorNumberField('Raumhöhe unsaniert', 'settings.buildingDefaults.unsaniert.height', '0.1'),
           editorNumberField('Sonne Nord W/m2 Glas', 'settings.sunWatts.nord', '1'),
           editorNumberField('Sonne Ost W/m2 Glas', 'settings.sunWatts.ost', '1'),
-          editorNumberField('Sonne Sued W/m2 Glas', 'settings.sunWatts.sued', '1'),
+          editorNumberField('Sonne Süd W/m2 Glas', 'settings.sunWatts.sued', '1'),
           editorNumberField('Sonne West W/m2 Glas', 'settings.sunWatts.west', '1'),
-          editorNumberField('Sonne Sued-West W/m2 Glas', 'settings.sunWatts.suedwest', '1'),
+          editorNumberField('Sonne Süd-West W/m2 Glas', 'settings.sunWatts.suedwest', '1'),
           editorNumberField('Sonne stark W/m2 Glas', 'settings.sunWatts.stark', '1'),
           editorNumberField('Verschattung keine', 'settings.shadeFactors.none', '0.05'),
           editorNumberField('Verschattung innen', 'settings.shadeFactors.inside', '0.05'),
           editorNumberField('Verschattung aussen', 'settings.shadeFactors.outside', '0.05'),
           editorNumberField('Verschattung Rollladen', 'settings.shadeFactors.shutter', '0.05'),
-          editorListField('Innengeraete-Groessen kW', 'settings.indoorSizes')
+          editorListField('Innengeräte-Größen kW', 'settings.indoorSizes')
         ].join('');
       }
 
       function renderDatabaseEditor() {
         if (!editorConfig) return;
         renderDeviceEditor();
+        renderOutdoorEditor();
         renderMountingEditor();
         renderRiskEditor();
         renderSettingsEditor();
@@ -2054,13 +3473,28 @@ window.initKlimaCalculator = () => {
         updateEditorConfigFromInputs();
         const key = uniqueKey(editorConfig.devicePackages, 'paket');
         editorConfig.devicePackages[key] = {
-          label: `Neues Geraetepaket ${Object.keys(editorConfig.devicePackages).length + 1}`,
+          label: `Neues Innengerät ${Object.keys(editorConfig.devicePackages).length + 1}`,
+          system: 'both',
+          ratedKw: 0,
           base: 1200,
           room: 850,
           capacityStep: 230
         };
         renderDatabaseEditor();
-        showDatabaseStatus('Geraetepaket hinzugefuegt. Speichern nicht vergessen.');
+        showDatabaseStatus('Innengerät hinzugefügt. Speichern nicht vergessen.');
+      }
+
+      function addOutdoorUnit() {
+        updateEditorConfigFromInputs();
+        const key = uniqueKey(editorConfig.outdoorUnits, 'aussen');
+        editorConfig.outdoorUnits[key] = {
+          label: `Neues Außengerät ${Object.keys(editorConfig.outdoorUnits).length + 1}`,
+          ratedKw: 0,
+          base: 1800,
+          capacityStep: 250
+        };
+        renderDatabaseEditor();
+        showDatabaseStatus('Außengerät hinzugefügt. Speichern nicht vergessen.');
       }
 
       function addRisk() {
@@ -2072,7 +3506,7 @@ window.initKlimaCalculator = () => {
           complexity: 0.015
         };
         renderDatabaseEditor();
-        showDatabaseStatus('Zusatzarbeit hinzugefuegt. Speichern nicht vergessen.');
+        showDatabaseStatus('Zusatzarbeit hinzugefügt. Speichern nicht vergessen.');
       }
 
       function applyDatabaseFromEditor() {
@@ -2092,7 +3526,7 @@ window.initKlimaCalculator = () => {
           calculate();
           showDatabaseStatus('Preisliste wurde gespeichert.');
         } catch (error) {
-          showDatabaseStatus(`Speichern nicht moeglich: ${error.message}`);
+          showDatabaseStatus(`Speichern nicht möglich: ${error.message}`);
         }
       }
 
@@ -2107,7 +3541,7 @@ window.initKlimaCalculator = () => {
           validateConfig(merged);
           editorConfig = cloneConfig(merged);
           renderDatabaseEditor();
-          showDatabaseStatus('JSON wurde ins Formular uebernommen. Danach speichern.');
+          showDatabaseStatus('JSON wurde ins Formular übernommen. Danach speichern.');
         } catch (error) {
           showDatabaseStatus(`Fehler in JSON: ${error.message}`);
         }
@@ -2119,13 +3553,9 @@ window.initKlimaCalculator = () => {
         field.addEventListener('change', calculate);
       });
       fields.klasse.addEventListener('input', () => {
-        roomData.forEach((room) => { room.device = fields.klasse.value; });
-        renderRoomAreas();
         calculate();
       });
       fields.klasse.addEventListener('change', () => {
-        roomData.forEach((room) => { room.device = fields.klasse.value; });
-        renderRoomAreas();
         calculate();
       });
       fields.modus.addEventListener('input', () => {
@@ -2138,10 +3568,12 @@ window.initKlimaCalculator = () => {
       });
       fields.systemtyp.addEventListener('input', () => {
         fields.systemtyp.dataset.userSelected = 'true';
+        renderRoomAreas();
         calculate();
       });
       fields.systemtyp.addEventListener('change', () => {
         fields.systemtyp.dataset.userSelected = 'true';
+        renderRoomAreas();
         calculate();
       });
       root.querySelectorAll('[data-risk]').forEach((input) => input.addEventListener('input', calculate));
@@ -2163,6 +3595,7 @@ window.initKlimaCalculator = () => {
       });
       $('#kr-db-import-json').addEventListener('click', importDatabaseFromJson);
       $('#kr-db-add-device').addEventListener('click', addDevicePackage);
+      $('#kr-db-add-outdoor').addEventListener('click', addOutdoorUnit);
       $('#kr-db-add-risk').addEventListener('click', addRisk);
       $('#kr-db-save').addEventListener('click', applyDatabaseFromEditor);
       $('#kr-db-reset').addEventListener('click', () => {
@@ -2177,9 +3610,9 @@ window.initKlimaCalculator = () => {
           renderRoomAreas();
           renderDatabaseEditor();
           calculate();
-          showDatabaseStatus('Lokale Datenbank wurde geloescht. Datei prices.json ist wieder aktiv.');
+          showDatabaseStatus('Lokale Datenbank wurde gelöscht. Datei prices.json ist wieder aktiv.');
         } catch (error) {
-          showDatabaseStatus(`Reset nicht moeglich: ${error.message}`);
+          showDatabaseStatus(`Reset nicht möglich: ${error.message}`);
         }
       });
       $('#kr-download-pdf').addEventListener('click', () => {
@@ -2189,7 +3622,7 @@ window.initKlimaCalculator = () => {
       });
       $('#kr-reset').addEventListener('click', () => {
         fields.objekt.value = 'wohnung';
-        fields.klasse.value = 'standard';
+        fields.klasse.value = 'multi42';
         fields.modus.value = 'basis';
         fields.gebaeude.value = 'saniert';
         fields.raeume.value = '1';
@@ -2198,12 +3631,12 @@ window.initKlimaCalculator = () => {
         roomData.splice(
           0,
           roomData.length,
-          { area: 25, height: 2.6, window: 5, u: 1.3, sun: 'sued', shade: 'none', insulation: 'normal', persons: 2, attic: 'no', device: 'standard' },
-          { area: 18, height: 2.6, window: 3, u: 1.3, sun: 'west', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
-          { area: 16, height: 2.6, window: 3, u: 1.3, sun: 'ost', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
-          { area: 14, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
-          { area: 12, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
-          { area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' }
+          { name: 'Raum 1', area: 25, height: 2.6, window: 5, u: 1.3, sun: 'sued', shade: 'none', insulation: 'normal', persons: 2, attic: 'no', device: 'standard' },
+          { name: 'Raum 2', area: 18, height: 2.6, window: 3, u: 1.3, sun: 'west', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+          { name: 'Raum 3', area: 16, height: 2.6, window: 3, u: 1.3, sun: 'ost', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+          { name: 'Raum 4', area: 14, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+          { name: 'Raum 5', area: 12, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' },
+          { name: 'Raum 6', area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: 'standard' }
         );
         fields.aussen.value = 'balkon';
         fields.bohrung.value = '1';
@@ -2211,9 +3644,10 @@ window.initKlimaCalculator = () => {
         fields.kanal.value = '4';
         fields.strom.value = 'nah';
         fields.kondensat.value = 'frei';
+        fields.rabatt.value = '0';
         fields.notiz.value = '';
         root.querySelectorAll('[data-risk]').forEach((input) => { input.checked = false; });
-        out.status.textContent = 'Der finale Preis wird nach Besichtigung bestaetigt.';
+        out.status.textContent = 'Der finale Preis wird nach Besichtigung bestätigt.';
         renderRoomAreas();
         calculate();
       });

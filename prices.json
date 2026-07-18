@@ -1,27 +1,767 @@
 {
-  "version": 3,
+  "version": 5,
   "currency": "EUR",
   "admin": {
     "updateCode": "KLIMA2026"
   },
   "devicePackages": {
     "basis": {
-      "label": "Basis-Paket Wandgeraet",
+      "label": "Basis-Paket Wandger\u00e4t",
       "base": 980,
       "room": 740,
-      "capacityStep": 210
+      "capacityStep": 210,
+      "system": "both",
+      "ratedKw": 3.5
     },
     "standard": {
       "label": "Komfort-Paket leise/effizient",
       "base": 1280,
       "room": 890,
-      "capacityStep": 230
+      "capacityStep": 230,
+      "system": "both",
+      "ratedKw": 3.5
     },
     "premium": {
       "label": "Premium-Paket Design/leise",
       "base": 1780,
       "room": 1120,
-      "capacityStep": 260
+      "capacityStep": 260,
+      "system": "both",
+      "ratedKw": 3.5
+    },
+    "single_split_klimaanlage_2_5_kw_inkl_innengeraet_und": {
+      "label": "Split-Klimaanlage 2,5 kW inkl. Innenger\u00e4t und Au\u00dfenger\u00e4t",
+      "system": "single",
+      "ratedKw": 2.5,
+      "base": 990.0,
+      "room": 990.0,
+      "capacityStep": 230
+    },
+    "single_split_klimaanlage_3_5_kw_inkl_innengeraet_und": {
+      "label": "Split-Klimaanlage 3,5 kW inkl. Innenger\u00e4t und Au\u00dfenger\u00e4t",
+      "system": "single",
+      "ratedKw": 3.5,
+      "base": 1190.0,
+      "room": 1190.0,
+      "capacityStep": 230
+    },
+    "single_split_klimaanlage_5_0_kw_inkl_innengeraet_und": {
+      "label": "Split-Klimaanlage 5,0 kW inkl. Innenger\u00e4t und Au\u00dfenger\u00e4t",
+      "system": "single",
+      "ratedKw": 5.0,
+      "base": 1690.0,
+      "room": 1690.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_standard_ii_2_5_kw": {
+      "label": "LG Single-Split Standard II 2,5 kW",
+      "system": "single",
+      "ratedKw": 2.5,
+      "base": 1145.0,
+      "room": 1145.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_standard_ii_3_5_kw": {
+      "label": "LG Single-Split Standard II 3,5 kW",
+      "system": "single",
+      "ratedKw": 3.5,
+      "base": 1248.0,
+      "room": 1248.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_standard_ii_5_0_kw": {
+      "label": "LG Single-Split Standard II 5,0 kW",
+      "system": "single",
+      "ratedKw": 5.0,
+      "base": 1473.0,
+      "room": 1473.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_standard_ii_6_6_kw": {
+      "label": "LG Single-Split Standard II 6,6 kW",
+      "system": "single",
+      "ratedKw": 6.6,
+      "base": 1763.0,
+      "room": 1763.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_standard_plus_2_5_kw": {
+      "label": "LG Single-Split Standard Plus 2,5 kW",
+      "system": "single",
+      "ratedKw": 2.5,
+      "base": 1393.0,
+      "room": 1393.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_standard_plus_3_5_kw": {
+      "label": "LG Single-Split Standard Plus 3,5 kW",
+      "system": "single",
+      "ratedKw": 3.5,
+      "base": 1537.0,
+      "room": 1537.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_standard_plus_5_0_kw": {
+      "label": "LG Single-Split Standard Plus 5,0 kW",
+      "system": "single",
+      "ratedKw": 5.0,
+      "base": 1816.0,
+      "room": 1816.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_standard_plus_6_5_kw": {
+      "label": "LG Single-Split Standard Plus 6,5 kW",
+      "system": "single",
+      "ratedKw": 6.5,
+      "base": 2026.0,
+      "room": 2026.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_deluxe_2_5_kw": {
+      "label": "LG Single-Split Deluxe 2,5 kW",
+      "system": "single",
+      "ratedKw": 2.5,
+      "base": 1537.0,
+      "room": 1537.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_deluxe_3_5_kw": {
+      "label": "LG Single-Split Deluxe 3,5 kW",
+      "system": "single",
+      "ratedKw": 3.5,
+      "base": 1783.0,
+      "room": 1783.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_deluxe_5_0_kw": {
+      "label": "LG Single-Split Deluxe 5,0 kW",
+      "system": "single",
+      "ratedKw": 5.0,
+      "base": 2080.0,
+      "room": 2080.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_deluxe_6_5_kw": {
+      "label": "LG Single-Split Deluxe 6,5 kW",
+      "system": "single",
+      "ratedKw": 6.5,
+      "base": 2495.0,
+      "room": 2495.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_dualcool_premium_2_5_kw": {
+      "label": "LG Single-Split DualCool Premium 2,5 kW",
+      "system": "single",
+      "ratedKw": 2.5,
+      "base": 1882.0,
+      "room": 1882.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_dualcool_premium_3_5_kw": {
+      "label": "LG Single-Split DualCool Premium 3,5 kW",
+      "system": "single",
+      "ratedKw": 3.5,
+      "base": 2182.0,
+      "room": 2182.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_artcool_mirror_2_5_kw": {
+      "label": "LG Single-Split ArtCool Mirror 2,5 kW",
+      "system": "single",
+      "ratedKw": 2.5,
+      "base": 2019.0,
+      "room": 2019.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_artcool_mirror_3_5_kw": {
+      "label": "LG Single-Split ArtCool Mirror 3,5 kW",
+      "system": "single",
+      "ratedKw": 3.5,
+      "base": 2290.0,
+      "room": 2290.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_artcool_mirror_5_0_kw": {
+      "label": "LG Single-Split ArtCool Mirror 5,0 kW",
+      "system": "single",
+      "ratedKw": 5.0,
+      "base": 2619.0,
+      "room": 2619.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_artcool_mirror_6_6_kw": {
+      "label": "LG Single-Split ArtCool Mirror 6,6 kW",
+      "system": "single",
+      "ratedKw": 6.6,
+      "base": 3080.0,
+      "room": 3080.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_artcool_gallery_premium_2_6": {
+      "label": "LG Single-Split ArtCool Gallery Premium 2,6 kW",
+      "system": "single",
+      "ratedKw": 2.6,
+      "base": 3537.0,
+      "room": 3537.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_artcool_gallery_premium_3_7": {
+      "label": "LG Single-Split ArtCool Gallery Premium 3,7 kW",
+      "system": "single",
+      "ratedKw": 3.7,
+      "base": 4012.0,
+      "room": 4012.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_artcool_gallery_special_2_6": {
+      "label": "LG Single-Split ArtCool Gallery Special 2,6 kW",
+      "system": "single",
+      "ratedKw": 2.6,
+      "base": 2584.0,
+      "room": 2584.0,
+      "capacityStep": 230
+    },
+    "single_lg_single_split_artcool_gallery_special_3_7": {
+      "label": "LG Single-Split ArtCool Gallery Special 3,7 kW",
+      "system": "single",
+      "ratedKw": 3.7,
+      "base": 2752.0,
+      "room": 2752.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_standard_ii_2_5_kw": {
+      "label": "LG Multi Innenger\u00e4t Standard II 2,5 kW",
+      "system": "multi",
+      "ratedKw": 2.5,
+      "base": 419.0,
+      "room": 419.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_standard_ii_3_5_kw": {
+      "label": "LG Multi Innenger\u00e4t Standard II 3,5 kW",
+      "system": "multi",
+      "ratedKw": 3.5,
+      "base": 461.0,
+      "room": 461.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_standard_ii_5_0_kw": {
+      "label": "LG Multi Innenger\u00e4t Standard II 5,0 kW",
+      "system": "multi",
+      "ratedKw": 5.0,
+      "base": 566.0,
+      "room": 566.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_standard_ii_6_6_kw": {
+      "label": "LG Multi Innenger\u00e4t Standard II 6,6 kW",
+      "system": "multi",
+      "ratedKw": 6.6,
+      "base": 673.0,
+      "room": 673.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_standard_plus_2_1_kw": {
+      "label": "LG Multi Innenger\u00e4t Standard Plus 2,1 kW",
+      "system": "multi",
+      "ratedKw": 2.1,
+      "base": 535.0,
+      "room": 535.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_standard_plus_2_5_kw": {
+      "label": "LG Multi Innenger\u00e4t Standard Plus 2,5 kW",
+      "system": "multi",
+      "ratedKw": 2.5,
+      "base": 574.0,
+      "room": 574.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_standard_plus_3_5_kw": {
+      "label": "LG Multi Innenger\u00e4t Standard Plus 3,5 kW",
+      "system": "multi",
+      "ratedKw": 3.5,
+      "base": 614.0,
+      "room": 614.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_standard_plus_4_2_kw": {
+      "label": "LG Multi Innenger\u00e4t Standard Plus 4,2 kW",
+      "system": "multi",
+      "ratedKw": 4.2,
+      "base": 614.0,
+      "room": 614.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_standard_plus_5_0_kw": {
+      "label": "LG Multi Innenger\u00e4t Standard Plus 5,0 kW",
+      "system": "multi",
+      "ratedKw": 5.0,
+      "base": 673.0,
+      "room": 673.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_standard_plus_6_5_kw": {
+      "label": "LG Multi Innenger\u00e4t Standard Plus 6,5 kW",
+      "system": "multi",
+      "ratedKw": 6.5,
+      "base": 766.0,
+      "room": 766.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_dualcool_premium_2_5_kw": {
+      "label": "LG Multi Innenger\u00e4t DualCool Premium 2,5 kW",
+      "system": "multi",
+      "ratedKw": 2.5,
+      "base": 878.0,
+      "room": 878.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_dualcool_premium_3_5_kw": {
+      "label": "LG Multi Innenger\u00e4t DualCool Premium 3,5 kW",
+      "system": "multi",
+      "ratedKw": 3.5,
+      "base": 999.0,
+      "room": 999.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_deluxe_2_1_kw": {
+      "label": "LG Multi Innenger\u00e4t Deluxe 2,1 kW",
+      "system": "multi",
+      "ratedKw": 2.1,
+      "base": 600.0,
+      "room": 600.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_deluxe_2_5_kw": {
+      "label": "LG Multi Innenger\u00e4t Deluxe 2,5 kW",
+      "system": "multi",
+      "ratedKw": 2.5,
+      "base": 636.0,
+      "room": 636.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_deluxe_3_5_kw": {
+      "label": "LG Multi Innenger\u00e4t Deluxe 3,5 kW",
+      "system": "multi",
+      "ratedKw": 3.5,
+      "base": 718.0,
+      "room": 718.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_deluxe_5_0_kw": {
+      "label": "LG Multi Innenger\u00e4t Deluxe 5,0 kW",
+      "system": "multi",
+      "ratedKw": 5.0,
+      "base": 858.0,
+      "room": 858.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_deluxe_6_5_kw": {
+      "label": "LG Multi Innenger\u00e4t Deluxe 6,5 kW",
+      "system": "multi",
+      "ratedKw": 6.5,
+      "base": 1094.0,
+      "room": 1094.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_artcool_mirror_2_1_kw": {
+      "label": "LG Multi Innenger\u00e4t ArtCool Mirror 2,1 kW",
+      "system": "multi",
+      "ratedKw": 2.1,
+      "base": 633.0,
+      "room": 633.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_artcool_mirror_2_5_kw": {
+      "label": "LG Multi Innenger\u00e4t ArtCool Mirror 2,5 kW",
+      "system": "multi",
+      "ratedKw": 2.5,
+      "base": 748.0,
+      "room": 748.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_artcool_mirror_3_5_kw": {
+      "label": "LG Multi Innenger\u00e4t ArtCool Mirror 3,5 kW",
+      "system": "multi",
+      "ratedKw": 3.5,
+      "base": 854.0,
+      "room": 854.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_artcool_mirror_5_0_kw": {
+      "label": "LG Multi Innenger\u00e4t ArtCool Mirror 5,0 kW",
+      "system": "multi",
+      "ratedKw": 5.0,
+      "base": 1026.0,
+      "room": 1026.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_artcool_mirror_6_5_kw": {
+      "label": "LG Multi Innenger\u00e4t ArtCool Mirror 6,5 kW",
+      "system": "multi",
+      "ratedKw": 6.5,
+      "base": 1155.0,
+      "room": 1155.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_artcool_gallery_premium_2_6": {
+      "label": "LG Multi Innenger\u00e4t ArtCool Gallery Premium 2,6 kW",
+      "system": "multi",
+      "ratedKw": 2.6,
+      "base": 1899.0,
+      "room": 1899.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_artcool_gallery_premium_3_7": {
+      "label": "LG Multi Innenger\u00e4t ArtCool Gallery Premium 3,7 kW",
+      "system": "multi",
+      "ratedKw": 3.7,
+      "base": 2299.0,
+      "room": 2299.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_artcool_gallery_special_2_6": {
+      "label": "LG Multi Innenger\u00e4t ArtCool Gallery Special 2,6 kW",
+      "system": "multi",
+      "ratedKw": 2.6,
+      "base": 946.0,
+      "room": 946.0,
+      "capacityStep": 230
+    },
+    "multi_innen_lg_multi_innengeraet_artcool_gallery_special_3_7": {
+      "label": "LG Multi Innenger\u00e4t ArtCool Gallery Special 3,7 kW",
+      "system": "multi",
+      "ratedKw": 3.7,
+      "base": 1039.0,
+      "room": 1039.0,
+      "capacityStep": 230
+    },
+    "single_samsung_single_cebu_living_2_5_kw": {
+      "label": "Samsung Single Cebu Living 2,5 kW",
+      "system": "single",
+      "ratedKw": 2.5,
+      "base": 1612.0,
+      "room": 1612.0,
+      "capacityStep": 230
+    },
+    "single_samsung_single_cebu_living_3_5_kw": {
+      "label": "Samsung Single Cebu Living 3,5 kW",
+      "system": "single",
+      "ratedKw": 3.5,
+      "base": 1703.0,
+      "room": 1703.0,
+      "capacityStep": 230
+    },
+    "single_samsung_single_cebu_living_5_0_kw": {
+      "label": "Samsung Single Cebu Living 5,0 kW",
+      "system": "single",
+      "ratedKw": 5.0,
+      "base": 2354.0,
+      "room": 2354.0,
+      "capacityStep": 230
+    },
+    "single_samsung_single_cebu_living_6_5_kw": {
+      "label": "Samsung Single Cebu Living 6,5 kW",
+      "system": "single",
+      "ratedKw": 6.5,
+      "base": 3134.0,
+      "room": 3134.0,
+      "capacityStep": 230
+    },
+    "single_samsung_single_windfree_standard_2_5_kw": {
+      "label": "Samsung Single WindFree Standard 2,5 kW",
+      "system": "single",
+      "ratedKw": 2.5,
+      "base": 2026.0,
+      "room": 2026.0,
+      "capacityStep": 230
+    },
+    "single_samsung_single_windfree_standard_3_5_kw": {
+      "label": "Samsung Single WindFree Standard 3,5 kW",
+      "system": "single",
+      "ratedKw": 3.5,
+      "base": 2151.0,
+      "room": 2151.0,
+      "capacityStep": 230
+    },
+    "single_samsung_single_windfree_standard_5_0_kw": {
+      "label": "Samsung Single WindFree Standard 5,0 kW",
+      "system": "single",
+      "ratedKw": 5.0,
+      "base": 2933.0,
+      "room": 2933.0,
+      "capacityStep": 230
+    },
+    "single_samsung_single_windfree_standard_6_5_kw": {
+      "label": "Samsung Single WindFree Standard 6,5 kW",
+      "system": "single",
+      "ratedKw": 6.5,
+      "base": 3627.0,
+      "room": 3627.0,
+      "capacityStep": 230
+    },
+    "single_samsung_single_windfree_exklusiv_2_5_kw": {
+      "label": "Samsung Single WindFree Exklusiv 2,5 kW",
+      "system": "single",
+      "ratedKw": 2.5,
+      "base": 2503.0,
+      "room": 2503.0,
+      "capacityStep": 230
+    },
+    "single_samsung_single_windfree_exklusiv_3_5_kw": {
+      "label": "Samsung Single WindFree Exklusiv 3,5 kW",
+      "system": "single",
+      "ratedKw": 3.5,
+      "base": 2682.0,
+      "room": 2682.0,
+      "capacityStep": 230
+    },
+    "single_samsung_single_windfree_exklusiv_5_0_kw": {
+      "label": "Samsung Single WindFree Exklusiv 5,0 kW",
+      "system": "single",
+      "ratedKw": 5.0,
+      "base": 3646.0,
+      "room": 3646.0,
+      "capacityStep": 230
+    },
+    "single_samsung_single_windfree_exklusiv_6_5_kw": {
+      "label": "Samsung Single WindFree Exklusiv 6,5 kW",
+      "system": "single",
+      "ratedKw": 6.5,
+      "base": 4778.0,
+      "room": 4778.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_cebu_living_2_5_kw": {
+      "label": "Samsung Multi Innenger\u00e4t Cebu Living 2,5 kW",
+      "system": "multi",
+      "ratedKw": 2.5,
+      "base": 676.0,
+      "room": 676.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_cebu_living_3_5_kw": {
+      "label": "Samsung Multi Innenger\u00e4t Cebu Living 3,5 kW",
+      "system": "multi",
+      "ratedKw": 3.5,
+      "base": 734.0,
+      "room": 734.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_cebu_living_5_0_kw": {
+      "label": "Samsung Multi Innenger\u00e4t Cebu Living 5,0 kW",
+      "system": "multi",
+      "ratedKw": 5.0,
+      "base": 866.0,
+      "room": 866.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_cebu_living_6_5_kw": {
+      "label": "Samsung Multi Innenger\u00e4t Cebu Living 6,5 kW",
+      "system": "multi",
+      "ratedKw": 6.5,
+      "base": 1178.0,
+      "room": 1178.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_windfree_standard_2_5_kw": {
+      "label": "Samsung Multi Innenger\u00e4t WindFree Standard 2,5 kW",
+      "system": "multi",
+      "ratedKw": 2.5,
+      "base": 730.0,
+      "room": 730.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_windfree_standard_3_5_kw": {
+      "label": "Samsung Multi Innenger\u00e4t WindFree Standard 3,5 kW",
+      "system": "multi",
+      "ratedKw": 3.5,
+      "base": 801.0,
+      "room": 801.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_windfree_standard_5_0_kw": {
+      "label": "Samsung Multi Innenger\u00e4t WindFree Standard 5,0 kW",
+      "system": "multi",
+      "ratedKw": 5.0,
+      "base": 1160.0,
+      "room": 1160.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_windfree_standard_6_5_kw": {
+      "label": "Samsung Multi Innenger\u00e4t WindFree Standard 6,5 kW",
+      "system": "multi",
+      "ratedKw": 6.5,
+      "base": 1518.0,
+      "room": 1518.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_windfree_exklusiv_2_5_kw": {
+      "label": "Samsung Multi Innenger\u00e4t WindFree Exklusiv 2,5 kW",
+      "system": "multi",
+      "ratedKw": 2.5,
+      "base": 1127.0,
+      "room": 1127.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_windfree_exklusiv_3_5_kw": {
+      "label": "Samsung Multi Innenger\u00e4t WindFree Exklusiv 3,5 kW",
+      "system": "multi",
+      "ratedKw": 3.5,
+      "base": 1217.0,
+      "room": 1217.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_windfree_exklusiv_5_0_kw": {
+      "label": "Samsung Multi Innenger\u00e4t WindFree Exklusiv 5,0 kW",
+      "system": "multi",
+      "ratedKw": 5.0,
+      "base": 1642.0,
+      "room": 1642.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_windfree_exklusiv_6_5_kw": {
+      "label": "Samsung Multi Innenger\u00e4t WindFree Exklusiv 6,5 kW",
+      "system": "multi",
+      "ratedKw": 6.5,
+      "base": 2151.0,
+      "room": 2151.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_standtruhe_2_5_kw": {
+      "label": "Samsung Multi Innenger\u00e4t Standtruhe 2,5 kW",
+      "system": "multi",
+      "ratedKw": 2.5,
+      "base": 1021.0,
+      "room": 1021.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_standtruhe_3_5_kw": {
+      "label": "Samsung Multi Innenger\u00e4t Standtruhe 3,5 kW",
+      "system": "multi",
+      "ratedKw": 3.5,
+      "base": 1139.0,
+      "room": 1139.0,
+      "capacityStep": 230
+    },
+    "multi_innen_samsung_multi_innengeraet_standtruhe_5_2_kw": {
+      "label": "Samsung Multi Innenger\u00e4t Standtruhe 5,2 kW",
+      "system": "multi",
+      "ratedKw": 5.2,
+      "base": 1361.0,
+      "room": 1361.0,
+      "capacityStep": 230
+    }
+  },
+  "outdoorUnits": {
+    "multi42": {
+      "label": "Multi-Split Au\u00dfenger\u00e4t bis 4,2 kW",
+      "base": 1450,
+      "capacityStep": 230,
+      "ratedKw": 4.2
+    },
+    "multi60": {
+      "label": "Multi-Split Au\u00dfenger\u00e4t bis 6,0 kW",
+      "base": 1850,
+      "capacityStep": 250,
+      "ratedKw": 6.0
+    },
+    "multi80": {
+      "label": "Multi-Split Au\u00dfenger\u00e4t bis 8,0 kW",
+      "base": 2450,
+      "capacityStep": 280,
+      "ratedKw": 8.0
+    },
+    "aussen_multisplit_aussengeraet_fuer_2_innengeraete": {
+      "label": "Multisplit-Au\u00dfenger\u00e4t f\u00fcr 2 Innenger\u00e4te",
+      "ratedKw": 5.0,
+      "base": 1850.0,
+      "capacityStep": 250
+    },
+    "aussen_lg_multi_aussengeraet_mu2r15": {
+      "label": "LG Multi Au\u00dfenger\u00e4t MU2R15",
+      "ratedKw": 4.4,
+      "base": 1827.0,
+      "capacityStep": 250
+    },
+    "aussen_lg_multi_aussengeraet_mu2r17": {
+      "label": "LG Multi Au\u00dfenger\u00e4t MU2R17",
+      "ratedKw": 5.0,
+      "base": 2010.0,
+      "capacityStep": 250
+    },
+    "aussen_lg_multi_aussengeraet_mu3r19": {
+      "label": "LG Multi Au\u00dfenger\u00e4t MU3R19",
+      "ratedKw": 5.6,
+      "base": 2145.0,
+      "capacityStep": 250
+    },
+    "aussen_lg_multi_aussengeraet_mu3r21": {
+      "label": "LG Multi Au\u00dfenger\u00e4t MU3R21",
+      "ratedKw": 6.2,
+      "base": 2618.0,
+      "capacityStep": 250
+    },
+    "aussen_lg_multi_aussengeraet_mu4r25": {
+      "label": "LG Multi Au\u00dfenger\u00e4t MU4R25",
+      "ratedKw": 7.3,
+      "base": 3210.0,
+      "capacityStep": 250
+    },
+    "aussen_lg_multi_aussengeraet_mu4r27": {
+      "label": "LG Multi Au\u00dfenger\u00e4t MU4R27",
+      "ratedKw": 7.9,
+      "base": 3537.0,
+      "capacityStep": 250
+    },
+    "aussen_lg_multi_aussengeraet_mu5r30": {
+      "label": "LG Multi Au\u00dfenger\u00e4t MU5R30",
+      "ratedKw": 8.8,
+      "base": 3798.0,
+      "capacityStep": 250
+    },
+    "aussen_lg_multi_aussengeraet_mu5r40": {
+      "label": "LG Multi Au\u00dfenger\u00e4t MU5R40",
+      "ratedKw": 11.7,
+      "base": 5656.0,
+      "capacityStep": 250
+    },
+    "aussen_samsung_multi_aussengeraet_aj040_2ig": {
+      "label": "Samsung Multi Au\u00dfenger\u00e4t AJ040 (2IG)",
+      "ratedKw": 4.0,
+      "base": 2233.0,
+      "capacityStep": 250
+    },
+    "aussen_samsung_multi_aussengeraet_aj050_2ig": {
+      "label": "Samsung Multi Au\u00dfenger\u00e4t AJ050 (2IG)",
+      "ratedKw": 5.0,
+      "base": 2576.0,
+      "capacityStep": 250
+    },
+    "aussen_samsung_multi_aussengeraet_aj052_3ig": {
+      "label": "Samsung Multi Au\u00dfenger\u00e4t AJ052 (3IG)",
+      "ratedKw": 5.2,
+      "base": 2913.0,
+      "capacityStep": 250
+    },
+    "aussen_samsung_multi_aussengeraet_aj068_3ig": {
+      "label": "Samsung Multi Au\u00dfenger\u00e4t AJ068 (3IG)",
+      "ratedKw": 6.8,
+      "base": 3377.0,
+      "capacityStep": 250
+    },
+    "aussen_samsung_multi_aussengeraet_aj080_4ig": {
+      "label": "Samsung Multi Au\u00dfenger\u00e4t AJ080 (4IG)",
+      "ratedKw": 8.0,
+      "base": 4278.0,
+      "capacityStep": 250
+    },
+    "aussen_samsung_multi_aussengeraet_aj100_5ig": {
+      "label": "Samsung Multi Au\u00dfenger\u00e4t AJ100 (5IG)",
+      "ratedKw": 10.0,
+      "base": 5267.0,
+      "capacityStep": 250
     }
   },
   "mounting": {
@@ -51,7 +791,7 @@
   },
   "risks": {
     "ladder": {
-      "label": "Leiter/Geruest/Hoehe",
+      "label": "Leiter/Ger\u00fcst/H\u00f6he",
       "cost": 380,
       "complexity": 0.035
     },
@@ -66,7 +806,7 @@
       "complexity": 0.04
     },
     "oldunit": {
-      "label": "Altgeraet demontieren/entsorgen",
+      "label": "Altger\u00e4t demontieren/entsorgen",
       "cost": 220,
       "complexity": 0.015
     }

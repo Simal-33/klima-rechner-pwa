@@ -1,4 +1,4 @@
-const CACHE_NAME = 'klima-rechner-v13-flat';
+const CACHE_NAME = 'klima-rechner-v22-flat';
 const APP_SHELL = [
   './',
   './index.html',

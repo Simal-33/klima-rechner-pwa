@@ -4,7 +4,7 @@
   "short_name": "Klima Rechner",
   "lang": "de-DE",
   "dir": "ltr",
-  "description": "Richtpreis- und Anfrage-Rechner fuer Klimaanlagen.",
+  "description": "Richtpreis- und Anfrage-Rechner f\u00fcr Klimaanlagen.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
