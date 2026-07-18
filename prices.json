@@ -741,7 +741,7 @@
   "taxRates": {
     "at": 0.2
   },
-  "markupFactor": 1.22,
+  "markupFactor": 1.10,
   "settings": {
     "baseWattsPerM2": {
       "gut": 45,
