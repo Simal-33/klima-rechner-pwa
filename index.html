@@ -2158,17 +2158,25 @@ window.initKlimaCalculator = () => {
         syncRiskOptions();
       }
 
-      function deviceMatchesSystem(config, systemType) {
+      function deviceSystem(config) {
+        return config?.system || config?.availability || 'both';
+      }
+
+      function deviceMatchesSystem(config, systemType, strict = false) {
         if (!config) return false;
-        const availability = config.system || config.availability || 'both';
-        if (availability === 'both' || availability === systemType) return true;
+        const availability = deviceSystem(config);
+        if (availability === systemType) return true;
+        if (strict) return false;
+        if (availability === 'both') return true;
         if (systemType === 'single') return availability !== 'multi' && Number(config.base || 0) > 0;
         return availability !== 'single' && Number(config.room || 0) > 0;
       }
 
       function availableDeviceEntries(systemType = currentSystemType()) {
-        const entries = Object.entries(devicePrices).filter(([, config]) => deviceMatchesSystem(config, systemType));
-        return entries.length ? entries : Object.entries(devicePrices);
+        const exactEntries = Object.entries(devicePrices).filter(([, config]) => deviceMatchesSystem(config, systemType, true));
+        if (exactEntries.length) return exactEntries;
+        const fallbackEntries = Object.entries(devicePrices).filter(([, config]) => deviceMatchesSystem(config, systemType));
+        return fallbackEntries.length ? fallbackEntries : Object.entries(devicePrices);
       }
 
       function deviceOptions(selected, systemType = currentSystemType()) {
@@ -2180,8 +2188,6 @@ window.initKlimaCalculator = () => {
       }
 
       function fallbackDeviceKey(systemType = currentSystemType()) {
-        const preferred = ['standard', 'basis', 'premium'].find((key) => deviceMatchesSystem(devicePrices[key], systemType));
-        if (preferred) return preferred;
         return availableDeviceEntries(systemType)[0]?.[0] || Object.keys(devicePrices)[0];
       }
 
@@ -2203,8 +2209,9 @@ window.initKlimaCalculator = () => {
         const selectedOutdoor = outdoorUnitPrices[fields.klasse.value] ? fields.klasse.value : outdoorFallback;
         fields.klasse.innerHTML = outdoorOptions(selectedOutdoor);
         fields.klasse.value = selectedOutdoor;
+        const availableKeys = new Set(availableDeviceEntries(systemType).map(([key]) => key));
         roomData.forEach((room) => {
-          if (!deviceMatchesSystem(devicePrices[room.device], systemType)) room.device = roomFallback;
+          if (!availableKeys.has(room.device)) room.device = roomFallback;
         });
       }
 
@@ -2281,11 +2288,13 @@ window.initKlimaCalculator = () => {
         });
         out.roomAreas.innerHTML = Array.from({ length: rooms }, (_, index) => {
           const roomFallback = fallbackDeviceKey(systemType);
+          const availableKeys = new Set(availableDeviceEntries(systemType).map(([key]) => key));
           const data = roomData[index] || { name: defaultRoomName(index), area: 10, height: 2.6, window: 2, u: 1.3, sun: 'nord', shade: 'inside', insulation: 'normal', persons: 1, attic: 'no', device: roomFallback };
           if (!data.name) data.name = defaultRoomName(index);
-          if (!deviceMatchesSystem(devicePrices[data.device], systemType)) data.device = roomFallback;
+          if (!availableKeys.has(data.device)) data.device = roomFallback;
           roomData[index] = data;
           const roomLabel = displayRoomName(data, index);
+          const deviceFieldLabel = systemType === 'multi' ? 'Multi-Innengerät' : 'Single-Split Set';
           return `
             <div class="kr-room">
               <div class="kr-room-title">${escapeHtml(roomLabel)}</div>
@@ -2295,7 +2304,7 @@ window.initKlimaCalculator = () => {
                   <input class="form-control" data-room-field="name" data-room-index="${index}" type="text" value="${escapeHtml(data.name)}" placeholder="z. B. Wohnzimmer">
                 </label>
                 <label class="form-label">
-                  Innengerät für ${escapeHtml(roomLabel)}
+                  ${escapeHtml(deviceFieldLabel)} für ${escapeHtml(roomLabel)}
                   <select class="form-select" data-room-field="device" data-room-index="${index}">
                     ${deviceOptions(data.device, systemType)}
                   </select>
