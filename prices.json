@@ -5,54 +5,6 @@
     "updateCode": "KLIMA2026"
   },
   "devicePackages": {
-    "basis": {
-      "label": "Basis-Paket Wandger\u00e4t",
-      "base": 980,
-      "room": 740,
-      "capacityStep": 210,
-      "system": "both",
-      "ratedKw": 3.5
-    },
-    "standard": {
-      "label": "Komfort-Paket leise/effizient",
-      "base": 1280,
-      "room": 890,
-      "capacityStep": 230,
-      "system": "both",
-      "ratedKw": 3.5
-    },
-    "premium": {
-      "label": "Premium-Paket Design/leise",
-      "base": 1780,
-      "room": 1120,
-      "capacityStep": 260,
-      "system": "both",
-      "ratedKw": 3.5
-    },
-    "single_split_klimaanlage_2_5_kw_inkl_innengeraet_und": {
-      "label": "Split-Klimaanlage 2,5 kW inkl. Innenger\u00e4t und Au\u00dfenger\u00e4t",
-      "system": "single",
-      "ratedKw": 2.5,
-      "base": 990.0,
-      "room": 990.0,
-      "capacityStep": 230
-    },
-    "single_split_klimaanlage_3_5_kw_inkl_innengeraet_und": {
-      "label": "Split-Klimaanlage 3,5 kW inkl. Innenger\u00e4t und Au\u00dfenger\u00e4t",
-      "system": "single",
-      "ratedKw": 3.5,
-      "base": 1190.0,
-      "room": 1190.0,
-      "capacityStep": 230
-    },
-    "single_split_klimaanlage_5_0_kw_inkl_innengeraet_und": {
-      "label": "Split-Klimaanlage 5,0 kW inkl. Innenger\u00e4t und Au\u00dfenger\u00e4t",
-      "system": "single",
-      "ratedKw": 5.0,
-      "base": 1690.0,
-      "room": 1690.0,
-      "capacityStep": 230
-    },
     "single_lg_single_split_standard_ii_2_5_kw": {
       "label": "LG Single-Split Standard II 2,5 kW",
       "system": "single",
@@ -765,23 +717,23 @@
     }
   },
   "mounting": {
-    "baseInstall": 760,
-    "additionalIndoor": 340,
-    "drilling": 125,
-    "lineMeter": 44,
-    "channelMeter": 26,
+    "baseInstall": 600,
+    "additionalIndoor": 100,
+    "drilling": 100,
+    "lineMeter": 30,
+    "channelMeter": 20,
     "outdoor": {
-      "balkon": 170,
-      "wand": 230,
-      "boden": 260,
-      "dach": 620
+      "balkon": 100,
+      "wand": 100,
+      "boden": 100,
+      "dach": 400
     },
     "power": {
       "nah": 0,
-      "mittel": 330,
-      "weit": 620
+      "mittel": 200,
+      "weit": 400
     },
-    "condensatePump": 280
+    "condensatePump": 200
   },
   "objectFactor": {
     "wohnung": 1,
@@ -792,22 +744,22 @@
   "risks": {
     "ladder": {
       "label": "Leiter/Ger\u00fcst/H\u00f6he",
-      "cost": 380,
+      "cost": 200,
       "complexity": 0.035
     },
     "concrete": {
       "label": "Stahlbeton/Kernbohrung schwer",
-      "cost": 260,
+      "cost": 150,
       "complexity": 0.025
     },
     "permit": {
       "label": "Genehmigung/WEG/Denkmalschutz offen",
-      "cost": 180,
+      "cost": 300,
       "complexity": 0.04
     },
     "oldunit": {
       "label": "Altger\u00e4t demontieren/entsorgen",
-      "cost": 220,
+      "cost": 250,
       "complexity": 0.015
     }
   },
