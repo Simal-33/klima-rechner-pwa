@@ -905,6 +905,26 @@ textarea:focus-visible {
 
   <div class="kr-layout">
     <section class="kr-form" aria-label="Kundenangaben">
+      <div class="viz-controls kr-section" aria-label="Kunde">
+        <div class="kr-fields">
+          <label class="form-label">
+            Name
+            <input id="kr-kunde-name" class="form-control" type="text" autocomplete="name" placeholder="z. B. Max Mustermann">
+          </label>
+          <label class="form-label">
+            Straße / Hausnummer
+            <input id="kr-kunde-strasse" class="form-control" type="text" autocomplete="street-address" placeholder="z. B. Musterstraße 12">
+          </label>
+          <label class="form-label">
+            PLZ
+            <input id="kr-kunde-plz" class="form-control" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="z. B. 1010">
+          </label>
+          <label class="form-label">
+            Ort
+            <input id="kr-kunde-ort" class="form-control" type="text" autocomplete="address-level2" placeholder="z. B. Wien">
+          </label>
+        </div>
+      </div>
       <div class="viz-controls kr-section" aria-label="Projekt">
         <div class="kr-fields">
           <label class="form-label">
@@ -1072,6 +1092,7 @@ textarea:focus-visible {
 
       <div class="kr-total">
         <div class="kr-total-line text-small"><span>Richtpreis netto</span><span id="kr-netto">0 EUR</span></div>
+        <div class="kr-total-line text-small"><span>MwSt-Basis Geräte/Material</span><span id="kr-tax-base">0 EUR</span></div>
         <div class="kr-total-line text-small"><span id="kr-ust-label">USt. 20 Prozent</span><span id="kr-ust">0 EUR</span></div>
         <div class="kr-total-line kr-grand"><span>Unverbindlicher Richtpreis</span><span id="kr-final">0 EUR</span></div>
       </div>
@@ -1163,6 +1184,10 @@ window.initKlimaCalculator = () => {
       const $ = (selector) => root.querySelector(selector);
       const euro = (value) => `${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(value)} EUR`;
       const fields = {
+        kundeName: $('#kr-kunde-name'),
+        kundeStrasse: $('#kr-kunde-strasse'),
+        kundePlz: $('#kr-kunde-plz'),
+        kundeOrt: $('#kr-kunde-ort'),
         objekt: $('#kr-objekt'),
         hersteller: $('#kr-hersteller'),
         klasse: $('#kr-klasse'),
@@ -1196,6 +1221,7 @@ window.initKlimaCalculator = () => {
         outdoorCheck: $('#kr-outdoor-check'),
         lines: $('#kr-lines'),
         netto: $('#kr-netto'),
+        taxBase: $('#kr-tax-base'),
         ustLabel: $('#kr-ust-label'),
         ust: $('#kr-ust'),
         final: $('#kr-final'),
@@ -2343,6 +2369,25 @@ window.initKlimaCalculator = () => {
         return name || defaultRoomName(index);
       }
 
+      function customerData() {
+        const name = fields.kundeName.value.trim();
+        const street = fields.kundeStrasse.value.trim();
+        const postal = fields.kundePlz.value.trim();
+        const city = fields.kundeOrt.value.trim();
+        const cityLine = [postal, city].filter(Boolean).join(' ');
+        return {
+          name,
+          street,
+          postal,
+          city,
+          cityLine,
+          hasData: Boolean(name || street || postal || city),
+          nameLine: name || '[Name des Kunden]',
+          streetLine: street || '[Straße Nr.]',
+          cityLineDisplay: cityLine || '[PLZ Ort]'
+        };
+      }
+
       function applyMode() {
         const exact = fields.modus.value === 'genau';
         root.querySelectorAll('[data-advanced-room]').forEach((node) => {
@@ -2690,6 +2735,7 @@ window.initKlimaCalculator = () => {
         out.last.textContent = `${plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
         out.treiber.textContent = `${displayRoomName(plan.largest.room, plan.largest.index)}: ${plan.largest.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
         out.netto.textContent = euro(net);
+        out.taxBase.textContent = euro(taxableNet);
         out.ustLabel.textContent = `USt. ${Math.round(taxRate * 100)} Prozent auf Geräte/Material`;
         out.ust.textContent = euro(tax);
         out.final.textContent = euro(gross);
@@ -2752,6 +2798,7 @@ window.initKlimaCalculator = () => {
 
       function requestText() {
         const result = calculate();
+        const customer = customerData();
         const objectLabel = fields.objekt.options[fields.objekt.selectedIndex].text;
         const modeLabel = fields.modus.options[fields.modus.selectedIndex].text;
         const manufacturerLabel = fields.hersteller.options[fields.hersteller.selectedIndex].text;
@@ -2767,6 +2814,11 @@ window.initKlimaCalculator = () => {
         return [
           'Anfrage Klimaanlage',
           '',
+          customer.hasData ? 'Kunde:' : null,
+          customer.name ? `Name: ${customer.name}` : null,
+          customer.street ? `Adresse: ${customer.street}` : null,
+          customer.cityLine ? `PLZ/Ort: ${customer.cityLine}` : null,
+          customer.hasData ? '' : null,
           `Objekt: ${objectLabel}`,
           'Standort: Österreich',
           `Berechnung: ${modeLabel}`,
@@ -2800,6 +2852,7 @@ window.initKlimaCalculator = () => {
 
       function printableOfferHtml() {
         const result = calculate();
+        const customer = customerData();
         const objectLabel = fields.objekt.options[fields.objekt.selectedIndex].text;
         const modeLabel = fields.modus.options[fields.modus.selectedIndex].text;
         const buildingLabel = fields.gebaeude.options[fields.gebaeude.selectedIndex].text;
@@ -2868,6 +2921,15 @@ window.initKlimaCalculator = () => {
               <strong>Berechnung:</strong> ${escapeHtml(modeLabel)}
             </div>
           </div>
+          <div class="kr-print-section">
+            <h3>Kunde</h3>
+            <table class="kr-print-table">
+              <tbody>
+                <tr><th>Name</th><td>${escapeHtml(customer.nameLine)}</td><th>Adresse</th><td>${escapeHtml(customer.streetLine)}</td></tr>
+                <tr><th>PLZ / Ort</th><td colspan="3">${escapeHtml(customer.cityLineDisplay)}</td></tr>
+              </tbody>
+            </table>
+          </div>
           <div class="kr-print-summary">
             <div class="kr-print-box"><span class="kr-print-label">Richtpreis brutto</span><span class="kr-print-value">${euro(result.gross)}</span></div>
             <div class="kr-print-box"><span class="kr-print-label">Preisspanne</span><span class="kr-print-value">${euro(result.low)} bis ${euro(result.high)}</span></div>
@@ -2924,6 +2986,7 @@ window.initKlimaCalculator = () => {
               <tbody>
                 ${costRows}
                 <tr class="kr-print-subtotal"><th colspan="5">Summe netto</th><td class="kr-print-money">${euro(result.net)}</td></tr>
+                <tr class="kr-print-tax"><th colspan="5">MwSt-Basis Geräte/Material</th><td class="kr-print-money">${euro(result.taxableNet)}</td></tr>
                 <tr class="kr-print-tax"><th colspan="5">USt. ${Math.round(taxRates.at * 100)} Prozent auf Geräte/Material</th><td class="kr-print-money">${euro(result.tax)}</td></tr>
                 <tr class="kr-print-total"><th colspan="5">Unverbindlicher Richtpreis</th><td class="kr-print-money">${euro(result.gross)}</td></tr>
               </tbody>
@@ -2936,6 +2999,7 @@ window.initKlimaCalculator = () => {
 
       function offerPdfLines() {
         const result = calculate();
+        const customer = customerData();
         const objectLabel = fields.objekt.options[fields.objekt.selectedIndex].text;
         const modeLabel = fields.modus.options[fields.modus.selectedIndex].text;
         const buildingLabel = fields.gebaeude.options[fields.gebaeude.selectedIndex].text;
@@ -2952,6 +3016,11 @@ window.initKlimaCalculator = () => {
           `Standort: Österreich`,
           `Berechnung: ${modeLabel}`,
           '',
+          customer.hasData ? 'Kunde:' : null,
+          customer.name ? `Name: ${customer.name}` : null,
+          customer.street ? `Adresse: ${customer.street}` : null,
+          customer.cityLine ? `PLZ/Ort: ${customer.cityLine}` : null,
+          customer.hasData ? '' : null,
           `Objekt: ${objectLabel}`,
           `Gebäudezustand: ${buildingLabel}`,
           `Räume / Fläche: ${result.rooms} / ${result.area} m2`,
@@ -2976,6 +3045,7 @@ window.initKlimaCalculator = () => {
           'Kostenübersicht:',
           ...result.positions.map((position, index) => `${index + 1}. ${position.label}: ${formatQuantity(position.qty)} ${position.unit}, Einzel ${euro(position.unitPrice * serviceFactor)}, Gesamt ${euro(position.total * serviceFactor)}`),
           `Richtpreis netto: ${euro(result.net)}`,
+          `MwSt-Basis Geräte/Material: ${euro(result.taxableNet)}`,
           `USt. ${Math.round(taxRates.at * 100)} Prozent auf Geräte/Material: ${euro(result.tax)}`,
           `Unverbindlicher Richtpreis: ${euro(result.gross)}`,
           `Preisspanne: ${euro(result.low)} bis ${euro(result.high)}`,
@@ -2990,6 +3060,7 @@ window.initKlimaCalculator = () => {
 
       function offerPdfData() {
         const result = calculate();
+        const customer = customerData();
         const exact = fields.modus.value === 'genau';
         const defaults = buildingDefaults[fields.gebaeude.value];
         const shadeLabels = { none: 'keine Verschattung', inside: 'innen verschattet', outside: 'aussen verschattet', shutter: 'stark verschattet' };
@@ -2998,6 +3069,7 @@ window.initKlimaCalculator = () => {
         const btu = Math.round(result.kw * 3412);
         return {
           result,
+          customer,
           today,
           modeLabel: fields.modus.options[fields.modus.selectedIndex].text,
           manufacturerLabel: result.manufacturerLabel,
@@ -3040,6 +3112,7 @@ window.initKlimaCalculator = () => {
               value: euro(position.total * serviceFactor)
             })),
             { label: 'Summe netto', value: euro(result.net) },
+            { label: 'MwSt-Basis Geräte/Material', value: euro(result.taxableNet) },
             { label: `USt. ${Math.round(taxRates.at * 100)} Prozent auf Geräte/Material`, value: euro(result.tax) },
             { label: 'Unverbindlicher Richtpreis', value: euro(result.gross), total: true }
           ]
@@ -3542,12 +3615,15 @@ window.initKlimaCalculator = () => {
 
         function drawCustomerBlock() {
           const h = 48;
+          const customer = data.customer || {};
           rect(layout.x, cursorY - h, layout.w, h, color.box, color.line, .8);
           rect(layout.x, cursorY - h, 5, h, color.primary);
           text('KUNDE', layout.x + 18, cursorY - 15, 7.2, 'F2', color.primary);
-          text('[Name des Kunden]', layout.x + 18, cursorY - 31, 9.5, 'F2', color.text);
-          text('[Straße Nr.]', layout.x + 260, cursorY - 18, 8.2, 'F1', color.muted);
-          text('[PLZ Ort]', layout.x + 260, cursorY - 33, 8.2, 'F1', color.muted);
+          wrapText(customer.nameLine || '[Name des Kunden]', 34).slice(0, 2).forEach((item, index) => {
+            text(item, layout.x + 18, cursorY - 31 - index * 9, index === 0 ? 9.5 : 7.8, index === 0 ? 'F2' : 'F1', color.text);
+          });
+          wrapText(customer.streetLine || '[Straße Nr.]', 35).slice(0, 1).forEach((item) => text(item, layout.x + 260, cursorY - 18, 8.2, 'F1', color.muted));
+          wrapText(customer.cityLineDisplay || '[PLZ Ort]', 35).slice(0, 1).forEach((item) => text(item, layout.x + 260, cursorY - 33, 8.2, 'F1', color.muted));
           cursorY -= h + 18;
         }
 
@@ -4187,6 +4263,10 @@ window.initKlimaCalculator = () => {
         out.status.textContent = 'PDF-Datei wurde erstellt.';
       });
       $('#kr-reset').addEventListener('click', () => {
+        fields.kundeName.value = '';
+        fields.kundeStrasse.value = '';
+        fields.kundePlz.value = '';
+        fields.kundeOrt.value = '';
         fields.objekt.value = 'wohnung';
         fields.hersteller.value = 'lg';
         fields.klasse.value = fallbackOutdoorKey();
