@@ -712,9 +712,9 @@
   },
   "objectFactor": {
     "wohnung": 1,
-    "haus": 1.04,
-    "buero": 1.08,
-    "laden": 1.12
+    "haus": 1,
+    "buero": 1.20,
+    "laden": 1.20
   },
   "risks": {
     "ladder": {
