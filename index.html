@@ -703,6 +703,7 @@ textarea:focus-visible {
     #klima-kundenrechner .kr-print-table {
       width: 100%;
       border-collapse: collapse;
+      table-layout: fixed;
       font-size: 9.5pt;
     }
     #klima-kundenrechner .kr-print-table th,
@@ -711,6 +712,7 @@ textarea:focus-visible {
       padding: 5px 4px;
       text-align: left;
       vertical-align: top;
+      overflow-wrap: break-word;
     }
     #klima-kundenrechner .kr-print-table th {
       color: #53616b;
@@ -720,6 +722,22 @@ textarea:focus-visible {
     #klima-kundenrechner .kr-print-money {
       text-align: right !important;
       white-space: nowrap;
+    }
+    #klima-kundenrechner .kr-print-pos,
+    #klima-kundenrechner .kr-print-qty,
+    #klima-kundenrechner .kr-print-unit,
+    #klima-kundenrechner .kr-print-nowrap {
+      white-space: nowrap;
+    }
+    #klima-kundenrechner .kr-print-pos,
+    #klima-kundenrechner .kr-print-qty {
+      text-align: center !important;
+    }
+    #klima-kundenrechner .kr-print-detail-row td {
+      color: #53616b;
+      font-size: 8.5pt;
+      padding-top: 2px;
+      background: #fbfcfa;
     }
     #klima-kundenrechner .kr-print-total {
       font-size: 12pt;
@@ -872,8 +890,8 @@ textarea:focus-visible {
           <label class="form-label">
             Anlagentyp
             <select id="kr-systemtyp" class="form-select">
-              <option value="single" selected>Single-Split je Raum</option>
-              <option value="multi">Multi-Split mit einem Außengerät</option>
+              <option value="single" selected>Single-Split Set je Raum</option>
+              <option value="multi">Multi-Split mit separatem Außengerät</option>
             </select>
           </label>
           <label class="form-label">
@@ -904,7 +922,7 @@ textarea:focus-visible {
           <label id="kr-outdoor-device-wrap" class="form-label kr-hidden">
             Außengerät bei Multi-Split
             <select id="kr-klasse" class="form-select">
-              <option value="standard" selected>Komfort-Paket leise/effizient</option>
+              <option value="multi42" selected>Multi-Split Außengerät bis 4,2 kW</option>
             </select>
           </label>
         </div>
@@ -2245,17 +2263,15 @@ window.initKlimaCalculator = () => {
       }
 
       function currentSystemType() {
-        return roomCount() > 1 ? fields.systemtyp.value : 'single';
+        return fields.systemtyp.value;
       }
 
       function syncSystemChoice() {
         const multiRoom = roomCount() > 1;
-        fields.systemtyp.disabled = !multiRoom;
-        if (!multiRoom) fields.systemtyp.value = 'single';
         if (multiRoom && fields.systemtyp.value === 'single' && !fields.systemtyp.dataset.userSelected) {
           fields.systemtyp.value = 'multi';
         }
-        out.systemWrap.classList.toggle('kr-hidden', !(multiRoom && fields.systemtyp.value === 'multi'));
+        out.systemWrap.classList.toggle('kr-hidden', fields.systemtyp.value !== 'multi');
       }
 
       setRuntimeConfig(activeDatabase());
@@ -2406,7 +2422,7 @@ window.initKlimaCalculator = () => {
       }
 
       function systemFor(systemType, roomCount) {
-        if (roomCount <= 1) return 'Single-Split Anlage';
+        if (roomCount <= 1) return systemType === 'multi' ? 'Multi-Split Anlage' : 'Single-Split Anlage';
         return systemType === 'single' ? 'Single-Split je Raum' : 'Multi-Split Anlage';
       }
 
@@ -2668,24 +2684,34 @@ window.initKlimaCalculator = () => {
           const uValue = exact ? room.u : defaults.u;
           const insulation = exact ? room.insulation : defaults.insulation;
           const deviceLabel = (devicePrices[room.device] || result.device).label;
+          const details = [
+            `Höhe ${height.toLocaleString('de-DE')} m`,
+            `Fenster ${room.window.toLocaleString('de-DE')} m2 / U ${uValue.toLocaleString('de-DE')}`,
+            `${sunLabels[room.sun]}, ${shadeLabels[room.shade]}`,
+            insulationLabels[insulation],
+            `${room.persons} Personen`
+          ].join(' | ');
           return `
             <tr>
+              <td class="kr-print-pos">${item.index + 1}</td>
               <td>${escapeHtml(displayRoomName(room, item.index))}</td>
               <td>${room.area.toLocaleString('de-DE')} m2</td>
               <td>${escapeHtml(deviceLabel)}</td>
-              <td>${height.toLocaleString('de-DE')} m</td>
-              <td>${room.window.toLocaleString('de-DE')} m2 / U ${uValue.toLocaleString('de-DE')}</td>
-              <td>${escapeHtml(sunLabels[room.sun])}, ${escapeHtml(shadeLabels[room.shade])}</td>
-              <td>${escapeHtml(insulationLabels[insulation])}</td>
-              <td>${room.persons}</td>
-              <td>${item.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td>
-              <td>${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td>
+              <td class="kr-print-nowrap">${item.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td>
+              <td class="kr-print-nowrap">${item.indoorKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW</td>
+            </tr>
+            <tr class="kr-print-detail-row">
+              <td></td>
+              <td colspan="5">${escapeHtml(details)}</td>
             </tr>
           `;
         }).join('');
-        const costRows = result.lines.map((lineItem) => `
+        const costRows = result.lines.map((lineItem, index) => `
           <tr>
+            <td class="kr-print-pos">${index + 1}</td>
             <td>${escapeHtml(lineItem[0])}</td>
+            <td class="kr-print-qty">1</td>
+            <td class="kr-print-unit">Pauschal</td>
             <td class="kr-print-money">${euro(lineItem[1] * serviceFactor)}</td>
           </tr>
         `).join('');
@@ -2729,21 +2755,39 @@ window.initKlimaCalculator = () => {
           </div>
           <div class="kr-print-section">
             <h3>Räume und Geräte</h3>
-            <table class="kr-print-table">
+            <table class="kr-print-table kr-print-room-table">
+              <colgroup>
+                <col style="width:7%">
+                <col style="width:15%">
+                <col style="width:12%">
+                <col style="width:43%">
+                <col style="width:11%">
+                <col style="width:12%">
+              </colgroup>
               <thead>
-                <tr><th>Raum</th><th>Fläche</th><th>Innengerät / Set</th><th>Höhe</th><th>Fenster</th><th>Sonne</th><th>Dämmung</th><th>Pers.</th><th>Last</th><th>Innen</th></tr>
+                <tr><th>Pos.</th><th>Raum</th><th>Fläche</th><th>Innengerät / Set</th><th>Last</th><th>Innen</th></tr>
               </thead>
               <tbody>${roomRows}</tbody>
             </table>
           </div>
           <div class="kr-print-section">
-            <h3>Kostenübersicht</h3>
-            <table class="kr-print-table">
+            <h3>Angebotspositionen</h3>
+            <table class="kr-print-table kr-print-position-table">
+              <colgroup>
+                <col style="width:8%">
+                <col style="width:52%">
+                <col style="width:10%">
+                <col style="width:14%">
+                <col style="width:16%">
+              </colgroup>
+              <thead>
+                <tr><th>Pos.</th><th>Leistung</th><th>Menge</th><th>Einheit</th><th class="kr-print-money">Betrag netto</th></tr>
+              </thead>
               <tbody>
                 ${costRows}
-                <tr><th>Richtpreis netto</th><td class="kr-print-money">${euro(result.net)}</td></tr>
-                <tr><th>USt. ${Math.round(taxRates.at * 100)} Prozent</th><td class="kr-print-money">${euro(result.tax)}</td></tr>
-                <tr class="kr-print-total"><th>Unverbindlicher Richtpreis</th><td class="kr-print-money">${euro(result.gross)}</td></tr>
+                <tr><th colspan="4">Richtpreis netto</th><td class="kr-print-money">${euro(result.net)}</td></tr>
+                <tr><th colspan="4">USt. ${Math.round(taxRates.at * 100)} Prozent</th><td class="kr-print-money">${euro(result.tax)}</td></tr>
+                <tr class="kr-print-total"><th colspan="4">Unverbindlicher Richtpreis</th><td class="kr-print-money">${euro(result.gross)}</td></tr>
               </tbody>
             </table>
           </div>
@@ -2845,7 +2889,7 @@ window.initKlimaCalculator = () => {
             };
           }),
           costs: [
-            ...result.lines.map((lineItem) => ({ label: lineItem[0], value: euro(lineItem[1] * serviceFactor) })),
+            ...result.lines.map((lineItem, index) => ({ pos: String(index + 1), label: lineItem[0], qty: '1', unit: 'Pauschal', value: euro(lineItem[1] * serviceFactor) })),
             { label: 'Richtpreis netto', value: euro(result.net) },
             { label: `USt. ${Math.round(taxRates.at * 100)} Prozent`, value: euro(result.tax) },
             { label: 'Unverbindlicher Richtpreis', value: euro(result.gross), total: true }
@@ -3149,14 +3193,31 @@ window.initKlimaCalculator = () => {
               .forEach((item, index) => text(item, 132, y - 20 - index * 9, 7.5, 'F1', color.text));
             y -= 38;
           });
-          text('Kostenübersicht', 62, y - 4, 13, 'F2', color.text);
+          text('Angebotspositionen', 62, y - 4, 13, 'F2', color.text);
           y -= 28;
+          text('Pos.', 66, y, 7.4, 'F2', color.muted);
+          text('Leistung', 104, y, 7.4, 'F2', color.muted);
+          text('Menge', 585, y, 7.4, 'F2', color.muted);
+          text('Einheit', 642, y, 7.4, 'F2', color.muted);
+          textRight('Betrag netto', 760, y, 7.4, 'F2', color.muted);
+          line(62, y - 8, 780, y - 8);
+          y -= 22;
           data.costs.forEach((item) => {
             if (y < 64) return;
-            if (item.total) rect(62, y - 8, 718, 18, color.soft, color.primary);
-            text(item.label, item.total ? 76 : 66, y - 2, item.total ? 8.8 : 8, item.total ? 'F2' : 'F1', color.text);
-            textRight(item.value, 760, y - 2, item.total ? 9.2 : 8.2, item.total ? 'F2' : 'F1', color.text);
-            y -= item.total ? 22 : 16;
+            if (item.total) rect(62, y - 9, 718, 20, color.soft, color.primary);
+            if (item.total || !item.pos) {
+              text(item.label, item.total ? 76 : 104, y - 2, item.total ? 8.8 : 8, item.total ? 'F2' : 'F1', color.text);
+              textRight(item.value, 760, y - 2, item.total ? 9.2 : 8.2, item.total ? 'F2' : 'F1', color.text);
+              y -= item.total ? 23 : 17;
+              return;
+            }
+            text(item.pos, 72, y - 2, 8, 'F2', color.primary);
+            const labelLines = wrapText(item.label, 68).slice(0, 2);
+            labelLines.forEach((lineItem, index) => text(lineItem, 104, y - 2 - index * 9, 7.8, 'F1', color.text));
+            text(item.qty || '1', 590, y - 2, 7.8, 'F1', color.text);
+            text(item.unit || 'Pauschal', 642, y - 2, 7.8, 'F1', color.text);
+            textRight(item.value, 760, y - 2, 8, 'F1', color.text);
+            y -= labelLines.length > 1 ? 25 : 17;
           });
           pageStreams.push(commands.join('\n'));
         }
