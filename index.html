@@ -1041,7 +1041,7 @@ textarea:focus-visible {
         <div class="card viz-stat">
           <span class="text-muted">Geschätzter Richtpreis</span>
           <span id="kr-brutto" class="viz-stat-value">0 EUR</span>
-          <span id="kr-spanne" class="text-small kr-note">inkl. Montage und USt.</span>
+          <span id="kr-spanne" class="text-small kr-note">inkl. Montage, USt. nur auf Geräte/Material.</span>
         </div>
         <div class="card viz-stat">
           <span class="text-muted">Raumlast</span>
@@ -2569,7 +2569,7 @@ window.initKlimaCalculator = () => {
         const normalizedQty = Number(qty) || 0;
         const normalizedPrice = Number(unitPrice) || 0;
         const total = Object.prototype.hasOwnProperty.call(options, 'total') ? Number(options.total) || 0 : normalizedQty * normalizedPrice;
-        return { label, qty: normalizedQty, unit, unitPrice: normalizedPrice, total };
+        return { label, qty: normalizedQty, unit, unitPrice: normalizedPrice, total, taxable: options.taxable === true };
       }
 
       function formatQuantity(value) {
@@ -2627,33 +2627,34 @@ window.initKlimaCalculator = () => {
         const positions = [];
         if (systemType === 'multi') {
           const outdoorCost = (outdoorUnit.base || 0) + outdoorCapacitySurcharge;
-          positions.push(offerPosition(`Außengerät ${outdoorUnit.label}`, 1, 'Stk.', outdoorCost));
+          positions.push(offerPosition(`Außengerät ${outdoorUnit.label}`, 1, 'Stk.', outdoorCost, { taxable: true }));
           roomDeviceCosts.forEach((item, index) => {
             const roomLabel = displayRoomName(plan.perRoom[index].room, plan.perRoom[index].index);
-            positions.push(offerPosition(`Innengerät ${roomLabel} - ${item.label}`, 1, 'Stk.', item.cost));
+            positions.push(offerPosition(`Innengerät ${roomLabel} - ${item.label}`, 1, 'Stk.', item.cost, { taxable: true }));
           });
         } else {
           roomDeviceCosts.forEach((item, index) => {
             const roomLabel = displayRoomName(plan.perRoom[index].room, plan.perRoom[index].index);
-            positions.push(offerPosition(`Single-Split Set ${roomLabel} - ${item.label}`, 1, 'Set', item.cost));
+            positions.push(offerPosition(`Single-Split Set ${roomLabel} - ${item.label}`, 1, 'Set', item.cost, { taxable: true }));
           });
         }
-        if (deviceDiscount > 0) positions.push(offerPosition(`Geräterabatt ${discountPercent.toLocaleString('de-DE', { maximumFractionDigits: 1 })} % auf Geräte`, 1, 'Abzug', -deviceDiscount));
+        if (deviceDiscount > 0) positions.push(offerPosition(`Geräterabatt ${discountPercent.toLocaleString('de-DE', { maximumFractionDigits: 1 })} % auf Geräte`, 1, 'Abzug', -deviceDiscount, { taxable: true }));
         positions.push(offerPosition('Montage und Inbetriebnahme', systemType === 'single' ? rooms : 1, systemType === 'single' ? 'Set' : 'Pauschal', systemType === 'single' ? mountingPrices.baseInstall : baseInstall, { total: baseInstall }));
-        if (line > 0) positions.push(offerPosition('Kältemittelleitung und Steuerleitung', number(fields.leitung), 'm', mountingPrices.lineMeter));
-        if (channel > 0) positions.push(offerPosition('Kabelkanal sichtbar', number(fields.kanal), 'm', mountingPrices.channelMeter));
+        if (line > 0) positions.push(offerPosition('Kältemittelleitung und Steuerleitung', number(fields.leitung), 'm', mountingPrices.lineMeter, { taxable: true }));
+        if (channel > 0) positions.push(offerPosition('Kabelkanal sichtbar', number(fields.kanal), 'm', mountingPrices.channelMeter, { taxable: true }));
         if (drilling > 0) positions.push(offerPosition('Kernbohrung / Wanddurchbruch', drillingUnits, 'Stk.', mountingPrices.drilling));
-        if (outside > 0) positions.push(offerPosition('Außengerät-Standort und Montagekonsole', systemType === 'single' ? rooms : 1, 'Stk.', mountingPrices.outdoor[fields.aussen.value], { total: outside }));
-        if (electric > 0) positions.push(offerPosition('Stromzuleitung', 1, 'Pauschal', electric));
-        if (pump > 0) positions.push(offerPosition('Kondensatpumpe', 1, 'Stk.', pump));
+        if (outside > 0) positions.push(offerPosition('Außengerät-Standort und Montagekonsole', systemType === 'single' ? rooms : 1, 'Stk.', mountingPrices.outdoor[fields.aussen.value], { total: outside, taxable: true }));
+        if (electric > 0) positions.push(offerPosition('Stromzuleitung', 1, 'Pauschal', electric, { taxable: true }));
+        if (pump > 0) positions.push(offerPosition('Kondensatpumpe', 1, 'Stk.', pump, { taxable: true }));
         risks.forEach((risk) => positions.push(offerPosition(`Montage-Zuschlag: ${risk.label}`, 1, 'Pauschal', risk.cost)));
         const beforeObjectFactor = positions.reduce((sum, position) => sum + position.total, 0);
         const objectSurcharge = beforeObjectFactor * (objectFactor[fields.objekt.value] - 1);
         if (objectSurcharge > 0) positions.push(offerPosition('Objekt-/Gewerbeaufschlag', 1, 'Pauschal', objectSurcharge));
         const subtotal = positions.reduce((sum, position) => sum + position.total, 0);
         const net = subtotal * serviceFactor;
+        const taxableNet = Math.max(0, positions.reduce((sum, position) => sum + (position.taxable ? position.total : 0), 0) * serviceFactor);
         const taxRate = taxRates.at;
-        const tax = net * taxRate;
+        const tax = taxableNet * taxRate;
         const gross = net + tax;
         const hasAttic = roomDetails.some((room) => room.attic === 'yes');
         const riskComplexity = risks.reduce((sum, risk) => sum + risk.complexity, 0);
@@ -2689,7 +2690,7 @@ window.initKlimaCalculator = () => {
         out.last.textContent = `${plan.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
         out.treiber.textContent = `${displayRoomName(plan.largest.room, plan.largest.index)}: ${plan.largest.rawKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
         out.netto.textContent = euro(net);
-        out.ustLabel.textContent = `USt. ${Math.round(taxRate * 100)} Prozent`;
+        out.ustLabel.textContent = `USt. ${Math.round(taxRate * 100)} Prozent auf Geräte/Material`;
         out.ust.textContent = euro(tax);
         out.final.textContent = euro(gross);
         out.lines.innerHTML = lines.map((lineItem) => `
@@ -2746,7 +2747,7 @@ window.initKlimaCalculator = () => {
         out.status.textContent = systemType === 'multi' && !outdoorCheck.ok
           ? outdoorCheck.message
           : 'Der finale Preis wird nach Besichtigung bestätigt.';
-        return { area, roomDetails, rooms, kw, plan, risks, lines, positions, net, tax, gross, low, high, device, outdoorUnit, outdoorCheck, discountPercent, deviceDiscount, systemType, systemLabel, manufacturer: currentManufacturer(), manufacturerLabel: fields.hersteller.options[fields.hersteller.selectedIndex].text };
+        return { area, roomDetails, rooms, kw, plan, risks, lines, positions, net, taxableNet, tax, gross, low, high, device, outdoorUnit, outdoorCheck, discountPercent, deviceDiscount, systemType, systemLabel, manufacturer: currentManufacturer(), manufacturerLabel: fields.hersteller.options[fields.hersteller.selectedIndex].text };
       }
 
       function requestText() {
@@ -2923,7 +2924,7 @@ window.initKlimaCalculator = () => {
               <tbody>
                 ${costRows}
                 <tr class="kr-print-subtotal"><th colspan="5">Summe netto</th><td class="kr-print-money">${euro(result.net)}</td></tr>
-                <tr class="kr-print-tax"><th colspan="5">USt. ${Math.round(taxRates.at * 100)} Prozent</th><td class="kr-print-money">${euro(result.tax)}</td></tr>
+                <tr class="kr-print-tax"><th colspan="5">USt. ${Math.round(taxRates.at * 100)} Prozent auf Geräte/Material</th><td class="kr-print-money">${euro(result.tax)}</td></tr>
                 <tr class="kr-print-total"><th colspan="5">Unverbindlicher Richtpreis</th><td class="kr-print-money">${euro(result.gross)}</td></tr>
               </tbody>
             </table>
@@ -2975,7 +2976,7 @@ window.initKlimaCalculator = () => {
           'Kostenübersicht:',
           ...result.positions.map((position, index) => `${index + 1}. ${position.label}: ${formatQuantity(position.qty)} ${position.unit}, Einzel ${euro(position.unitPrice * serviceFactor)}, Gesamt ${euro(position.total * serviceFactor)}`),
           `Richtpreis netto: ${euro(result.net)}`,
-          `USt. ${Math.round(taxRates.at * 100)} Prozent: ${euro(result.tax)}`,
+          `USt. ${Math.round(taxRates.at * 100)} Prozent auf Geräte/Material: ${euro(result.tax)}`,
           `Unverbindlicher Richtpreis: ${euro(result.gross)}`,
           `Preisspanne: ${euro(result.low)} bis ${euro(result.high)}`,
           note ? '' : null,
@@ -3039,7 +3040,7 @@ window.initKlimaCalculator = () => {
               value: euro(position.total * serviceFactor)
             })),
             { label: 'Summe netto', value: euro(result.net) },
-            { label: `USt. ${Math.round(taxRates.at * 100)} Prozent`, value: euro(result.tax) },
+            { label: `USt. ${Math.round(taxRates.at * 100)} Prozent auf Geräte/Material`, value: euro(result.tax) },
             { label: 'Unverbindlicher Richtpreis', value: euro(result.gross), total: true }
           ]
         };
@@ -3657,18 +3658,6 @@ window.initKlimaCalculator = () => {
 
         function drawPositions() {
           const positionRows = data.costs.filter((item) => item.pos);
-          const summaryRows = data.costs.filter((item) => !item.pos);
-          const estimatedRows = positionRows.reduce((sum, item) => {
-            const labelLines = wrapText(item.label, 34).slice(0, 3);
-            return sum + Math.max(28, 16 + labelLines.length * 9);
-          }, 0);
-          const estimatedTotal = 21 + estimatedRows + 16 + summaryRows.length * 23 + 64;
-          if (cursorY - estimatedTotal < layout.bottom) {
-            finishPage();
-            startContinuationPage('Angebotspositionen');
-          } else {
-            sectionTitle('Angebotspositionen');
-          }
           drawPositionHeader();
           positionRows.forEach((item, index) => {
             const labelLines = wrapText(item.label, 34).slice(0, 3);
@@ -3718,6 +3707,8 @@ window.initKlimaCalculator = () => {
         drawMetrics();
         drawProjectGrid();
         drawRooms();
+        finishPage();
+        startContinuationPage('Angebotspositionen');
         drawPositions();
         drawTotals();
         finishPage();
